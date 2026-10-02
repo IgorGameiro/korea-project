@@ -1,0 +1,13 @@
+// korea-project Prisma schema.
+// Domain models arrive in Phase 2; Phase 1 only wires the connection and client generation.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+  runtime      = "nodejs"
+}
+
+datasource db {
+  provider = "postgresql"
+}

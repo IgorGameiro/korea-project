@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage
+.next
+.turbo
+pnpm-lock.yaml
+**/src/generated
+**/prisma/migrations
+next-env.d.ts
+docs/SPEC.md
+CLAUDE.md

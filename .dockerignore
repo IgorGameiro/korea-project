@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/.next
+**/.turbo
+**/coverage
+**/src/generated
+**/*.tsbuildinfo
+.git
+.husky
+.env
+.env.*
+!.env.example
+docs
+CLAUDE.md

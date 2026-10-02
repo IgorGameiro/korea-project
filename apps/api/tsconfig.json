@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "resolvePackageJsonExports": true,
+    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "noUncheckedIndexedAccess": false,
+    "declaration": false,
+    "removeComments": true,
+    "sourceMap": true,
+    "incremental": true,
+    "types": ["node", "jest"],
+    "rootDir": ".",
+    "outDir": "./dist"
+  },
+  "include": ["src", "test", "prisma"]
+}
