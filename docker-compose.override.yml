@@ -6,6 +6,9 @@ services:
       target: dev
     environment:
       NODE_ENV: development
+      # Per-file fs.watch misses changes on VM bind mounts (Colima/Docker Desktop);
+      # watching the parent directory picks them up.
+      TSC_WATCHFILE: UseFsEventsOnParentDirectory
     volumes:
       - ./apps/api/src:/app/apps/api/src
       - ./apps/api/prisma:/app/apps/api/prisma

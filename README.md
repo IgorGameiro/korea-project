@@ -33,7 +33,20 @@ docker-compose.override.yml  overrides de desenvolvimento (hot reload), aplicado
 
 - Node.js 24 (`nvm use` lê o `.nvmrc`)
 - pnpm 12 via Corepack: `corepack enable pnpm`
-- Docker com Compose v2 (para banco e/ou stack completa)
+- Docker com Compose v2 e Buildx (para banco e/ou stack completa)
+
+### Docker no macOS com Colima
+
+Qualquer runtime Docker serve (Docker Desktop, OrbStack, Colima). Com o Colima:
+
+```bash
+brew install colima docker docker-compose docker-buildx
+# registre os plugins compose/buildx no ~/.docker/config.json:
+#   { "cliPluginsExtraDirs": ["/opt/homebrew/lib/docker/cli-plugins"] }
+colima start --cpu 4 --memory 6 --vm-type vz --mount-type virtiofs --mount-inotify
+```
+
+`--mount-inotify` é obrigatório para o hot reload em modo dev: sem ele os containers não recebem os eventos de alteração de arquivo do macOS. A opção fica salva em `~/.colima/default/colima.yaml`, então depois basta `colima start`.
 
 ## Começando
 
@@ -47,7 +60,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Sobe `postgres` → `migrate` (aplica migrations e encerra) → `api` → `web`, em modo desenvolvimento com hot reload em `src/`.
+Sobe `postgres` → `migrate` (aplica migrations e encerra) → `api` → `web`, em modo desenvolvimento com hot reload em `apps/api/src` e `apps/web/src`. Mudanças em `packages/shared` ou em dependências exigem `docker compose up --build` (ou `docker compose restart api web`).
 
 Para rodar as imagens de produção (sem o override):
 
