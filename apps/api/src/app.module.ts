@@ -16,6 +16,7 @@ import { AccommodationsModule } from './modules/accommodations/accommodations.mo
 import { AuthModule } from './modules/auth/auth.module';
 import { CitiesModule } from './modules/cities/cities.module';
 import { CityOverviewModule } from './modules/city-overview/city-overview.module';
+import { CostEstimatesModule } from './modules/cost-estimates/cost-estimates.module';
 import { DistrictsModule } from './modules/districts/districts.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { PlaceOverviewModule } from './modules/place-overview/place-overview.module';
@@ -53,6 +54,7 @@ import { PrismaModule } from './prisma/prisma.module';
     AccommodationsModule,
     ReviewsModule,
     FavoritesModule,
+    CostEstimatesModule,
     CityOverviewModule,
     PlaceOverviewModule,
   ],

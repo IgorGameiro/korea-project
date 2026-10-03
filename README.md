@@ -2,7 +2,7 @@
 
 South Korea travel guide: cities, neighborhoods, places (restaurants, nightlife, hiking, attractions, cafés, shopping, culture, nature), accommodations and a trip cost calculator. The site is in **English by default**, with **Brazilian Portuguese** as an option; prices are shown in KRW plus USD or BRL.
 
-> **Status:** Phase 2 — database schema, migrations and seed. See the [Roadmap](#roadmap).
+> **Status:** Phase 3 — REST API complete. See the [Roadmap](#roadmap).
 
 ## Stack
 
@@ -171,6 +171,30 @@ To change the schema: edit `schema.prisma`, run `pnpm --filter @korea-project/ap
 - **End-to-end tests** (`pnpm test:e2e`) run the full Nest app with Supertest against `TEST_DATABASE_URL` (default: `korea_project_test` on the Compose Postgres). Before the suite, [`global-setup.ts`](apps/api/test/global-setup.ts) **drops and recreates** that database, applies the migrations and loads the seed, so every run starts from the same state and never touches development data.
 - **Safety guard:** the e2e suite refuses to run unless the database name contains `_test` ([`test-database.ts`](apps/api/test/test-database.ts)).
 
+## API endpoints
+
+All routes are under `/api/v1` and documented in Swagger (`/api/docs`). Localized routes accept `?locale=en|pt-BR` (else `Accept-Language`, else `en`) and answer with `Content-Language`; every localized item says which language its text is in (`locale`), after falling back to English. Lists return `{ data, meta: { page, limit, total, totalPages } }`. Errors return `{ error: { code, message, details? } }`.
+
+| Area           | Routes                                                                                                                                                                                                                                                 | Access                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
+| Health         | `GET /health`                                                                                                                                                                                                                                          | public                   |
+| Auth           | `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`, `GET /auth/me`                                                                                                                                                                  | public / Bearer for `me` |
+| Cities         | `GET /cities?featured=`, `GET /cities/:slug` (districts + place counts per category)                                                                                                                                                                   | public                   |
+| Places         | `GET /cities/:slug/places` (filters `category`, `districtId`, `priceLevel=1,2`, `tags=a,b`, `difficulty`, `minRating`, `search`; `sort=rating\|price`), `GET /places/:slug` (city, district, newest reviews), `GET /cities/:slug/map` (cached markers) | public                   |
+| Accommodations | `GET /cities/:slug/accommodations?tier=&type=&districtId=&sort=price\|-price`                                                                                                                                                                          | public                   |
+| Reviews        | `GET /places/:slug/reviews`, `POST /places/:id/reviews`, `PATCH`/`DELETE /reviews/:id` (author or admin)                                                                                                                                               | public / Bearer          |
+| Favorites      | `GET`/`POST`/`DELETE /places/:id/favorite`                                                                                                                                                                                                             | Bearer                   |
+| Profile        | `GET /users/me/reviews`, `GET /users/me/favorites`                                                                                                                                                                                                     | Bearer                   |
+| Costs          | `POST /cost-estimates/calculate` `{ citySlug, people, days, tier, currency? }`                                                                                                                                                                         | public                   |
+| Exchange rates | `GET /exchange-rates` (with `updatedAt`)                                                                                                                                                                                                               | public                   |
+| Admin          | CRUD under `/admin/cities`, `/admin/districts`, `/admin/places`, `/admin/accommodations`, `/admin/cost-estimates`                                                                                                                                      | ADMIN                    |
+
+**Auth flow:** the access token (15 min) is returned in the body and sent as `Authorization: Bearer`. The refresh token lives in an `HttpOnly`, `SameSite=Lax` cookie scoped to `/api/v1/auth`; it is rotated on every refresh and only its SHA-256 hash is stored. Reusing a rotated token revokes every session of that login. In production the web and the API must share a site (e.g. `example.com` and `api.example.com`) for the cookie to be sent.
+
+**Admin translations:** create requires `translations.en`; on update, only the locales sent are changed, partial fields keep the rest, and `"pt-BR": null` removes the Portuguese text (`en` cannot be removed).
+
+**Module graph** (no cycles): `cities ← districts ← places ← reviews / favorites`, plus `accommodations`, `cost-estimates`, `exchange-rates`, `users ← auth`. Endpoints that combine domains (`GET /cities/:slug`, `GET /places/:slug`) live in small composition modules (`city-overview`, `place-overview`) that only call services.
+
 ## API architecture
 
 Modular monolith: one Nest module per domain in `apps/api/src/modules/`, with **controller → service → repository** layers. Modules only talk to each other through exported services and never access another domain's tables.
@@ -196,7 +220,7 @@ API error messages are meant for developers; the web app translates errors by `c
 
 1. ✅ Monorepo setup, Docker Compose, lint/format, `.env.example`, NestJS skeleton
 2. ✅ Prisma schema (with i18n), migrations and seed
-3. API: auth, users, cities, districts, places, accommodations, reviews, favorites, cost estimates, exchange rates + tests
+3. ✅ API: auth, users, cities, districts, places, accommodations, reviews, favorites, cost estimates, exchange rates + tests
 4. Web: base layout, design system, locale routing, Home, city page, map
 5. Cost calculator, place page, reviews, auth, favorites
 6. Admin panel, SEO, optimizations, tests, final README with an extension guide
