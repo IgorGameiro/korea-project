@@ -2,7 +2,7 @@
   "name": "@korea-project/api",
   "version": "0.1.0",
   "private": true,
-  "description": "API REST do korea-project (NestJS)",
+  "description": "korea-project REST API (NestJS)",
   "files": [
     "dist"
   ],

@@ -24,7 +24,7 @@ export function configureApp(app: INestApplication): void {
 export function setupSwagger(app: INestApplication): void {
   const config = new DocumentBuilder()
     .setTitle('korea-project API')
-    .setDescription('Guia de viagem da Coreia do Sul — API REST')
+    .setDescription('South Korea travel guide — REST API')
     .setVersion('1.0')
     .addBearerAuth()
     .addCookieAuth('refresh_token')

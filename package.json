@@ -2,7 +2,7 @@
   "name": "korea-project",
   "version": "0.1.0",
   "private": true,
-  "description": "Guia de viagem da Coreia do Sul para brasileiros (monorepo full stack)",
+  "description": "South Korea travel guide (full stack monorepo)",
   "packageManager": "pnpm@12.8.1",
   "engines": {
     "node": ">=24.0.0"

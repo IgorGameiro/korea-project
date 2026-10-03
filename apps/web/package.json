@@ -2,7 +2,7 @@
   "name": "@korea-project/web",
   "version": "0.1.0",
   "private": true,
-  "description": "Front-end do korea-project (Next.js)",
+  "description": "korea-project web app (Next.js)",
   "scripts": {
     "dev": "next dev --port 3000",
     "build": "next build",

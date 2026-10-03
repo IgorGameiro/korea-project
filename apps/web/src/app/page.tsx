@@ -12,8 +12,8 @@ export default async function Home() {
       <p className="text-sm font-semibold tracking-widest text-coral-500 uppercase">
         korea-project
       </p>
-      <h1 className="text-4xl font-bold">Guia de Viagem da Coreia do Sul</h1>
-      <p className="text-navy-700">Em construção. O site completo chega nas próximas fases.</p>
+      <h1 className="text-4xl font-bold">South Korea Travel Guide</h1>
+      <p className="text-navy-700">Under construction. The full site arrives in the next phases.</p>
       <ApiStatus status={health} />
     </main>
   );

@@ -1,6 +1,10 @@
 # Development overrides, applied automatically by `docker compose up`.
 # Source folders are bind-mounted for hot reload; node_modules stay inside the images.
 services:
+  migrate:
+    environment:
+      NODE_ENV: development
+
   api:
     build:
       target: dev

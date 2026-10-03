@@ -3,7 +3,8 @@
 #
 # Targets:
 #   dev       hot reload (used by docker-compose.override.yml)
-#   migrator  runs `prisma migrate deploy` (has the Prisma CLI, a dev dependency)
+#   migrator  applies migrations and, unless NODE_ENV=production, loads the demo seed
+#             (needs the Prisma CLI and tsx, which are dev dependencies)
 #   runner    production image (default)
 
 ARG NODE_VERSION=24
@@ -38,7 +39,10 @@ CMD ["sh", "-c", "pnpm --filter @korea-project/shared build && pnpm --filter @ko
 
 # --- Migrations ---------------------------------------------------------------
 FROM source AS migrator
-CMD ["pnpm", "--filter", "@korea-project/api", "db:deploy"]
+# The seed imports the generated Prisma client and the built shared package.
+RUN pnpm --filter @korea-project/shared build && pnpm --filter @korea-project/api db:generate
+WORKDIR /app/apps/api
+CMD ["sh", "scripts/migrate.sh"]
 
 # --- Production build -------------------------------------------------------
 FROM source AS builder

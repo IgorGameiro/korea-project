@@ -1,8 +1,8 @@
 import type { ApiHealth } from '@/lib/api/health';
 
 const LABELS: Record<ApiHealth, string> = {
-  up: 'API conectada',
-  down: 'API indisponível',
+  up: 'API connected',
+  down: 'API unavailable',
 };
 
 export function ApiStatus({ status }: { status: ApiHealth }) {
