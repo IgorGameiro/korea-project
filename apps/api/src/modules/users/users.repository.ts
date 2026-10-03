@@ -13,6 +13,13 @@ export class UsersRepository {
     return this.prisma.user.findUnique({ where: { id } });
   }
 
+  findPublicByIds(ids: string[]) {
+    return this.prisma.user.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, name: true },
+    });
+  }
+
   create(data: { name: string; email: string; passwordHash: string }) {
     return this.prisma.user.create({ data });
   }

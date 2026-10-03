@@ -217,6 +217,32 @@ export class PlacesService {
     if (!(await this.repository.existsById(id))) throw placeNotFound();
   }
 
+  /** Summaries in the order of `ids` (unknown ids are skipped). */
+  async findSummariesByIds(ids: string[], locale: Locale): Promise<PlaceSummaryDto[]> {
+    if (ids.length === 0) return [];
+    const rows = await this.repository.findManyByIdsLocalized(ids, locale);
+    const byId = new Map(rows.map((row) => [row.id, toSummary(row, locale)]));
+    return ids.flatMap((id) => byId.get(id) ?? []);
+  }
+
+  /**
+   * For the reviews module: locks the place row inside the caller's transaction (404 if missing).
+   * Call before reading reviews to recompute the rating.
+   */
+  async lockForRatingUpdate(tx: Prisma.TransactionClient, placeId: string): Promise<void> {
+    if (!(await this.repository.lockForUpdate(tx, placeId))) throw placeNotFound();
+  }
+
+  /** Writes the denormalized rating inside the caller's transaction (after lockForRatingUpdate). */
+  async setRating(
+    tx: Prisma.TransactionClient,
+    placeId: string,
+    ratingAvg: number,
+    ratingCount: number,
+  ) {
+    await this.repository.setRating(tx, placeId, ratingAvg, ratingCount);
+  }
+
   // ----- Admin -----
 
   async listAdmin(query: ListPlacesAdminQueryDto): Promise<Paginated<AdminPlaceDto>> {

@@ -115,6 +115,27 @@ export class PlacesRepository {
     });
   }
 
+  findManyByIdsLocalized(ids: string[], locale: Locale) {
+    return this.prisma.place.findMany({
+      where: { id: { in: ids } },
+      include: { translations: translationsFor(locale) },
+    });
+  }
+
+  /**
+   * Row lock on the place for the rest of the transaction, so concurrent review writes on the same
+   * place recompute its rating one after the other (no lost updates).
+   */
+  async lockForUpdate(tx: Prisma.TransactionClient, placeId: string): Promise<boolean> {
+    const rows = await tx.$queryRaw<{ id: string }[]>`
+      SELECT "id" FROM "Place" WHERE "id" = ${placeId}::uuid FOR UPDATE`;
+    return rows.length === 1;
+  }
+
+  setRating(tx: Prisma.TransactionClient, placeId: string, ratingAvg: number, ratingCount: number) {
+    return tx.place.update({ where: { id: placeId }, data: { ratingAvg, ratingCount } });
+  }
+
   countByCategory(cityId: string) {
     return this.prisma.place.groupBy({
       by: ['category'],

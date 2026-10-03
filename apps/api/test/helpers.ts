@@ -31,3 +31,17 @@ export async function loginAs(app: INestApplication<App>, who: 'admin' | 'user')
 /** A unique, valid slug for records created by a test. */
 export const testSlug = (prefix: string) =>
   `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+
+/** Registers a fresh USER and returns its id and access token. */
+export async function registerUser(
+  app: INestApplication<App>,
+  name = 'Test Reviewer',
+): Promise<{ id: string; token: string }> {
+  const email = `${testSlug('user')}@example.com`;
+  const res = await request(app.getHttpServer())
+    .post('/api/v1/auth/register')
+    .send({ name, email, password: 'a-long-password' })
+    .expect(201);
+  const body = res.body as { accessToken: string; user: { id: string } };
+  return { id: body.user.id, token: body.accessToken };
+}

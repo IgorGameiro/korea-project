@@ -17,6 +17,13 @@ export class UsersService {
     return this.repository.findById(id);
   }
 
+  /** Public author info (id and name only), keyed by id: for showing who wrote what. */
+  async findPublicProfiles(ids: string[]): Promise<Map<string, { id: string; name: string }>> {
+    if (ids.length === 0) return new Map();
+    const rows = await this.repository.findPublicByIds([...new Set(ids)]);
+    return new Map(rows.map((row) => [row.id, row]));
+  }
+
   async create(input: { name: string; email: string; passwordHash: string }) {
     const email = normalizeEmail(input.email);
     if (await this.repository.findByEmail(email)) {
