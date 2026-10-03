@@ -20,6 +20,9 @@ export enum NodeEnv {
   Test = 'test',
 }
 
+/** Seconds ("900") or a duration understood by jsonwebtoken ("15m", "12h", "7d"). */
+const DURATION = /^\d+(s|m|h|d|w)?$/;
+
 const toBoolean = ({ value }: { value: unknown }) =>
   value === true || value === 'true' || value === '1';
 
@@ -51,7 +54,7 @@ export class EnvironmentVariables {
   JWT_ACCESS_SECRET: string;
 
   @IsString()
-  @IsNotEmpty()
+  @Matches(DURATION, { message: 'JWT_ACCESS_EXPIRES_IN must look like 900, 15m, 12h or 7d' })
   JWT_ACCESS_EXPIRES_IN = '15m';
 
   @IsString()
@@ -59,7 +62,7 @@ export class EnvironmentVariables {
   JWT_REFRESH_SECRET: string;
 
   @IsString()
-  @IsNotEmpty()
+  @Matches(DURATION, { message: 'JWT_REFRESH_EXPIRES_IN must look like 900, 15m, 12h or 7d' })
   JWT_REFRESH_EXPIRES_IN = '7d';
 
   @Transform(toBoolean)
