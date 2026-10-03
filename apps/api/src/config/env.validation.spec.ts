@@ -4,7 +4,6 @@ const required = {
   DATABASE_URL: 'postgresql://user:pass@localhost:5433/db',
   JWT_ACCESS_SECRET: 'a'.repeat(32),
   JWT_REFRESH_SECRET: 'b'.repeat(32),
-  KRW_TO_BRL: '0.0039',
 };
 
 describe('validateEnv', () => {
@@ -13,7 +12,6 @@ describe('validateEnv', () => {
 
     expect(env.NODE_ENV).toBe(NodeEnv.Development);
     expect(env.API_PORT).toBe(3001);
-    expect(env.KRW_TO_BRL).toBe(0.0039);
     expect(env.SWAGGER_ENABLED).toBe(true);
     expect(env.COOKIE_SECURE).toBe(false);
   });

@@ -14,11 +14,13 @@ export type TimeRange = {
   close: string;
 };
 
+/**
+ * Language-neutral schedule. Free-text caveats (holidays, reservations…) are translatable,
+ * so they live in PlaceTranslation.openingHoursNote, not here.
+ */
 export type OpeningHours = {
   /** Every weekday is present; an empty list means closed that day. */
   days: Record<Weekday, TimeRange[]>;
-  /** Free-text caveats shown to the user (holidays, seasonal changes, reservations). */
-  notes?: string;
 };
 
 const OPEN_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -27,11 +29,10 @@ const CLOSE_TIME = /^(([01]\d|2[0-3]):[0-5]\d|24:00)$/;
 /** Returns a list of problems; an empty list means the value is a valid OpeningHours. */
 export function validateOpeningHours(value: unknown): string[] {
   if (typeof value !== 'object' || value === null) return ['must be an object'];
-  const { days, notes } = value as Partial<OpeningHours>;
+  const { days } = value as Partial<OpeningHours>;
   const errors: string[] = [];
 
-  if (notes !== undefined && typeof notes !== 'string') errors.push('notes must be a string');
-  if (typeof days !== 'object' || days === null) return [...errors, 'days must be an object'];
+  if (typeof days !== 'object' || days === null) return ['days must be an object'];
 
   for (const day of WEEKDAYS) {
     const ranges: unknown = days[day];

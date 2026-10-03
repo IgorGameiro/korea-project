@@ -91,10 +91,6 @@ export class EnvironmentVariables {
   @IsPositive()
   CACHE_TTL_MS = 60_000;
 
-  @Type(() => Number)
-  @IsPositive()
-  KRW_TO_BRL: number;
-
   @Transform(toBoolean)
   @IsBoolean()
   SWAGGER_ENABLED = true;

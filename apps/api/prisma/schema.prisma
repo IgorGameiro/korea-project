@@ -8,6 +8,10 @@
 //   must remove children first. User-owned rows that make no sense alone (RefreshToken, Favorite) cascade.
 // - CHECK constraints (ranges, non-negative money) live in the migration SQL: Prisma cannot declare them.
 // - Enum values must stay identical to packages/shared/src/enums.ts (enforced by a unit test).
+// - i18n: translatable text lives in <Entity>Translation tables, one row per (entity, locale).
+//   Locales are BCP 47 strings ("en", "pt-BR"; see packages/shared/src/i18n.ts), restricted by a
+//   CHECK constraint. Every entity has an "en" row; the API falls back to it for missing locales.
+//   Slugs, tags and addresses are language-neutral (English keys / romanized Korean).
 
 generator client {
   provider     = "prisma-client"
@@ -66,22 +70,20 @@ enum Role {
 // ---------------------------------------------------------------------------
 
 model City {
-  id              String   @id @default(uuid(7)) @db.Uuid
-  slug            String   @unique
-  name            String
-  nameKo          String
-  description     String
-  heroImageUrl    String
-  latitude        Float
-  longitude       Float
-  bestTimeToVisit String
-  population      Int?
+  id           String   @id @default(uuid(7)) @db.Uuid
+  slug         String   @unique
+  nameKo       String
+  heroImageUrl String
+  latitude     Float
+  longitude    Float
+  population   Int?
   /// Shown in the Home "featured cities" grid, ordered by sortOrder.
-  isFeatured      Boolean  @default(false)
-  sortOrder       Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isFeatured   Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
+  translations   CityTranslation[]
   districts      District[]
   places         Place[]
   accommodations Accommodation[]
@@ -90,23 +92,52 @@ model City {
   @@index([isFeatured, sortOrder])
 }
 
-model District {
-  id          String   @id @default(uuid(7)) @db.Uuid
-  cityId      String   @db.Uuid
-  slug        String
-  name        String
-  nameKo      String
-  description String
-  latitude    Float
-  longitude   Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model CityTranslation {
+  id              String   @id @default(uuid(7)) @db.Uuid
+  cityId          String   @db.Uuid
+  /// BCP 47 tag ("en", "pt-BR"). CHECK constraint in the migration.
+  locale          String   @db.VarChar(10)
+  name            String
+  description     String
+  bestTimeToVisit String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  city           City            @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  city City @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  @@unique([cityId, locale])
+}
+
+model District {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  cityId    String   @db.Uuid
+  slug      String
+  nameKo    String
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  city           City                  @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  translations   DistrictTranslation[]
   places         Place[]
   accommodations Accommodation[]
 
   @@unique([cityId, slug])
+}
+
+model DistrictTranslation {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  districtId  String   @db.Uuid
+  locale      String   @db.VarChar(10)
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  @@unique([districtId, locale])
 }
 
 model Place {
@@ -114,11 +145,10 @@ model Place {
   cityId          String        @db.Uuid
   districtId      String?       @db.Uuid
   category        PlaceCategory
-  /// Globally unique: the public URL is /lugares/[slug], without the city.
+  /// Globally unique: the public URL is /places/[slug], without the city.
   slug            String        @unique
-  name            String
   nameKo          String
-  description     String
+  /// Romanized street address (not translated).
   address         String
   latitude        Float
   longitude       Float
@@ -143,15 +173,32 @@ model Place {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  city      City       @relation(fields: [cityId], references: [id], onDelete: Restrict)
-  district  District?  @relation(fields: [districtId], references: [id], onDelete: Restrict)
-  reviews   Review[]
-  favorites Favorite[]
+  city         City               @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  district     District?          @relation(fields: [districtId], references: [id], onDelete: Restrict)
+  translations PlaceTranslation[]
+  reviews      Review[]
+  favorites    Favorite[]
 
   @@index([cityId, category, ratingAvg(sort: Desc)])
   @@index([cityId, priceLevel])
   @@index([districtId])
   @@index([tags], type: Gin)
+}
+
+model PlaceTranslation {
+  id               String   @id @default(uuid(7)) @db.Uuid
+  placeId          String   @db.Uuid
+  locale           String   @db.VarChar(10)
+  name             String
+  description      String
+  /// Caveats about the schedule in Place.openingHours (holidays, reservations, seasons).
+  openingHoursNote String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([placeId, locale])
 }
 
 model Accommodation {
@@ -194,7 +241,8 @@ model CostEstimate {
   @@unique([cityId, tier])
 }
 
-/// Conversion rates, e.g. base KRW -> target BRL. In the MVP the value comes from KRW_TO_BRL.
+/// Conversion rates from KRW to each display currency (KRW->BRL, KRW->USD). The API reads this
+/// table; in the MVP the seed fills it from KRW_TO_BRL / KRW_TO_USD.
 model ExchangeRate {
   id        String   @id @default(uuid(7)) @db.Uuid
   base      String   @db.Char(3)
@@ -254,6 +302,8 @@ model Review {
   placeId   String    @db.Uuid
   /// 1 to 5. CHECK constraint in the migration.
   rating    Int       @db.SmallInt
+  /// Language the review was written in (BCP 47). Reviews are never machine-translated.
+  locale    String    @db.VarChar(10)
   title     String
   comment   String
   visitedAt DateTime? @db.Date

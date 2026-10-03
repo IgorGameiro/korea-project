@@ -11,18 +11,23 @@ export const users: UserSeed[] = [
   { name: 'Bruno Lima', email: 'bruno.lima@example.com', role: 'USER' },
   { name: 'Carla Mendes', email: 'carla.mendes@example.com', role: 'USER' },
   { name: 'Diego Rocha', email: 'diego.rocha@example.com', role: 'USER' },
+  { name: 'Emily Carter', email: 'emily.carter@example.com', role: 'USER' },
+  { name: 'Grace Kim', email: 'grace.kim@example.com', role: 'USER' },
 ];
 
 const ana = 'ana.souza@example.com';
 const bruno = 'bruno.lima@example.com';
 const carla = 'carla.mendes@example.com';
 const diego = 'diego.rocha@example.com';
+const emily = 'emily.carter@example.com';
+const grace = 'grace.kim@example.com';
 
-export const reviews: ReviewSeed[] = [
-  // Seul
+const portugueseReviews: ReviewSeed[] = [
+  // Seoul
   {
     userEmail: ana,
-    placeSlug: 'palacio-gyeongbokgung',
+    locale: 'pt-BR',
+    placeSlug: 'gyeongbokgung-palace',
     rating: 5,
     title: 'Imperdível, ainda mais de hanbok',
     comment:
@@ -31,7 +36,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: bruno,
-    placeSlug: 'palacio-gyeongbokgung',
+    locale: 'pt-BR',
+    placeSlug: 'gyeongbokgung-palace',
     rating: 4,
     title: 'Lindo, mas muito cheio',
     comment: 'O palácio é enorme e bonito. No fim de semana estava lotado; volte num dia útil.',
@@ -39,7 +45,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: carla,
-    placeSlug: 'palacio-gyeongbokgung',
+    locale: 'pt-BR',
+    placeSlug: 'gyeongbokgung-palace',
     rating: 5,
     title: 'Aula de história a céu aberto',
     comment: 'Vale juntar com o Museu Folclórico, que fica dentro do complexo. Reserve meio dia.',
@@ -47,7 +54,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: ana,
-    placeSlug: 'mercado-gwangjang',
+    locale: 'pt-BR',
+    placeSlug: 'gwangjang-market',
     rating: 5,
     title: 'O melhor bindaetteok da vida',
     comment:
@@ -56,7 +64,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: diego,
-    placeSlug: 'mercado-gwangjang',
+    locale: 'pt-BR',
+    placeSlug: 'gwangjang-market',
     rating: 4,
     title: 'Ótimo para provar de tudo',
     comment: 'Ambiente animado e barato. Os assentos são apertados, então não espere conforto.',
@@ -64,6 +73,7 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: bruno,
+    locale: 'pt-BR',
     placeSlug: 'n-seoul-tower',
     rating: 4,
     title: 'Vista noturna espetacular',
@@ -73,6 +83,7 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: carla,
+    locale: 'pt-BR',
     placeSlug: 'n-seoul-tower',
     rating: 3,
     title: 'Bonito, porém turístico',
@@ -81,6 +92,7 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: ana,
+    locale: 'pt-BR',
     placeSlug: 'myeongdong-kyoja',
     rating: 5,
     title: 'Kalguksu que conforta a alma',
@@ -90,7 +102,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: diego,
-    placeSlug: 'bukhansan-pico-baegundae',
+    locale: 'pt-BR',
+    placeSlug: 'bukhansan-baegundae-peak',
     rating: 5,
     title: 'Melhor trilha perto de Seul',
     comment:
@@ -99,6 +112,7 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: bruno,
+    locale: 'pt-BR',
     placeSlug: 'lotte-world-tower-seoul-sky',
     rating: 4,
     title: 'Piso de vidro dá um frio na barriga',
@@ -107,7 +121,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: carla,
-    placeSlug: 'vilarejo-bukchon-hanok',
+    locale: 'pt-BR',
+    placeSlug: 'bukchon-hanok-village',
     rating: 4,
     title: 'Charmoso, respeite os moradores',
     comment:
@@ -116,6 +131,7 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: ana,
+    locale: 'pt-BR',
     placeSlug: 'cafe-onion-anguk',
     rating: 4,
     title: 'Pão incrível em um hanok',
@@ -124,7 +140,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: diego,
-    placeSlug: 'rua-hongdae-walking-street',
+    locale: 'pt-BR',
+    placeSlug: 'hongdae-walking-street',
     rating: 4,
     title: 'Energia jovem a noite toda',
     comment:
@@ -133,7 +150,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: bruno,
-    placeSlug: 'museu-nacional-da-coreia',
+    locale: 'pt-BR',
+    placeSlug: 'national-museum-of-korea',
     rating: 5,
     title: 'Gratuito e de primeiro mundo',
     comment: 'Acervo impressionante e muito bem organizado. Ótima opção para dia de chuva.',
@@ -143,7 +161,8 @@ export const reviews: ReviewSeed[] = [
   // Busan
   {
     userEmail: ana,
-    placeSlug: 'vilarejo-cultural-gamcheon',
+    locale: 'pt-BR',
+    placeSlug: 'gamcheon-culture-village',
     rating: 5,
     title: 'Colorido e cheio de surpresas',
     comment: 'Compre o mapa de carimbos e siga as setas. As vistas lá de cima são lindas.',
@@ -151,7 +170,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: carla,
-    placeSlug: 'vilarejo-cultural-gamcheon',
+    locale: 'pt-BR',
+    placeSlug: 'gamcheon-culture-village',
     rating: 4,
     title: 'Muitas escadas, mas vale',
     comment:
@@ -160,7 +180,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: bruno,
-    placeSlug: 'templo-haedong-yonggungsa',
+    locale: 'pt-BR',
+    placeSlug: 'haedong-yonggungsa-temple',
     rating: 5,
     title: 'Templo sobre o mar, surreal',
     comment:
@@ -169,7 +190,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: diego,
-    placeSlug: 'templo-haedong-yonggungsa',
+    locale: 'pt-BR',
+    placeSlug: 'haedong-yonggungsa-temple',
     rating: 4,
     title: 'Lindo, porém lotado de dia',
     comment:
@@ -178,7 +200,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: ana,
-    placeSlug: 'mercado-de-peixes-jagalchi',
+    locale: 'pt-BR',
+    placeSlug: 'jagalchi-fish-market',
     rating: 4,
     title: 'Frutos do mar fresquíssimos',
     comment: 'Escolhemos o peixe embaixo e comemos em cima. Negocie o preço antes de fechar.',
@@ -186,7 +209,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: carla,
-    placeSlug: 'praia-de-haeundae',
+    locale: 'pt-BR',
+    placeSlug: 'haeundae-beach',
     rating: 4,
     title: 'Praia urbana muito bem cuidada',
     comment: 'Areia limpa e estrutura ótima. Em agosto é lotada, mas em junho estava tranquila.',
@@ -194,6 +218,7 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: bruno,
+    locale: 'pt-BR',
     placeSlug: 'haeundae-blueline-park',
     rating: 5,
     title: 'Cápsula do céu é obrigatória',
@@ -203,7 +228,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: diego,
-    placeSlug: 'orla-de-gwangalli',
+    locale: 'pt-BR',
+    placeSlug: 'gwangalli-beachfront',
     rating: 5,
     title: 'Noite perfeita com vista da ponte',
     comment:
@@ -212,7 +238,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: ana,
-    placeSlug: 'beco-do-dwaeji-gukbap-de-seomyeon',
+    locale: 'pt-BR',
+    placeSlug: 'seomyeon-pork-soup-alley',
     rating: 4,
     title: 'Sopa de porco que vale a fama',
     comment:
@@ -223,6 +250,7 @@ export const reviews: ReviewSeed[] = [
   // Jeju
   {
     userEmail: carla,
+    locale: 'pt-BR',
     placeSlug: 'seongsan-ilchulbong',
     rating: 5,
     title: 'Nascer do sol inesquecível',
@@ -231,6 +259,7 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: ana,
+    locale: 'pt-BR',
     placeSlug: 'seongsan-ilchulbong',
     rating: 4,
     title: 'Rápido e lindo',
@@ -239,7 +268,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: diego,
-    placeSlug: 'hallasan-trilha-seongpanak',
+    locale: 'pt-BR',
+    placeSlug: 'hallasan-seongpanak-trail',
     rating: 5,
     title: 'Desafio do ano',
     comment:
@@ -248,7 +278,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: bruno,
-    placeSlug: 'ilha-udo',
+    locale: 'pt-BR',
+    placeSlug: 'udo-island',
     rating: 5,
     title: 'Dia perfeito de carrinho elétrico',
     comment:
@@ -257,7 +288,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: carla,
-    placeSlug: 'rua-do-porco-preto',
+    locale: 'pt-BR',
+    placeSlug: 'black-pork-street',
     rating: 4,
     title: 'Porco preto suculento',
     comment: 'Carne muito saborosa. Peça o molho de anchova, combina demais.',
@@ -265,7 +297,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: ana,
-    placeSlug: 'o-sulloc-tea-museum',
+    locale: 'pt-BR',
+    placeSlug: 'osulloc-tea-museum',
     rating: 4,
     title: 'Sorvete de matcha delicioso',
     comment: 'As plantações são lindas para caminhar. A loja tem ótimos presentes de chá.',
@@ -273,7 +306,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: bruno,
-    placeSlug: 'mercado-dongmun',
+    locale: 'pt-BR',
+    placeSlug: 'dongmun-market',
     rating: 4,
     title: 'Tangerinas e muita comida',
     comment: 'Voltamos à noite para o mercado noturno. A lagosta grelhada com queijo é famosa.',
@@ -283,7 +317,8 @@ export const reviews: ReviewSeed[] = [
   // Incheon
   {
     userEmail: diego,
-    placeSlug: 'chinatown-de-incheon',
+    locale: 'pt-BR',
+    placeSlug: 'incheon-chinatown',
     rating: 4,
     title: 'Ótimo bate-volta de Seul',
     comment: 'Fácil de chegar de metrô. Combine com a vila dos contos de fadas, que fica ao lado.',
@@ -291,6 +326,7 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: carla,
+    locale: 'pt-BR',
     placeSlug: 'gonghwachun',
     rating: 4,
     title: 'Jajangmyeon com história',
@@ -299,7 +335,8 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: bruno,
-    placeSlug: 'mercado-internacional-de-sinpo',
+    locale: 'pt-BR',
+    placeSlug: 'sinpo-international-market',
     rating: 5,
     title: 'Dakgangjeong viciante',
     comment:
@@ -308,6 +345,7 @@ export const reviews: ReviewSeed[] = [
   },
   {
     userEmail: ana,
+    locale: 'pt-BR',
     placeSlug: 'songdo-central-park',
     rating: 4,
     title: 'Passeio de barco relaxante',
@@ -317,13 +355,116 @@ export const reviews: ReviewSeed[] = [
   },
 ];
 
+// Reviews are user content and are shown in the language they were written in (never translated).
+const englishReviews: ReviewSeed[] = [
+  {
+    userEmail: emily,
+    locale: 'en',
+    placeSlug: 'gyeongbokgung-palace',
+    rating: 5,
+    title: 'Go early and rent a hanbok',
+    comment:
+      'Free entry in hanbok and far fewer people before 10am. The changing of the guard is worth timing your visit around.',
+    visitedAt: '2026-03-28',
+  },
+  {
+    userEmail: grace,
+    locale: 'en',
+    placeSlug: 'bukchon-hanok-village',
+    rating: 4,
+    title: 'Beautiful, but remember people live here',
+    comment:
+      'Gorgeous rooftops and quiet lanes. Respect the visiting hours and keep the noise down.',
+    visitedAt: '2026-04-02',
+  },
+  {
+    userEmail: emily,
+    locale: 'en',
+    placeSlug: 'gwangjang-market',
+    rating: 5,
+    title: 'Best food stop in Seoul',
+    comment:
+      'Bindaetteok fresh off the griddle and mayak gimbap for a few thousand won. Bring cash and an appetite.',
+    visitedAt: '2026-03-29',
+  },
+  {
+    userEmail: grace,
+    locale: 'en',
+    placeSlug: 'national-museum-of-korea',
+    rating: 5,
+    title: 'World-class and free',
+    comment:
+      'You could spend a whole day here. The pensive bodhisattva room alone is worth the trip.',
+    visitedAt: '2026-04-03',
+  },
+  {
+    userEmail: emily,
+    locale: 'en',
+    placeSlug: 'gamcheon-culture-village',
+    rating: 4,
+    title: 'Colorful and very hilly',
+    comment: 'Take a taxi up and walk down. The stamp map is a fun way to explore the alleys.',
+    visitedAt: '2026-04-05',
+  },
+  {
+    userEmail: grace,
+    locale: 'en',
+    placeSlug: 'haedong-yonggungsa-temple',
+    rating: 5,
+    title: 'Stunning seaside temple',
+    comment: 'Arrive at opening for the sunrise and to beat the tour buses.',
+    visitedAt: '2026-04-06',
+  },
+  {
+    userEmail: emily,
+    locale: 'en',
+    placeSlug: 'gwangalli-beachfront',
+    rating: 5,
+    title: 'Saturday drone show',
+    comment: 'Grab a spot on the sand before the show starts. The bridge lights make it magical.',
+    visitedAt: '2026-04-04',
+  },
+  {
+    userEmail: grace,
+    locale: 'en',
+    placeSlug: 'seongsan-ilchulbong',
+    rating: 5,
+    title: 'Short climb, huge reward',
+    comment: 'Steep but quick. The crater view at sunrise was the highlight of our Jeju trip.',
+    visitedAt: '2026-04-10',
+  },
+  {
+    userEmail: emily,
+    locale: 'en',
+    placeSlug: 'udo-island',
+    rating: 4,
+    title: 'Lovely day trip',
+    comment: 'We rented an electric cart and circled the island. Try the peanut ice cream.',
+    visitedAt: '2026-04-11',
+  },
+  {
+    userEmail: grace,
+    locale: 'en',
+    placeSlug: 'incheon-chinatown',
+    rating: 4,
+    title: 'Great before a flight',
+    comment:
+      'Easy subway ride and good jajangmyeon. Pair it with the fairy-tale village next door.',
+    visitedAt: '2026-04-14',
+  },
+];
+
+export const reviews: ReviewSeed[] = [...portugueseReviews, ...englishReviews];
+
 export const favorites: FavoriteSeed[] = [
-  { userEmail: ana, placeSlug: 'palacio-gyeongbokgung' },
-  { userEmail: ana, placeSlug: 'vilarejo-cultural-gamcheon' },
+  { userEmail: ana, placeSlug: 'gyeongbokgung-palace' },
+  { userEmail: ana, placeSlug: 'gamcheon-culture-village' },
   { userEmail: ana, placeSlug: 'seongsan-ilchulbong' },
   { userEmail: bruno, placeSlug: 'haeundae-blueline-park' },
-  { userEmail: bruno, placeSlug: 'ilha-udo' },
-  { userEmail: carla, placeSlug: 'vilarejo-bukchon-hanok' },
-  { userEmail: diego, placeSlug: 'bukhansan-pico-baegundae' },
-  { userEmail: diego, placeSlug: 'hallasan-trilha-seongpanak' },
+  { userEmail: bruno, placeSlug: 'udo-island' },
+  { userEmail: carla, placeSlug: 'bukchon-hanok-village' },
+  { userEmail: diego, placeSlug: 'bukhansan-baegundae-peak' },
+  { userEmail: diego, placeSlug: 'hallasan-seongpanak-trail' },
+  { userEmail: emily, placeSlug: 'gwangjang-market' },
+  { userEmail: grace, placeSlug: 'national-museum-of-korea' },
 ];

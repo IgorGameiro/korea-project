@@ -21,13 +21,18 @@ function requireEnv(name: string, minLength = 1): string {
   return value;
 }
 
+function positiveNumber(name: string): number {
+  const value = Number(requireEnv(name));
+  if (!(value > 0)) throw new Error(`${name} must be a positive number`);
+  return value;
+}
+
 async function main(): Promise<void> {
   loadEnv();
   const databaseUrl = requireEnv('DATABASE_URL');
   const adminPassword = requireEnv('SEED_ADMIN_PASSWORD', 8);
   const userPassword = requireEnv('SEED_USER_PASSWORD', 8);
-  const krwToBrl = Number(requireEnv('KRW_TO_BRL'));
-  if (!(krwToBrl > 0)) throw new Error('KRW_TO_BRL must be a positive number');
+  const exchangeRates = { BRL: positiveNumber('KRW_TO_BRL'), USD: positiveNumber('KRW_TO_USD') };
 
   const passwordHashes = new Map<string, string>();
   for (const user of users) {
@@ -44,7 +49,7 @@ async function main(): Promise<void> {
       reviews,
       favorites,
       passwordHashes,
-      krwToBrl,
+      exchangeRates,
     });
     console.log(`Seed finished in ${Date.now() - startedAt}ms. Rows in the database:`);
     console.table(summary);

@@ -45,15 +45,4 @@ export const cacheConfig = registerAs('cache', () => ({
   ttlMs: validateEnv(process.env).CACHE_TTL_MS,
 }));
 
-export const exchangeConfig = registerAs('exchange', () => ({
-  krwToBrl: validateEnv(process.env).KRW_TO_BRL,
-}));
-
-export const configNamespaces = [
-  appConfig,
-  databaseConfig,
-  jwtConfig,
-  throttleConfig,
-  cacheConfig,
-  exchangeConfig,
-];
+export const configNamespaces = [appConfig, databaseConfig, jwtConfig, throttleConfig, cacheConfig];

@@ -15,7 +15,7 @@ describe('validateOpeningHours', () => {
       { open: '17:30', close: '22:00' },
     ];
 
-    assert.deepEqual(validateOpeningHours({ days, notes: 'Fecha em feriados' }), []);
+    assert.deepEqual(validateOpeningHours({ days }), []);
   });
 
   it('requires every weekday', () => {
@@ -38,9 +38,6 @@ describe('validateOpeningHours', () => {
 
   it('rejects non-objects', () => {
     assert.deepEqual(validateOpeningHours(null), ['must be an object']);
-    assert.deepEqual(validateOpeningHours({ notes: 1 }), [
-      'notes must be a string',
-      'days must be an object',
-    ]);
+    assert.deepEqual(validateOpeningHours({}), ['days must be an object']);
   });
 });

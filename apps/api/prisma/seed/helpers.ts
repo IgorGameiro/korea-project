@@ -1,12 +1,13 @@
 import { type OpeningHours, type TimeRange, type Weekday, WEEKDAYS } from '@korea-project/shared';
 
-/** "Palácio Gyeongbokgung" -> "palacio-gyeongbokgung" */
+/** "Hotel Shilla & Spa" -> "hotel-shilla-and-spa" */
 export function slugify(value: string): string {
   return value
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
-    .replace(/&/g, ' e ')
+    .replace(/&/g, ' and ')
+    .replace(/'/g, '')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 }
@@ -21,33 +22,30 @@ export const galleryImages = (slug: string, count = 3) =>
   Array.from({ length: count }, (_, i) => picsum(`${slug}-${i + 1}`, 1200, 800));
 
 // ---------------------------------------------------------------------------
-// Opening hours builders
+// Opening hours builders (language-neutral; caveats go in the translated hoursNote)
 // ---------------------------------------------------------------------------
 
 const range = (open: string, close: string): TimeRange => ({ open, close });
 
-function build(perDay: (day: Weekday) => TimeRange[], notes?: string): OpeningHours {
-  const days = Object.fromEntries(
-    WEEKDAYS.map((day) => [day, perDay(day)]),
-  ) as OpeningHours['days'];
-  return notes ? { days, notes } : { days };
+function build(perDay: (day: Weekday) => TimeRange[]): OpeningHours {
+  return {
+    days: Object.fromEntries(WEEKDAYS.map((day) => [day, perDay(day)])) as OpeningHours['days'],
+  };
 }
 
 /** Same hours every day. Overnight ranges (close < open) are allowed. */
-export const everyDay = (open: string, close: string, notes?: string) =>
-  build(() => [range(open, close)], notes);
+export const everyDay = (open: string, close: string) => build(() => [range(open, close)]);
 
 /** Same hours every day except the listed closing days. */
-export const closedOn = (closed: Weekday[], open: string, close: string, notes?: string) =>
-  build((day) => (closed.includes(day) ? [] : [range(open, close)]), notes);
+export const closedOn = (closed: Weekday[], open: string, close: string) =>
+  build((day) => (closed.includes(day) ? [] : [range(open, close)]));
 
 /** Lunch and dinner service with a break in between. */
 export const splitShift = (
   lunch: [string, string],
   dinner: [string, string],
   closed: Weekday[] = [],
-  notes?: string,
-) => build((day) => (closed.includes(day) ? [] : [range(...lunch), range(...dinner)]), notes);
+) => build((day) => (closed.includes(day) ? [] : [range(...lunch), range(...dinner)]));
 
 /** Public spaces with free access at any time (streets, beaches, parks, trails). */
-export const alwaysOpen = (notes?: string) => everyDay('00:00', '24:00', notes);
+export const alwaysOpen = () => everyDay('00:00', '24:00');

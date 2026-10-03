@@ -1,4 +1,4 @@
-import type { OpeningHours } from '@korea-project/shared';
+import type { Locale, OpeningHours } from '@korea-project/shared';
 import type {
   AccommodationType,
   CostTier,
@@ -7,14 +7,34 @@ import type {
 } from '../../src/generated/prisma/enums';
 
 // Plain data shapes for the seed. Relations are expressed by slug and resolved to ids at insert time.
+// Translatable text is a Record over every Locale, so a missing translation is a type error.
+
+export type Localized<T> = Record<Locale, T>;
+
+export interface CityText {
+  name: string;
+  description: string;
+  bestTimeToVisit: string;
+}
+
+export interface DistrictText {
+  name: string;
+  description: string;
+}
+
+export interface PlaceText {
+  name: string;
+  description: string;
+  /** Caveat shown next to the opening hours. */
+  hoursNote?: string;
+}
 
 export interface DistrictSeed {
   slug: string;
-  name: string;
   nameKo: string;
-  description: string;
   latitude: number;
   longitude: number;
+  text: Localized<DistrictText>;
 }
 
 export interface CostEstimateSeed {
@@ -32,12 +52,13 @@ export interface TrailSeed {
 }
 
 export interface PlaceSeed {
+  /** Stable, English, globally unique. Part of the public URL: never derive it from a translation. */
+  slug: string;
   category: PlaceCategory;
-  name: string;
   nameKo: string;
   /** District slug within the same city. Omitted when the place is outside the listed districts. */
   district?: string;
-  description: string;
+  /** Romanized street address. */
   address: string;
   latitude: number;
   longitude: number;
@@ -45,11 +66,14 @@ export interface PlaceSeed {
   averageSpendKRW: number;
   openingHours: OpeningHours | null;
   website?: string;
+  /** English keys; labels are translated in the web app. */
   tags: string[];
   trail?: TrailSeed;
+  text: Localized<PlaceText>;
 }
 
 export interface AccommodationSeed {
+  /** Proper names are not translated; generic names are English. */
   name: string;
   type: AccommodationType;
   tier: CostTier;
@@ -61,15 +85,13 @@ export interface AccommodationSeed {
 
 export interface CitySeed {
   slug: string;
-  name: string;
   nameKo: string;
-  description: string;
   latitude: number;
   longitude: number;
-  bestTimeToVisit: string;
   population: number;
   isFeatured: boolean;
   sortOrder: number;
+  text: Localized<CityText>;
   districts: DistrictSeed[];
   costEstimates: Record<CostTier, CostEstimateSeed>;
   places: PlaceSeed[];
@@ -85,6 +107,8 @@ export interface UserSeed {
 export interface ReviewSeed {
   userEmail: string;
   placeSlug: string;
+  /** Language the review is written in. */
+  locale: Locale;
   rating: 1 | 2 | 3 | 4 | 5;
   title: string;
   comment: string;
