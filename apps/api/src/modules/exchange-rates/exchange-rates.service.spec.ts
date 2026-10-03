@@ -20,8 +20,14 @@ function setup(rows = [row('BRL', '0.0039'), row('USD', '0.00072'), row('EUR', '
   const cache = {
     get: jest.fn((key: string) => Promise.resolve(store.get(key))),
     set: jest.fn((key: string, value: unknown) => Promise.resolve(store.set(key, value))),
+    del: jest.fn((key: string) => Promise.resolve(store.delete(key))),
   } as unknown as Cache;
-  const repository = { findByBase: jest.fn().mockResolvedValue(rows) };
+  const repository = {
+    findByBase: jest.fn().mockResolvedValue(rows),
+    upsert: jest.fn((base: string, target: string, rate: number, source: string) =>
+      Promise.resolve({ ...row(target, String(rate)), source }),
+    ),
+  };
   const service = new ExchangeRatesService(repository as unknown as ExchangeRatesRepository, cache);
   return { service, repository };
 }
@@ -49,6 +55,27 @@ describe('ExchangeRatesService', () => {
     const { service } = setup([row('BRL', '0.0039')]);
 
     await expect(service.getRate('USD')).rejects.toBeInstanceOf(ServiceUnavailableException);
+  });
+
+  it('never returns a zero, negative or non-finite rate: it is reported as unavailable', async () => {
+    const { service } = setup([row('BRL', '0'), row('USD', '-1')]);
+
+    await expect(service.findAll()).resolves.toEqual([]);
+    await expect(service.getRate('BRL')).rejects.toMatchObject({
+      response: { code: 'EXCHANGE_RATE_UNAVAILABLE' },
+    });
+  });
+
+  it('upsert writes by base+target and invalidates the cached rates', async () => {
+    const { service, repository } = setup();
+    await service.findAll(); // warm the cache
+
+    const saved = await service.upsert('USD', 0.0008);
+
+    expect(repository.upsert).toHaveBeenCalledWith('KRW', 'USD', 0.0008, 'admin');
+    expect(saved).toMatchObject({ currency: 'USD', rate: 0.0008, source: 'admin' });
+    await service.findAll();
+    expect(repository.findByBase).toHaveBeenCalledTimes(2); // re-read after invalidation
   });
 
   it('converts KRW rounding to cents', () => {

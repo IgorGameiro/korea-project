@@ -16,8 +16,9 @@ export interface ExchangeRate {
 }
 
 /**
- * Single source of exchange rates for the API. Reads the ExchangeRate table (filled by the seed in
- * the MVP); switching to an external provider means changing only this service.
+ * Single source of exchange rates for the API. Reads the ExchangeRate table, which is filled by the
+ * seed in development and by admins (PUT /admin/exchange-rates/:currency) in production.
+ * Extension point: an external provider would call `upsert` from a scheduled job; nothing else changes.
  */
 @Injectable()
 export class ExchangeRatesService {
@@ -40,7 +41,9 @@ export class ExchangeRatesService {
         rate: row.rate.toNumber(),
         source: row.source,
         updatedAt: row.updatedAt,
-      }));
+      }))
+      // Never hand out a rate that would turn prices into 0, negative numbers or NaN.
+      .filter((rate) => Number.isFinite(rate.rate) && rate.rate > 0);
 
     await this.cache.set(CACHE_KEY, rates);
     return rates;
@@ -55,6 +58,13 @@ export class ExchangeRatesService {
       });
     }
     return rate;
+  }
+
+  /** Sets the KRW -> currency rate and drops the cached rates, so readers see it immediately. */
+  async upsert(currency: DisplayCurrency, rate: number, source = 'admin'): Promise<ExchangeRate> {
+    const row = await this.repository.upsert(BASE_CURRENCY, currency, rate, source);
+    await this.cache.del(CACHE_KEY);
+    return { currency, rate: row.rate.toNumber(), source: row.source, updatedAt: row.updatedAt };
   }
 
   /** KRW amount in the target currency, rounded to cents. */

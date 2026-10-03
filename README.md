@@ -187,9 +187,11 @@ All routes are under `/api/v1` and documented in Swagger (`/api/docs`). Localize
 | Profile        | `GET /users/me/reviews`, `GET /users/me/favorites`                                                                                                                                                                                                     | Bearer                   |
 | Costs          | `POST /cost-estimates/calculate` `{ citySlug, people, days, tier, currency? }`                                                                                                                                                                         | public                   |
 | Exchange rates | `GET /exchange-rates` (with `updatedAt`)                                                                                                                                                                                                               | public                   |
-| Admin          | CRUD under `/admin/cities`, `/admin/districts`, `/admin/places`, `/admin/accommodations`, `/admin/cost-estimates`                                                                                                                                      | ADMIN                    |
+| Admin          | CRUD under `/admin/cities`, `/admin/districts`, `/admin/places`, `/admin/accommodations`, `/admin/cost-estimates`; `PUT /admin/exchange-rates/:currency` `{ rate }` (USD or BRL)                                                                       | ADMIN                    |
 
 **Auth flow:** the access token (15 min) is returned in the body and sent as `Authorization: Bearer`. The refresh token lives in an `HttpOnly`, `SameSite=Lax` cookie scoped to `/api/v1/auth`; it is rotated on every refresh and only its SHA-256 hash is stored. Reusing a rotated token revokes every session of that login. In production the web and the API must share a site (e.g. `example.com` and `api.example.com`) for the cookie to be sent.
+
+**Exchange rates:** prices are stored in KRW. Rates live in the `ExchangeRate` table, one row per base + target (`KRW→USD`, `KRW→BRL`). In development the seed writes them from `KRW_TO_USD` / `KRW_TO_BRL`; **in production (no seed) an admin must set them** with `PUT /admin/exchange-rates/:currency` (upsert, `rate > 0`, at most 8 decimals). Every write invalidates the cached rates. A missing rate makes the calculator answer `503 EXCHANGE_RATE_UNAVAILABLE`, never a zero or NaN amount.
 
 **Admin translations:** create requires `translations.en`; on update, only the locales sent are changed, partial fields keep the rest, and `"pt-BR": null` removes the Portuguese text (`en` cannot be removed).
 
@@ -215,6 +217,10 @@ Ready so far:
 - **Health** ([`modules/health`](apps/api/src/modules/health)): `GET /api/v1/health` runs `SELECT 1` against Postgres.
 
 API error messages are meant for developers; the web app translates errors by `code`.
+
+## Extension points
+
+- **Automatic exchange rates (not implemented):** add a provider client and a scheduled job (e.g. `@nestjs/schedule`) that calls `ExchangeRatesService.upsert(currency, rate, '<provider>')`. Nothing else changes: the table, the cache invalidation and every reader already go through that service. Keep the admin route as a manual override.
 
 ## Roadmap
 
