@@ -5,19 +5,21 @@
 export const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 export type Weekday = (typeof WEEKDAYS)[number];
 
-export interface TimeRange {
+// Declared as `type` (not `interface`) so values are assignable to JSON column inputs,
+// which require an implicit index signature.
+export type TimeRange = {
   /** "HH:MM", 00:00–23:59 */
   open: string;
   /** "HH:MM", 00:00–24:00 */
   close: string;
-}
+};
 
-export interface OpeningHours {
+export type OpeningHours = {
   /** Every weekday is present; an empty list means closed that day. */
   days: Record<Weekday, TimeRange[]>;
   /** Free-text caveats shown to the user (holidays, seasonal changes, reservations). */
   notes?: string;
-}
+};
 
 const OPEN_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 const CLOSE_TIME = /^(([01]\d|2[0-3]):[0-5]\d|24:00)$/;

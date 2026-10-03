@@ -10,8 +10,7 @@ export default [
     languageOptions: {
       globals: { ...globals.node, ...globals.jest },
       parserOptions: {
-        // prisma.config.ts is loaded by the Prisma CLI, not compiled with the app.
-        projectService: { allowDefaultProject: ['prisma.config.ts'] },
+        projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
