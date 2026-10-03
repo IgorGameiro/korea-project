@@ -21,10 +21,7 @@ export default function ErrorPage({
   }, [error]);
 
   return (
-    <main
-      id="main"
-      className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-start justify-center gap-4 px-6"
-    >
+    <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-start justify-center gap-4 px-6">
       <h1 className="text-2xl font-bold">{t('unavailableTitle')}</h1>
       <p className="text-navy-700">{t('unavailableBody')}</p>
       <button
@@ -34,6 +31,6 @@ export default function ErrorPage({
       >
         {t('retry')}
       </button>
-    </main>
+    </div>
   );
 }

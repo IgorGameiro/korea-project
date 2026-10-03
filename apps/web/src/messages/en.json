@@ -39,5 +39,36 @@
   "placeholder": {
     "title": "South Korea Travel Guide",
     "body": "Under construction. The full site arrives in the next phases."
+  },
+  "categories": {
+    "RESTAURANT": "Restaurant",
+    "NIGHTLIFE": "Nightlife",
+    "HIKING": "Hiking",
+    "ATTRACTION": "Attraction",
+    "CAFE": "Café",
+    "SHOPPING": "Shopping",
+    "CULTURE": "Culture",
+    "NATURE": "Nature"
+  },
+  "rating": {
+    "label": "Rated {value} out of 5, {count, plural, =0 {no reviews yet} one {# review} other {# reviews}}",
+    "noReviews": "No reviews yet",
+    "reviews": "{count, plural, one {# review} other {# reviews}}"
+  },
+  "price": {
+    "free": "Free",
+    "approx": "≈ {amount}",
+    "perNight": "per night",
+    "level": "Price level {level} of 4",
+    "krwOnly": "Exchange rate unavailable; showing KRW only"
+  },
+  "modal": {
+    "close": "Close"
+  },
+  "header": {
+    "home": "Korea Travel Guide home",
+    "mainNav": "Main",
+    "switchLanguage": "Change language",
+    "switchCurrency": "Change currency"
   }
 }

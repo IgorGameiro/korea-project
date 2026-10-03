@@ -17,16 +17,13 @@ export default async function Home({ params }: PageProps<'/[locale]'>) {
   const health = await getApiHealth();
 
   return (
-    <main
-      id="main"
-      className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-4 px-6"
-    >
+    <div className="mx-auto flex min-h-[60vh] max-w-2xl flex-col justify-center gap-4 px-6">
       <p className="text-coral-500 text-sm font-semibold tracking-widest uppercase">
         korea-project
       </p>
       <h1 className="text-4xl font-bold">{t('title')}</h1>
       <p className="text-navy-700">{t('body')}</p>
       <ApiStatus status={health} label={health === 'up' ? status('apiUp') : status('apiDown')} />
-    </main>
+    </div>
   );
 }

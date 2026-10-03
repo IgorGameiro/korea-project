@@ -4,6 +4,8 @@ import { Inter, Noto_Sans_KR } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { SiteFooter } from '@/components/layout/site-footer';
+import { SiteHeader } from '@/components/layout/site-header';
 import { routing } from '@/i18n/routing';
 import { loadOr, serverApi } from '@/lib/api/server';
 import { CurrencyProvider } from '@/lib/currency/currency-context';
@@ -52,7 +54,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
 
   return (
     <html lang={locale} className={`${inter.variable} ${notoSansKr.variable}`}>
-      <body>
+      <body className="flex min-h-screen flex-col">
         <a href="#main" className="skip-link">
           {t('skipToContent')}
         </a>
@@ -61,7 +63,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
             locale={locale}
             rates={rates.map((r) => ({ ...r, updatedAt: String(r.updatedAt) }))}
           >
-            {children}
+            <SiteHeader />
+            <main id="main" tabIndex={-1} className="focus:outline-none">
+              {children}
+            </main>
+            <SiteFooter />
           </CurrencyProvider>
         </NextIntlClientProvider>
       </body>

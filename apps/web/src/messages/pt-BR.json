@@ -39,5 +39,36 @@
   "placeholder": {
     "title": "Guia de Viagem da Coreia do Sul",
     "body": "Em construção. O site completo chega nas próximas fases."
+  },
+  "categories": {
+    "RESTAURANT": "Restaurante",
+    "NIGHTLIFE": "Vida noturna",
+    "HIKING": "Trilha",
+    "ATTRACTION": "Atração",
+    "CAFE": "Café",
+    "SHOPPING": "Compras",
+    "CULTURE": "Cultura",
+    "NATURE": "Natureza"
+  },
+  "rating": {
+    "label": "Nota {value} de 5, {count, plural, =0 {sem avaliações} one {# avaliação} other {# avaliações}}",
+    "noReviews": "Sem avaliações ainda",
+    "reviews": "{count, plural, one {# avaliação} other {# avaliações}}"
+  },
+  "price": {
+    "free": "Gratuito",
+    "approx": "≈ {amount}",
+    "perNight": "por noite",
+    "level": "Faixa de preço {level} de 4",
+    "krwOnly": "Câmbio indisponível; valores apenas em KRW"
+  },
+  "modal": {
+    "close": "Fechar"
+  },
+  "header": {
+    "home": "Início do Guia de Viagem da Coreia",
+    "mainNav": "Principal",
+    "switchLanguage": "Mudar idioma",
+    "switchCurrency": "Mudar moeda"
   }
 }
