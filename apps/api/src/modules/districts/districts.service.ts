@@ -60,6 +60,12 @@ export class DistrictsService {
     return rows.map((row) => toDistrictDto(row, locale));
   }
 
+  async findById(id: string, locale: Locale): Promise<DistrictDto> {
+    const row = await this.repository.findByIdLocalized(id, locale);
+    if (!row) throw districtNotFound();
+    return toDistrictDto(row, locale);
+  }
+
   /** For places/accommodations: a district must belong to the same city. */
   async assertInCity(cityId: string, districtId: string): Promise<void> {
     if (!(await this.repository.findInCity(cityId, districtId))) {

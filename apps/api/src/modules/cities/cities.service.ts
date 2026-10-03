@@ -77,6 +77,12 @@ export class CitiesService {
     return toCityDto(row, locale);
   }
 
+  async findById(id: string, locale: Locale): Promise<CityDto> {
+    const row = await this.repository.findByIdLocalized(id, locale);
+    if (!row) throw cityNotFound();
+    return toCityDto(row, locale);
+  }
+
   /** For other modules that address cities by slug in their routes. */
   async getIdBySlug(slug: string): Promise<string> {
     const row = await this.repository.findIdBySlug(slug);

@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { CitiesModule } from '../cities/cities.module';
 import { DistrictsModule } from '../districts/districts.module';
 import { PlacesModule } from '../places/places.module';
-import { CityOverviewController } from './city-overview.controller';
+import { PlaceOverviewController } from './place-overview.controller';
 
 @Module({
-  imports: [CitiesModule, DistrictsModule, PlacesModule],
-  controllers: [CityOverviewController],
+  imports: [PlacesModule, CitiesModule, DistrictsModule],
+  controllers: [PlaceOverviewController],
 })
-export class CityOverviewModule {}
+export class PlaceOverviewModule {}

@@ -19,6 +19,13 @@ export class DistrictsRepository {
     });
   }
 
+  findByIdLocalized(id: string, locale: Locale) {
+    return this.prisma.district.findUnique({
+      where: { id },
+      include: { translations: translationsFor(locale) },
+    });
+  }
+
   findInCity(cityId: string, id: string) {
     return this.prisma.district.findFirst({ where: { id, cityId }, select: { id: true } });
   }

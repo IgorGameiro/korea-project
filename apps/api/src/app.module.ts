@@ -16,6 +16,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { CitiesModule } from './modules/cities/cities.module';
 import { CityOverviewModule } from './modules/city-overview/city-overview.module';
 import { DistrictsModule } from './modules/districts/districts.module';
+import { PlaceOverviewModule } from './modules/place-overview/place-overview.module';
+import { PlacesModule } from './modules/places/places.module';
 import { ExchangeRatesModule } from './modules/exchange-rates/exchange-rates.module';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
@@ -44,7 +46,9 @@ import { PrismaModule } from './prisma/prisma.module';
     AuthModule,
     CitiesModule,
     DistrictsModule,
+    PlacesModule,
     CityOverviewModule,
+    PlaceOverviewModule,
   ],
   providers: [
     { provide: APP_PIPE, useFactory: createValidationPipe },
