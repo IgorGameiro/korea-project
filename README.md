@@ -92,16 +92,16 @@ pnpm dev            # api on :3001 and web on :3000, in watch mode
 
 ## Scripts (repository root)
 
-| Script              | What it does                                                       |
-| ------------------- | ------------------------------------------------------------------ |
-| `pnpm dev`          | Runs every app in watch mode (Turborepo)                           |
-| `pnpm build`        | Production build of every package                                  |
-| `pnpm lint`         | ESLint in every package                                            |
-| `pnpm typecheck`    | `tsc --noEmit` in every package                                    |
-| `pnpm test`         | Unit tests (Jest in api, Vitest in web, `node --test` in shared)   |
-| `pnpm test:e2e`     | API end-to-end tests with Supertest (**needs a running Postgres**) |
-| `pnpm format`       | Prettier on the whole repository                                   |
-| `pnpm format:check` | Checks formatting (useful in CI)                                   |
+| Script              | What it does                                                                                   |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| `pnpm dev`          | Runs every app in watch mode (Turborepo)                                                       |
+| `pnpm build`        | Production build of every package                                                              |
+| `pnpm lint`         | ESLint in every package                                                                        |
+| `pnpm typecheck`    | `tsc --noEmit` in every package                                                                |
+| `pnpm test`         | Unit tests (Jest in api, Vitest in web, `node --test` in shared)                               |
+| `pnpm test:e2e`     | API end-to-end tests with Supertest against `TEST_DATABASE_URL` (**needs a running Postgres**) |
+| `pnpm format`       | Prettier on the whole repository                                                               |
+| `pnpm format:check` | Checks formatting (useful in CI)                                                               |
 
 Package scripts run with `pnpm --filter @korea-project/api <script>`:
 
@@ -123,6 +123,7 @@ The API **validates its variables at startup** ([`env.validation.ts`](apps/api/s
 | Variable                                                                | Used for                                                                        |
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | `DATABASE_URL`                                                          | Prisma connection (overridden in Compose to point at `postgres`)                |
+| `TEST_DATABASE_URL`                                                     | Database for `pnpm test:e2e`; its name must contain `_test`                     |
 | `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` / `POSTGRES_PORT` | Postgres container (port 5433 on the host)                                      |
 | `API_PORT`, `CORS_ORIGINS`, `SWAGGER_ENABLED`                           | API HTTP settings                                                               |
 | `JWT_*`, `COOKIE_SECURE`                                                | Authentication (Phase 3); secrets need at least 32 characters                   |
@@ -163,6 +164,12 @@ To change the schema: edit `schema.prisma`, run `pnpm --filter @korea-project/ap
 - **Integrity tests** ([`seed-data.spec.ts`](apps/api/prisma/seed/seed-data.spec.ts)) check slugs, translations, coordinates, opening hours, category counts and references, without a database.
 
 > ⚠️ **Prices, opening hours, average spend and exchange rates are planning estimates**, not verified data — review them before relying on them. Images are placeholders from [picsum.photos](https://picsum.photos) (deterministic per slug), to be replaced with real photos.
+
+## Testing
+
+- **Unit tests** (`pnpm test`) need no database.
+- **End-to-end tests** (`pnpm test:e2e`) run the full Nest app with Supertest against `TEST_DATABASE_URL` (default: `korea_project_test` on the Compose Postgres). Before the suite, [`global-setup.ts`](apps/api/test/global-setup.ts) **drops and recreates** that database, applies the migrations and loads the seed, so every run starts from the same state and never touches development data.
+- **Safety guard:** the e2e suite refuses to run unless the database name contains `_test` ([`test-database.ts`](apps/api/test/test-database.ts)).
 
 ## API architecture
 

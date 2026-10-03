@@ -10,4 +10,7 @@ export default {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  // Recreates, migrates and seeds the *_test database once; refuses non-test databases.
+  globalSetup: '<rootDir>/global-setup.ts',
+  setupFiles: ['<rootDir>/setup-env.ts'],
 };
