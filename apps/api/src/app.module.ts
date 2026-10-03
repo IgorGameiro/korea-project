@@ -13,6 +13,9 @@ import { createValidationPipe } from './common/pipes/validation.pipe';
 import { buildThrottlerOptions } from './common/throttler/throttler.options';
 import { configNamespaces, throttleConfig, validateEnv } from './config';
 import { AuthModule } from './modules/auth/auth.module';
+import { CitiesModule } from './modules/cities/cities.module';
+import { CityOverviewModule } from './modules/city-overview/city-overview.module';
+import { DistrictsModule } from './modules/districts/districts.module';
 import { ExchangeRatesModule } from './modules/exchange-rates/exchange-rates.module';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
@@ -39,6 +42,9 @@ import { PrismaModule } from './prisma/prisma.module';
     ExchangeRatesModule,
     UsersModule,
     AuthModule,
+    CitiesModule,
+    DistrictsModule,
+    CityOverviewModule,
   ],
   providers: [
     { provide: APP_PIPE, useFactory: createValidationPipe },

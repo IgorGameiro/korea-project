@@ -1,5 +1,6 @@
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import request from 'supertest';
 import type { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
 import { configureApp, setupSwagger } from '../src/setup-app';
@@ -13,3 +14,20 @@ export async function createTestApp(): Promise<INestApplication<App>> {
   await app.init();
   return app;
 }
+
+/** Access token of a seeded account (passwords come from the SEED_* env vars). */
+export async function loginAs(app: INestApplication<App>, who: 'admin' | 'user'): Promise<string> {
+  const credentials =
+    who === 'admin'
+      ? { email: 'admin@example.com', password: process.env.SEED_ADMIN_PASSWORD }
+      : { email: 'ana.souza@example.com', password: process.env.SEED_USER_PASSWORD };
+  const res = await request(app.getHttpServer())
+    .post('/api/v1/auth/login')
+    .send(credentials)
+    .expect(200);
+  return (res.body as { accessToken: string }).accessToken;
+}
+
+/** A unique, valid slug for records created by a test. */
+export const testSlug = (prefix: string) =>
+  `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
