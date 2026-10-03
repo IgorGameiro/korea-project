@@ -38,6 +38,7 @@ export const throttleConfig = registerAs('throttle', () => {
     limit: env.THROTTLE_LIMIT,
     authTtlMs: env.THROTTLE_AUTH_TTL_MS,
     authLimit: env.THROTTLE_AUTH_LIMIT,
+    searchLimit: env.THROTTLE_SEARCH_LIMIT,
   };
 });
 

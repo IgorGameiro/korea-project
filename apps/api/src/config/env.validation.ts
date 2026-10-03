@@ -92,6 +92,11 @@ export class EnvironmentVariables {
   @Type(() => Number)
   @IsInt()
   @IsPositive()
+  THROTTLE_SEARCH_LIMIT = 30;
+
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
   CACHE_TTL_MS = 60_000;
 
   @Transform(toBoolean)

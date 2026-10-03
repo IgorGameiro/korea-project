@@ -32,14 +32,6 @@
     "notFoundBody": "The page you were looking for doesn't exist or has moved.",
     "backHome": "Back to the home page"
   },
-  "status": {
-    "apiUp": "API connected",
-    "apiDown": "API unavailable"
-  },
-  "placeholder": {
-    "title": "South Korea Travel Guide",
-    "body": "Under construction. The full site arrives in the next phases."
-  },
   "categories": {
     "RESTAURANT": "Restaurant",
     "NIGHTLIFE": "Nightlife",
@@ -70,5 +62,53 @@
     "mainNav": "Main",
     "switchLanguage": "Change language",
     "switchCurrency": "Change currency"
+  },
+  "home": {
+    "metaTitle": "South Korea Travel Guide: cities, places and trip costs",
+    "heroTitle": "Plan your trip to South Korea",
+    "heroSubtitle": "Palaces, street food, mountain trails and island beaches — with real costs in your currency.",
+    "featuredTitle": "Featured cities",
+    "featuredSubtitle": "Start with the places most travelers love.",
+    "categoriesTitle": "Explore by interest",
+    "planTitle": "Plan your trip",
+    "planBody": "Choose a city, how many people and days, and your travel style to estimate lodging, food, transport and activities.",
+    "planCta": "Estimate my trip",
+    "placeCount": "{count, plural, one {# place} other {# places}}",
+    "citiesUnavailable": "Featured cities could not be loaded right now. Please check back in a few minutes."
+  },
+  "categoryShortcuts": {
+    "RESTAURANT": "Restaurants",
+    "NIGHTLIFE": "Nightlife",
+    "HIKING": "Hiking",
+    "ATTRACTION": "Attractions",
+    "CAFE": "Cafés",
+    "SHOPPING": "Shopping",
+    "CULTURE": "Culture",
+    "NATURE": "Nature"
+  },
+  "search": {
+    "label": "Search places in every city",
+    "placeholder": "Try “palace”, “market” or “beach”",
+    "submit": "Search",
+    "metaTitle": "Search",
+    "resultsFor": "Results for “{q}”",
+    "resultsInCategory": "{category} in every city",
+    "resultsCount": "{count, plural, =0 {No places found} one {# place found} other {# places found}}",
+    "tooShort": "Type at least 2 characters to search.",
+    "tooLong": "Use at most 100 characters.",
+    "empty": "No places match your search. Try another word or browse a city.",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "pagination": "Search results pages"
+  },
+  "place": {
+    "inCity": "in {city}"
+  },
+  "plan": {
+    "metaTitle": "Plan your trip",
+    "title": "Trip cost calculator",
+    "comingSoon": "The calculator is coming soon. Meanwhile, explore the cities to see what each one offers.",
+    "browseCities": "Browse cities"
   }
 }

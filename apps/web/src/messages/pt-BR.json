@@ -32,14 +32,6 @@
     "notFoundBody": "A página que você procura não existe ou mudou de endereço.",
     "backHome": "Voltar para o início"
   },
-  "status": {
-    "apiUp": "API conectada",
-    "apiDown": "API indisponível"
-  },
-  "placeholder": {
-    "title": "Guia de Viagem da Coreia do Sul",
-    "body": "Em construção. O site completo chega nas próximas fases."
-  },
   "categories": {
     "RESTAURANT": "Restaurante",
     "NIGHTLIFE": "Vida noturna",
@@ -70,5 +62,53 @@
     "mainNav": "Principal",
     "switchLanguage": "Mudar idioma",
     "switchCurrency": "Mudar moeda"
+  },
+  "home": {
+    "metaTitle": "Guia de Viagem da Coreia do Sul: cidades, lugares e custos",
+    "heroTitle": "Planeje sua viagem à Coreia do Sul",
+    "heroSubtitle": "Palácios, comida de rua, trilhas e praias nas ilhas — com custos reais na sua moeda.",
+    "featuredTitle": "Cidades em destaque",
+    "featuredSubtitle": "Comece pelos lugares que os viajantes mais amam.",
+    "categoriesTitle": "Explore por interesse",
+    "planTitle": "Planeje sua viagem",
+    "planBody": "Escolha a cidade, quantas pessoas e dias e o estilo de viagem para estimar hospedagem, alimentação, transporte e passeios.",
+    "planCta": "Calcular minha viagem",
+    "placeCount": "{count, plural, one {# lugar} other {# lugares}}",
+    "citiesUnavailable": "Não foi possível carregar as cidades em destaque agora. Volte em alguns minutos."
+  },
+  "categoryShortcuts": {
+    "RESTAURANT": "Restaurantes",
+    "NIGHTLIFE": "Vida noturna",
+    "HIKING": "Trilhas",
+    "ATTRACTION": "Atrações",
+    "CAFE": "Cafés",
+    "SHOPPING": "Compras",
+    "CULTURE": "Cultura",
+    "NATURE": "Natureza"
+  },
+  "search": {
+    "label": "Busque lugares em todas as cidades",
+    "placeholder": "Tente “palácio”, “mercado” ou “praia”",
+    "submit": "Buscar",
+    "metaTitle": "Busca",
+    "resultsFor": "Resultados para “{q}”",
+    "resultsInCategory": "{category} em todas as cidades",
+    "resultsCount": "{count, plural, =0 {Nenhum lugar encontrado} one {# lugar encontrado} other {# lugares encontrados}}",
+    "tooShort": "Digite pelo menos 2 caracteres para buscar.",
+    "tooLong": "Use no máximo 100 caracteres.",
+    "empty": "Nenhum lugar corresponde à sua busca. Tente outra palavra ou explore uma cidade.",
+    "previous": "Anterior",
+    "next": "Próxima",
+    "pageOf": "Página {page} de {total}",
+    "pagination": "Páginas de resultados"
+  },
+  "place": {
+    "inCity": "em {city}"
+  },
+  "plan": {
+    "metaTitle": "Planeje sua viagem",
+    "title": "Calculadora de custos",
+    "comingSoon": "A calculadora chega em breve. Enquanto isso, explore as cidades para ver o que cada uma oferece.",
+    "browseCities": "Ver cidades"
   }
 }

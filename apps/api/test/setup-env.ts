@@ -7,3 +7,4 @@ loadTestEnv();
 // globalSetup already loaded .env into this process, so the production values are present here.
 process.env.THROTTLE_LIMIT = '100000';
 process.env.THROTTLE_AUTH_LIMIT = '100000';
+process.env.THROTTLE_SEARCH_LIMIT = '100000';

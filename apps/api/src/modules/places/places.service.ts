@@ -67,6 +67,7 @@ function toSummary(row: PlaceRow, locale: Locale): PlaceSummaryDto {
     name: t.name,
     nameKo: row.nameKo,
     description: t.description,
+    cityId: row.cityId,
     districtId: row.districtId,
     latitude: row.latitude,
     longitude: row.longitude,
@@ -83,7 +84,6 @@ function toSummary(row: PlaceRow, locale: Locale): PlaceSummaryDto {
 function toDetail(row: PlaceRow, locale: Locale): PlaceDetailDto {
   return {
     ...toSummary(row, locale),
-    cityId: row.cityId,
     address: row.address,
     openingHours: (row.openingHours as OpeningHours | null) ?? null,
     openingHoursNote: localizedText(row, locale).openingHoursNote,
@@ -161,6 +161,25 @@ export class PlacesService {
       rows.map((row) => toSummary(row, locale)),
       total,
       { page, limit },
+    );
+  }
+
+  /** Places of every city matching a term and/or a category, best rated first. */
+  async search(
+    query: { q?: string; category?: PlaceCategory; page: number; limit: number; skip: number },
+    locale: Locale,
+  ): Promise<Paginated<PlaceSummaryDto>> {
+    const { rows, total } = await this.repository.listLocalized(
+      null,
+      { search: query.q, category: query.category },
+      'rating',
+      { skip: query.skip, take: query.limit },
+      locale,
+    );
+    return paginate(
+      rows.map((row) => toSummary(row, locale)),
+      total,
+      query,
     );
   }
 

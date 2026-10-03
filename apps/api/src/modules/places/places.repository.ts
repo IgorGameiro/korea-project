@@ -30,8 +30,13 @@ const ORDER_BY: Record<PlaceSort, Prisma.PlaceOrderByWithRelationInput[]> = {
   price: [{ priceLevel: 'asc' }, { averageSpendKRW: 'asc' }, { slug: 'asc' }],
 };
 
-function buildWhere(cityId: string, f: PlaceFilters, locale: Locale): Prisma.PlaceWhereInput {
-  const where: Prisma.PlaceWhereInput = { cityId };
+/** `cityId` null = every city (cross-city search). */
+function buildWhere(
+  cityId: string | null,
+  f: PlaceFilters,
+  locale: Locale,
+): Prisma.PlaceWhereInput {
+  const where: Prisma.PlaceWhereInput = cityId ? { cityId } : {};
   if (f.category) where.category = f.category;
   if (f.districtId) where.districtId = f.districtId;
   if (f.priceLevel?.length) where.priceLevel = { in: f.priceLevel };
@@ -65,7 +70,7 @@ export class PlacesRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async listLocalized(
-    cityId: string,
+    cityId: string | null,
     filters: PlaceFilters,
     sort: PlaceSort,
     page: { skip: number; take: number },

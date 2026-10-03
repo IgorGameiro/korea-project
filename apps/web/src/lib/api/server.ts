@@ -1,4 +1,5 @@
 import 'server-only';
+import { PHASE_PRODUCTION_BUILD } from 'next/constants';
 import { notFound } from 'next/navigation';
 import createClient from 'openapi-fetch';
 import { originOf, serverApiUrl } from '../env';
@@ -56,4 +57,14 @@ export async function loadOr<T>(call: Promise<FetchResult<T>>, fallback: T): Pro
     if (error instanceof ApiUnavailableError) return fallback;
     throw error;
   }
+}
+
+/**
+ * For pages whose route params come from a parent layout (so they are always prebuilt): during
+ * `next build` without a reachable API (the Docker image build) it resolves to `fallback` so the
+ * build succeeds, and ISR replaces the page once the API answers. At runtime it is load(), so a
+ * failed background regeneration keeps serving the last good page.
+ */
+export function loadAtBuildOr<T>(call: Promise<FetchResult<T>>, fallback: T): Promise<T> {
+  return process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD ? loadOr(call, fallback) : load(call);
 }

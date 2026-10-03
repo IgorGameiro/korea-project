@@ -38,6 +38,13 @@ export class CitiesRepository {
     });
   }
 
+  findManyByIdsLocalized(ids: string[], locale: Locale) {
+    return this.prisma.city.findMany({
+      where: { id: { in: ids } },
+      include: { translations: translationsFor(locale) },
+    });
+  }
+
   findByIdLocalized(id: string, locale: Locale) {
     return this.prisma.city.findUnique({
       where: { id },

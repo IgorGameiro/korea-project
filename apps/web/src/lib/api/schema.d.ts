@@ -504,6 +504,23 @@ export interface paths {
     patch: operations['AdminCostEstimatesController_update_v1'];
     trace?: never;
   };
+  '/api/v1/search': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Search places in every city, best rated first (rate limited) */
+    get: operations['SearchController_search_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/cities/{slug}': {
     parameters: {
       query?: never;
@@ -857,6 +874,8 @@ export interface components {
       name: string;
       nameKo: string;
       description: string;
+      /** Format: uuid */
+      cityId: string;
       /** Format: uuid */
       districtId?: string | null;
       latitude: number;
@@ -1364,6 +1383,51 @@ export interface components {
       /** @example 40000 */
       activitiesPerPersonPerDayKRW?: number;
     };
+    SearchCityDto: {
+      /** Format: uuid */
+      id: string;
+      slug: string;
+      name: string;
+    };
+    SearchResultDto: {
+      /** Format: uuid */
+      id: string;
+      slug: string;
+      /**
+       * @description Language of name/description after fallback.
+       * @enum {string}
+       */
+      locale: 'en' | 'pt-BR';
+      /** @enum {string} */
+      category:
+        | 'RESTAURANT'
+        | 'NIGHTLIFE'
+        | 'HIKING'
+        | 'ATTRACTION'
+        | 'CAFE'
+        | 'SHOPPING'
+        | 'CULTURE'
+        | 'NATURE';
+      name: string;
+      nameKo: string;
+      description: string;
+      /** Format: uuid */
+      cityId: string;
+      /** Format: uuid */
+      districtId?: string | null;
+      latitude: number;
+      longitude: number;
+      priceLevel: number;
+      /** @description In KRW; convert with GET /exchange-rates. */
+      averageSpendKRW: number;
+      /** @example 4.67 */
+      ratingAvg: number;
+      ratingCount: number;
+      tags: string[];
+      imageUrl?: string | null;
+      trail?: components['schemas']['TrailDto'] | null;
+      city: components['schemas']['SearchCityDto'];
+    };
     DistrictDto: {
       /** Format: uuid */
       id: string;
@@ -1439,6 +1503,8 @@ export interface components {
       nameKo: string;
       description: string;
       /** Format: uuid */
+      cityId: string;
+      /** Format: uuid */
       districtId?: string | null;
       latitude: number;
       longitude: number;
@@ -1451,8 +1517,6 @@ export interface components {
       tags: string[];
       imageUrl?: string | null;
       trail?: components['schemas']['TrailDto'] | null;
-      /** Format: uuid */
-      cityId: string;
       address: string;
       /** @description Weekly schedule (Asia/Seoul). */
       openingHours?: Record<string, never> | null;
@@ -3085,6 +3149,54 @@ export interface operations {
       };
       /** @description FORBIDDEN: requires the ADMIN role */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  SearchController_search_v1: {
+    parameters: {
+      query?: {
+        page?: number;
+        limit?: number;
+        /** @description Term matched against names and descriptions (requested language + English), Korean names and tags. % and _ are matched literally. Required unless `category` is given. */
+        q?: string;
+        category?:
+          | 'RESTAURANT'
+          | 'NIGHTLIFE'
+          | 'HIKING'
+          | 'ATTRACTION'
+          | 'CAFE'
+          | 'SHOPPING'
+          | 'CULTURE'
+          | 'NATURE';
+        /** @description Content language. Unsupported values fall back to "en". Takes precedence over Accept-Language. */
+        locale?: 'en' | 'pt-BR';
+      };
+      header?: {
+        /** @description Used when ?locale is absent. */
+        'Accept-Language'?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            data: components['schemas']['SearchResultDto'][];
+            meta: components['schemas']['PaginationMetaDto'];
+          };
+        };
+      };
+      /** @description TOO_MANY_REQUESTS */
+      429: {
         headers: {
           [name: string]: unknown;
         };

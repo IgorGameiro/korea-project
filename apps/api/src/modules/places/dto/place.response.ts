@@ -12,6 +12,7 @@ export class PlaceSummaryDto {
   @ApiProperty() name: string;
   @ApiProperty() nameKo: string;
   @ApiProperty() description: string;
+  @ApiProperty({ format: 'uuid' }) cityId: string;
   @ApiPropertyOptional({ format: 'uuid', nullable: true, type: String }) districtId: string | null;
   @ApiProperty() latitude: number;
   @ApiProperty() longitude: number;
@@ -27,7 +28,6 @@ export class PlaceSummaryDto {
 
 /** Full public view of a place. */
 export class PlaceDetailDto extends PlaceSummaryDto {
-  @ApiProperty({ format: 'uuid' }) cityId: string;
   @ApiProperty() address: string;
   @ApiPropertyOptional({ nullable: true, description: 'Weekly schedule (Asia/Seoul).' })
   openingHours: OpeningHours | null;

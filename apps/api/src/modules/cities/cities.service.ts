@@ -77,6 +77,13 @@ export class CitiesService {
     return toCityDto(row, locale);
   }
 
+  /** Localized cities keyed by id (unknown ids are skipped). */
+  async findManyByIds(ids: string[], locale: Locale): Promise<Map<string, CityDto>> {
+    if (ids.length === 0) return new Map();
+    const rows = await this.repository.findManyByIdsLocalized([...new Set(ids)], locale);
+    return new Map(rows.map((row) => [row.id, toCityDto(row, locale)]));
+  }
+
   async findById(id: string, locale: Locale): Promise<CityDto> {
     const row = await this.repository.findByIdLocalized(id, locale);
     if (!row) throw cityNotFound();

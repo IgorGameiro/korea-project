@@ -6,6 +6,7 @@ import { createTestApp } from './helpers';
 // setup-env.ts disables the limits for the other suites; this one restores a tiny auth limit.
 // The config factories read process.env when the app is created, i.e. after this line runs.
 process.env.THROTTLE_AUTH_LIMIT = '3';
+process.env.THROTTLE_SEARCH_LIMIT = '3';
 
 describe('Rate limiting (e2e)', () => {
   let app: INestApplication<App>;
@@ -31,5 +32,15 @@ describe('Rate limiting (e2e)', () => {
 
     // Other routes keep the (much higher) default limit.
     await request(app.getHttpServer()).get('/api/v1/exchange-rates').expect(200);
+  });
+
+  it('applies the search limit to /search only', async () => {
+    const search = () => request(app.getHttpServer()).get('/api/v1/search?q=palace');
+
+    for (let i = 0; i < 3; i++) await search().expect(200);
+
+    const limited = await search().expect(429);
+    expect(limited.body.error.code).toBe('TOO_MANY_REQUESTS');
+    await request(app.getHttpServer()).get('/api/v1/cities/seoul/places?search=palace').expect(200);
   });
 });
