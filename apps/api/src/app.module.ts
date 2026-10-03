@@ -12,6 +12,7 @@ import { RedactSecretsInterceptor } from './common/interceptors/redact-secrets.i
 import { createValidationPipe } from './common/pipes/validation.pipe';
 import { buildThrottlerOptions } from './common/throttler/throttler.options';
 import { configNamespaces, throttleConfig, validateEnv } from './config';
+import { AccommodationsModule } from './modules/accommodations/accommodations.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CitiesModule } from './modules/cities/cities.module';
 import { CityOverviewModule } from './modules/city-overview/city-overview.module';
@@ -47,6 +48,7 @@ import { PrismaModule } from './prisma/prisma.module';
     CitiesModule,
     DistrictsModule,
     PlacesModule,
+    AccommodationsModule,
     CityOverviewModule,
     PlaceOverviewModule,
   ],
