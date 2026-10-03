@@ -1,16 +1,7 @@
-import type { Metadata } from 'next';
-import './globals.css';
+import type { ReactNode } from 'react';
 
-export const metadata: Metadata = {
-  title: 'South Korea Travel Guide',
-  description: 'Cities, neighborhoods, places and costs to plan your trip to South Korea.',
-};
-
-// English is the default locale. Locale routing (pt-BR under /pt) and hreflang arrive in Phase 4.
-export default function RootLayout({ children }: LayoutProps<'/'>) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
+// The real root layout is app/[locale]/layout.tsx (it owns <html lang>). This pass-through layout
+// exists so Next can render not-found pages for requests that never reach a locale.
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return children;
 }

@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "siteName": "Guia de Viagem da Coreia",
+    "title": "Guia de Viagem da Coreia do Sul",
+    "description": "Cidades, bairros, lugares e custos para planejar sua viagem à Coreia do Sul."
+  },
+  "nav": {
+    "home": "Início",
+    "cities": "Cidades",
+    "plan": "Planeje sua viagem",
+    "skipToContent": "Pular para o conteúdo",
+    "language": "Idioma",
+    "currency": "Moeda"
+  },
+  "localeNames": {
+    "en": "English",
+    "pt-BR": "Português (Brasil)"
+  },
+  "currencyNames": {
+    "USD": "Dólar americano",
+    "BRL": "Real brasileiro"
+  },
+  "footer": {
+    "disclaimer": "Preços, horários e câmbio são estimativas para planejamento. Confira antes de ir.",
+    "mapData": "Dados do mapa © colaboradores do OpenStreetMap"
+  },
+  "errors": {
+    "unavailableTitle": "Não conseguimos carregar os dados agora",
+    "unavailableBody": "O serviço pode estar temporariamente indisponível. Tente de novo em instantes.",
+    "retry": "Tentar de novo",
+    "notFoundTitle": "Página não encontrada",
+    "notFoundBody": "A página que você procura não existe ou mudou de endereço.",
+    "backHome": "Voltar para o início"
+  },
+  "status": {
+    "apiUp": "API conectada",
+    "apiDown": "API indisponível"
+  },
+  "placeholder": {
+    "title": "Guia de Viagem da Coreia do Sul",
+    "body": "Em construção. O site completo chega nas próximas fases."
+  }
+}

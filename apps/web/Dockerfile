@@ -44,6 +44,8 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
 RUN pnpm turbo run build --filter=@korea-project/web
 
 FROM node:${NODE_VERSION}-alpine AS runner
+# HOSTNAME must stay 0.0.0.0 (or empty): with HOSTNAME=127.0.0.1, Next 16.3's standalone server turns
+# the proxy's locale rewrites (/ -> /en) into 307 self-redirects (see vercel/next.js#91844).
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \

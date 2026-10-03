@@ -5,6 +5,7 @@ allowBuilds:
   '@parcel/watcher': true
   '@prisma/engines': true
   '@scarf/scarf': false
+  '@swc/core': true
   argon2: true
   esbuild: true
   prisma: true
@@ -19,3 +20,8 @@ minimumReleaseAgeExclude:
   - '@types/node@24.19.1'
   - supertest@7.3.1
   - turbo@2.11.7
+peerDependencyRules:
+  allowedVersions:
+    # openapi-typescript 7.x declares typescript ^5 but generates our types correctly with TS 6
+    # (verified with `pnpm --filter @korea-project/web gen:api`).
+    openapi-typescript>typescript: '6'

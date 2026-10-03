@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "siteName": "Korea Travel Guide",
+    "title": "South Korea Travel Guide",
+    "description": "Cities, neighborhoods, places and trip costs to plan your trip to South Korea."
+  },
+  "nav": {
+    "home": "Home",
+    "cities": "Cities",
+    "plan": "Plan your trip",
+    "skipToContent": "Skip to content",
+    "language": "Language",
+    "currency": "Currency"
+  },
+  "localeNames": {
+    "en": "English",
+    "pt-BR": "Português (Brasil)"
+  },
+  "currencyNames": {
+    "USD": "US dollar",
+    "BRL": "Brazilian real"
+  },
+  "footer": {
+    "disclaimer": "Prices, opening hours and exchange rates are estimates for planning. Check them before you go.",
+    "mapData": "Map data © OpenStreetMap contributors"
+  },
+  "errors": {
+    "unavailableTitle": "We can't reach our travel data right now",
+    "unavailableBody": "The service may be temporarily unavailable. Please try again in a moment.",
+    "retry": "Try again",
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "The page you were looking for doesn't exist or has moved.",
+    "backHome": "Back to the home page"
+  },
+  "status": {
+    "apiUp": "API connected",
+    "apiDown": "API unavailable"
+  },
+  "placeholder": {
+    "title": "South Korea Travel Guide",
+    "body": "Under construction. The full site arrives in the next phases."
+  }
+}
