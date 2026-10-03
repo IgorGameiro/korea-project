@@ -1,7 +1,9 @@
 /** @type {import('jest').Config} */
 export default {
   moduleFileExtensions: ['js', 'json', 'ts'],
-  rootDir: 'src',
+  rootDir: '.',
+  // Unit tests for the app (src) and for the seed data (prisma/seed).
+  roots: ['<rootDir>/src', '<rootDir>/prisma'],
   testRegex: '.*\\.spec\\.ts$',
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
@@ -10,7 +12,7 @@ export default {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-  collectCoverageFrom: ['**/*.(t|j)s', '!generated/**', '!main.ts'],
-  coverageDirectory: '../coverage',
+  collectCoverageFrom: ['src/**/*.(t|j)s', '!src/generated/**', '!src/main.ts'],
+  coverageDirectory: './coverage',
   testEnvironment: 'node',
 };
