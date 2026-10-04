@@ -21,6 +21,8 @@ const DROPPED_REQUEST_HEADERS = [
   'upgrade',
   'host',
   'content-length',
+  // Only the web server's own server-side calls may claim to be internal.
+  'x-internal-token',
 ];
 // fetch() already decoded the body, so its original encoding/length no longer apply.
 const DROPPED_RESPONSE_HEADERS = [

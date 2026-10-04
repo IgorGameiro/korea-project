@@ -901,6 +901,27 @@ export interface components {
       latitude: number;
       longitude: number;
     };
+    TimeRangeDto: {
+      /** @example 11:00 */
+      open: string;
+      /**
+       * @description "24:00" closes at midnight.
+       * @example 22:00
+       */
+      close: string;
+    };
+    WeekScheduleDto: {
+      mon: components['schemas']['TimeRangeDto'][];
+      tue: components['schemas']['TimeRangeDto'][];
+      wed: components['schemas']['TimeRangeDto'][];
+      thu: components['schemas']['TimeRangeDto'][];
+      fri: components['schemas']['TimeRangeDto'][];
+      sat: components['schemas']['TimeRangeDto'][];
+      sun: components['schemas']['TimeRangeDto'][];
+    };
+    OpeningHoursDto: {
+      days: components['schemas']['WeekScheduleDto'];
+    };
     PlaceTextDto: {
       /** @example Gyeongbokgung Palace */
       name: string;
@@ -936,7 +957,7 @@ export interface components {
       longitude: number;
       priceLevel: number;
       averageSpendKRW: number;
-      openingHours?: Record<string, never> | null;
+      openingHours?: components['schemas']['OpeningHoursDto'] | null;
       website?: string | null;
       imageUrls: string[];
       tags: string[];
@@ -985,8 +1006,8 @@ export interface components {
       priceLevel: number;
       /** @example 3000 */
       averageSpendKRW: number;
-      /** @description Weekly schedule (see OpeningHours). */
-      openingHours?: Record<string, never> | null;
+      /** @description Weekly schedule (Asia/Seoul). */
+      openingHours?: components['schemas']['OpeningHoursDto'] | null;
       /** Format: uri */
       website?: string | null;
       /** @default [] */
@@ -1045,8 +1066,8 @@ export interface components {
       priceLevel?: number;
       /** @example 3000 */
       averageSpendKRW?: number;
-      /** @description Weekly schedule (see OpeningHours). */
-      openingHours?: Record<string, never> | null;
+      /** @description Weekly schedule (Asia/Seoul). */
+      openingHours?: components['schemas']['OpeningHoursDto'] | null;
       /** Format: uri */
       website?: string | null;
       /** @default [] */
@@ -1518,7 +1539,7 @@ export interface components {
       trail?: components['schemas']['TrailDto'] | null;
       address: string;
       /** @description Weekly schedule (Asia/Seoul). */
-      openingHours?: Record<string, never> | null;
+      openingHours?: components['schemas']['OpeningHoursDto'] | null;
       openingHoursNote?: string | null;
       website?: string | null;
       imageUrls: string[];

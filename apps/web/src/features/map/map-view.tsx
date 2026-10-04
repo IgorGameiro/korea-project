@@ -24,13 +24,34 @@ const LeafletMap = dynamic(() => import('./leaflet-map'), { ssr: false, loading:
  * Interactive map plus a keyboard-friendly list of the same points. The list is the accessible way
  * to explore: every item links to its page and has a "Show on map" button that moves the map there.
  */
-export function MapView({ points, label }: { points: MapPoint[]; label: string }) {
+export function MapView({
+  points,
+  label,
+  compact = false,
+}: {
+  points: MapPoint[];
+  label: string;
+  /** A small map of one place (its page already lists the address): no legend, no list. */
+  compact?: boolean;
+}) {
   const t = useTranslations('map');
   const kindLabel = useKindLabel();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
 
   if (points.length === 0) return <p className="text-navy-700">{t('empty')}</p>;
+
+  if (compact) {
+    return (
+      <div
+        role="region"
+        aria-label={label}
+        className="isolate h-56 overflow-hidden rounded-[var(--radius-card)] ring-1 ring-navy-100"
+      >
+        <LeafletMap points={points} selectedId={null} kindLabel={kindLabel} />
+      </div>
+    );
+  }
 
   const kinds = [...new Set(points.map((point) => point.kind))];
   const show = (id: string) => {

@@ -116,7 +116,7 @@ The Husky pre-commit hook runs ESLint `--fix` and Prettier on staged files only.
 
 ## Environment variables
 
-A single `.env` at the repository root is used by the API, the Prisma CLI, the seed and Docker Compose. The full list, with comments, is in [`.env.example`](.env.example).
+A single `.env` at the repository root is used by the API, the Prisma CLI, the seed, Docker Compose and the web app (its `next.config.ts` loads it for runs outside Docker; values already in the environment win). The full list, with comments, is in [`.env.example`](.env.example).
 
 The API **validates its variables at startup** ([`env.validation.ts`](apps/api/src/config/env.validation.ts)) and refuses to boot if one is missing or invalid, listing every problem at once.
 
@@ -128,6 +128,7 @@ The API **validates its variables at startup** ([`env.validation.ts`](apps/api/s
 | `API_PORT`, `CORS_ORIGINS`, `SWAGGER_ENABLED`                           | API HTTP settings                                                               |
 | `JWT_*`, `COOKIE_SECURE`                                                | Authentication (Phase 3); secrets need at least 32 characters                   |
 | `TRUST_PROXY`                                                           | Proxy hops whose `X-Forwarded-For` the API trusts (1: the web gateway)          |
+| `INTERNAL_API_TOKEN`                                                    | Secret of the web server's own API calls (build/ISR), exempt from rate limits   |
 | `THROTTLE_*`                                                            | Global rate limit and the stricter ones for `/auth/*` and `/search`             |
 | `CACHE_TTL_MS`                                                          | Default cache TTL                                                               |
 | `SEED_ADMIN_PASSWORD`, `SEED_USER_PASSWORD`                             | Passwords of the demo accounts created by the seed                              |
@@ -229,6 +230,7 @@ Next.js App Router in [`apps/web`](apps/web), with next-intl for routing and mes
 - **Currency:** the server never reads the currency cookie (that would make pages dynamic). The HTML renders the locale's default currency and a client provider applies the visitor's choice after hydration.
 - **Session (no tokens in localStorage):** the access token lives only in memory; the refresh token is an httpOnly cookie. On every page load the browser calls `POST /api/v1/auth/refresh` to restore the session (the header shows a neutral placeholder meanwhile). Refreshing is single-flight — requests that expire together share one refresh — and serialized across tabs with the Web Locks API, because refresh tokens rotate and a token presented twice revokes the whole session. Static pages render the signed-out shell; everything user-specific runs on the client, so ISR is unaffected.
 - **Same-origin API gateway:** browser calls go to the site's own `/api/v1/*` ([`app/api/v1/[...path]/route.ts`](apps/web/src/app/api/v1/[...path]/route.ts)), which forwards them at runtime to `API_INTERNAL_URL`. The refresh cookie is therefore a first-party cookie of the site (no CORS, no third-party-cookie blocking). The gateway passes `X-Forwarded-For` through and the API trusts one hop (`TRUST_PROXY=1`), so rate limits apply per visitor, not to the web server.
+- **Server-side calls are not rate limited:** builds and ISR regenerations all come from the web server's single IP (a full build renders 350+ pages). They send `X-Internal-Token: $INTERNAL_API_TOKEN`, which the API exempts from throttling (constant-time comparison). The token is server-only, and the gateway strips that header from browser requests, so visitors stay limited.
 - **API client:** typed with `openapi-typescript` from the API's OpenAPI document (`pnpm --filter @korea-project/web gen:api`, output committed in `src/lib/api/schema.d.ts`).
 - **Map:** `MapView` ([`src/features/map`](apps/web/src/features/map)) takes provider-agnostic points; Leaflet lives only in `leaflet-map.tsx`, loaded with `next/dynamic` (`ssr: false`). Swapping to Mapbox GL JS means writing another component with the same props. Markers have a per-category icon and a text label (never color alone), and every map comes with a keyboard-navigable list of its places with a "Show on map" button.
 
@@ -236,6 +238,7 @@ Next.js App Router in [`apps/web`](apps/web), with next-intl for routing and mes
 
 - [ ] **A reverse proxy in front of the web app must set `X-Forwarded-For`.** Next.js only fills that header with the socket address when the client sent none, so a web server exposed directly would let clients choose the IP the API rate-limits (and brute-force logins). Put Next behind nginx, a load balancer or a CDN that appends the real client IP, and keep `TRUST_PROXY` equal to the number of proxies between the visitor and the API that you control.
 - [ ] **Do not expose the API port publicly** when `TRUST_PROXY` > 0 (direct clients could spoof `X-Forwarded-For`). Browsers only need the web app; publish the API (or Swagger) only on a private network.
+- [ ] **A strong, private `INTERNAL_API_TOKEN`** (e.g. `openssl rand -base64 36`), the same in the API and the web server, never exposed to browsers (no `NEXT_PUBLIC_` prefix). Rotate it if it leaks: whoever has it bypasses the rate limits.
 - [ ] **HTTPS and `COOKIE_SECURE=true`**, so the refresh cookie is only sent over TLS.
 
 - [ ] **Map tiles — OpenStreetMap tile usage policy.** The default tiles come from `tile.openstreetmap.org`, which is run by volunteers and donations. Its [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) forbids heavy use, requires a valid identifying User-Agent/Referer and visible attribution, and the service can block a site at any time without notice. Before going live, review the policy and either confirm the expected traffic complies or set `NEXT_PUBLIC_MAP_TILE_URL` / `NEXT_PUBLIC_MAP_TILE_ATTRIBUTION` to a commercial or self-hosted tile provider. Keep the attribution visible either way.

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { LOCALES, validateOpeningHours } from '@korea-project/shared';
 import { CostTier, PlaceCategory } from '../../src/generated/prisma/enums';
 import { cities, favorites, reviews, users } from './data';
@@ -206,5 +208,21 @@ describe('seed helpers', () => {
     expect(galleryImages('x', 2)).toEqual(galleryImages('x', 2));
     expect(galleryImages('x', 2)).toHaveLength(2);
     expect(galleryImages('x')[0]).not.toBe(galleryImages('y')[0]);
+  });
+});
+
+describe('tag labels in the web app', () => {
+  // Tags are language-neutral keys; the web app translates them (apps/web/src/messages). A seed
+  // tag without a label would show up as a raw key, so this fails until both locales have it.
+  const messages = (locale: string) =>
+    JSON.parse(
+      readFileSync(join(__dirname, '../../../web/src/messages', `${locale}.json`), 'utf8'),
+    ) as { tags?: Record<string, string> };
+  const seedTags = [...new Set(places.flatMap(({ place }) => place.tags))].sort();
+
+  it.each(LOCALES)('every seed tag has a %s label', (locale) => {
+    const labels = messages(locale).tags ?? {};
+    const missing = seedTags.filter((tag) => !labels[tag]?.trim());
+    expect(missing).toEqual([]);
   });
 });

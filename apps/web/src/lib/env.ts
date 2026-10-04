@@ -9,6 +9,12 @@ export const publicApiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost
  */
 export const serverApiUrl = process.env.API_INTERNAL_URL ?? publicApiUrl;
 
+/**
+ * Shared secret sent on server-side API calls so ISR/builds are not rate limited like visitors.
+ * Server-only (no NEXT_PUBLIC_ prefix): it is never inlined into the browser bundle.
+ */
+export const internalApiToken = process.env.INTERNAL_API_TOKEN || undefined;
+
 /** Public origin of the site, for absolute URLs (canonical, hreflang, Open Graph). */
 export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 

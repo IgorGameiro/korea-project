@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Locale, LOCALES, type OpeningHours, PlaceCategory } from '@korea-project/shared';
+import { OpeningHoursDto } from './opening-hours.dto';
 import { PlaceTextDto, TrailDto } from './place-input.dto';
 
 /** Item of the public place list. */
@@ -29,7 +30,11 @@ export class PlaceSummaryDto {
 /** Full public view of a place. */
 export class PlaceDetailDto extends PlaceSummaryDto {
   @ApiProperty() address: string;
-  @ApiPropertyOptional({ nullable: true, description: 'Weekly schedule (Asia/Seoul).' })
+  @ApiPropertyOptional({
+    type: OpeningHoursDto,
+    nullable: true,
+    description: 'Weekly schedule (Asia/Seoul).',
+  })
   openingHours: OpeningHours | null;
   @ApiPropertyOptional({ nullable: true, type: String }) openingHoursNote: string | null;
   @ApiPropertyOptional({ nullable: true, type: String }) website: string | null;
@@ -63,7 +68,8 @@ export class AdminPlaceDto {
   @ApiProperty() longitude: number;
   @ApiProperty() priceLevel: number;
   @ApiProperty() averageSpendKRW: number;
-  @ApiPropertyOptional({ nullable: true }) openingHours: OpeningHours | null;
+  @ApiPropertyOptional({ type: OpeningHoursDto, nullable: true })
+  openingHours: OpeningHours | null;
   @ApiPropertyOptional({ nullable: true, type: String }) website: string | null;
   @ApiProperty({ type: [String] }) imageUrls: string[];
   @ApiProperty({ type: [String] }) tags: string[];

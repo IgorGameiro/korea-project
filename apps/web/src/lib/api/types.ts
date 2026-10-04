@@ -12,3 +12,5 @@ export type AccommodationDto = Schemas['AccommodationDto'];
 export type UserDto = Schemas['UserDto'];
 export type AuthResponseDto = Schemas['AuthResponseDto'];
 export type CostCalculationDto = Schemas['CostCalculationDto'];
+export type PlaceOverviewDto = Schemas['PlaceOverviewDto'];
+export type ReviewDto = Schemas['ReviewDto'];

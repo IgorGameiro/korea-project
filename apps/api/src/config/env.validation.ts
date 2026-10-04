@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { plainToInstance, Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsOptional,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -104,6 +105,16 @@ export class EnvironmentVariables {
   @IsInt()
   @IsPositive()
   THROTTLE_SEARCH_LIMIT = 30;
+
+  /**
+   * Shared secret of the web server's own (server-side) requests, which are not rate limited.
+   * Optional: without it, server-side rendering shares the per-IP limits.
+   */
+  @Transform(({ value }: { value: unknown }) => (value === '' ? undefined : value))
+  @IsOptional()
+  @IsString()
+  @MinLength(32)
+  INTERNAL_API_TOKEN?: string;
 
   @Type(() => Number)
   @IsInt()

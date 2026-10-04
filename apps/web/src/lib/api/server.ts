@@ -2,7 +2,7 @@ import 'server-only';
 import { PHASE_PRODUCTION_BUILD } from 'next/constants';
 import { notFound } from 'next/navigation';
 import createClient from 'openapi-fetch';
-import { originOf, serverApiUrl } from '../env';
+import { internalApiToken, originOf, serverApiUrl } from '../env';
 import type { paths } from './schema';
 
 /** The API could not answer (down, timing out or failing): pages show a friendly error instead. */
@@ -19,10 +19,12 @@ const TIMEOUT_MS = 5000;
  * Typed API client for server components. `revalidate` (seconds) feeds Next's data cache, so the
  * pages that use it stay statically generated and refresh in the background (ISR).
  * openapi-fetch builds a Request object, which drops Next's `next` option, so it is re-applied here.
+ * The internal token marks these calls as the web server's own (not rate limited per IP).
  */
 export function serverApi(revalidate = 300) {
   return createClient<paths>({
     baseUrl: originOf(serverApiUrl),
+    headers: internalApiToken ? { 'X-Internal-Token': internalApiToken } : undefined,
     fetch: (request: Request) =>
       fetch(request, { next: { revalidate }, signal: AbortSignal.timeout(TIMEOUT_MS) }),
   });

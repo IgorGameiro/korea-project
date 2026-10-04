@@ -7,6 +7,8 @@ import { createTestApp } from './helpers';
 // The config factories read process.env when the app is created, i.e. after this line runs.
 process.env.THROTTLE_AUTH_LIMIT = '3';
 process.env.THROTTLE_SEARCH_LIMIT = '3';
+const INTERNAL_TOKEN = 'e2e-internal-token-0123456789abcdef';
+process.env.INTERNAL_API_TOKEN = INTERNAL_TOKEN;
 
 describe('Rate limiting (e2e)', () => {
   let app: INestApplication<App>;
@@ -53,5 +55,18 @@ describe('Rate limiting (e2e)', () => {
     // The auth bucket of this socket is already exhausted by the first test.
     await login('198.51.100.7').expect(429);
     await login('198.51.100.8').expect(429);
+  });
+
+  it('does not limit the web server (internal token), and only with the exact token', async () => {
+    // The auth bucket of this socket is exhausted by the tests above.
+    const login = () =>
+      request(app.getHttpServer())
+        .post('/api/v1/auth/login')
+        .send({ email: 'nobody@example.com', password: 'wrong-password' });
+
+    await login().set('X-Internal-Token', INTERNAL_TOKEN).expect(401);
+    await login().set('X-Internal-Token', INTERNAL_TOKEN).expect(401);
+    await login().set('X-Internal-Token', 'e2e-internal-token-0123456789abcdeX').expect(429);
+    await login().expect(429);
   });
 });

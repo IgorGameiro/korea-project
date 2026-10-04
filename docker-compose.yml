@@ -70,6 +70,8 @@ services:
     environment:
       # Server components reach the API through the compose network, not localhost.
       API_INTERNAL_URL: http://api:3001/api/v1
+      # Server-side rendering is exempt from the API's per-IP rate limits (see README).
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-}
     ports:
       - '${WEB_PORT:-3000}:3000'
     depends_on:

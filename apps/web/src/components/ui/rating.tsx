@@ -1,10 +1,21 @@
 import { useTranslations } from 'next-intl';
 import { Icon } from './icon';
 
-/** Star rating with one accessible label ("Rated 4.7 out of 5, 3 reviews"); stars are decorative. */
-export function Rating({ value, count }: { value: number; count: number }) {
+/**
+ * Star rating with one accessible label ("Rated 4.7 out of 5, 3 reviews"); stars are decorative.
+ * `hideCount` is for a single review's own rating ("Rated 4 out of 5").
+ */
+export function Rating({
+  value,
+  count,
+  hideCount = false,
+}: {
+  value: number;
+  count: number;
+  hideCount?: boolean;
+}) {
   const t = useTranslations('rating');
-  if (count === 0) {
+  if (count === 0 && !hideCount) {
     return <p className="text-sm text-navy-700">{t('noReviews')}</p>;
   }
 
@@ -13,7 +24,7 @@ export function Rating({ value, count }: { value: number; count: number }) {
     <p
       className="flex items-center gap-1.5 text-sm"
       role="img"
-      aria-label={t('label', { value, count })}
+      aria-label={hideCount ? t('single', { value }) : t('label', { value, count })}
     >
       <span className="flex text-amber-500" aria-hidden="true">
         {[1, 2, 3, 4, 5].map((star) => (
@@ -28,9 +39,11 @@ export function Rating({ value, count }: { value: number; count: number }) {
       <span aria-hidden="true" className="font-semibold">
         {value.toFixed(1)}
       </span>
-      <span aria-hidden="true" className="text-navy-700">
-        ({t('reviews', { count })})
-      </span>
+      {hideCount ? null : (
+        <span aria-hidden="true" className="text-navy-700">
+          ({t('reviews', { count })})
+        </span>
+      )}
     </p>
   );
 }

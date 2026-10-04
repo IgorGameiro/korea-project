@@ -30,6 +30,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { SLUG_MESSAGE, SLUG_PATTERN } from '../../../common/validation';
+import { OpeningHoursDto } from './opening-hours.dto';
 
 /** Validates the shared OpeningHours shape (every weekday, HH:MM ranges). */
 const IsOpeningHours = () =>
@@ -173,7 +174,11 @@ export class CreatePlaceDto {
   @Min(0)
   averageSpendKRW: number;
 
-  @ApiPropertyOptional({ nullable: true, description: 'Weekly schedule (see OpeningHours).' })
+  @ApiPropertyOptional({
+    type: OpeningHoursDto,
+    nullable: true,
+    description: 'Weekly schedule (Asia/Seoul).',
+  })
   @IsOptional()
   @IsOpeningHours()
   openingHours?: OpeningHours | null;
