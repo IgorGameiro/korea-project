@@ -127,12 +127,13 @@ The API **validates its variables at startup** ([`env.validation.ts`](apps/api/s
 | `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` / `POSTGRES_PORT` | Postgres container (port 5433 on the host)                                      |
 | `API_PORT`, `CORS_ORIGINS`, `SWAGGER_ENABLED`                           | API HTTP settings                                                               |
 | `JWT_*`, `COOKIE_SECURE`                                                | Authentication (Phase 3); secrets need at least 32 characters                   |
-| `THROTTLE_*`                                                            | Global rate limit and the stricter one for `/auth/*`                            |
+| `THROTTLE_*`                                                            | Global rate limit and the stricter ones for `/auth/*` and `/search`             |
 | `CACHE_TTL_MS`                                                          | Default cache TTL                                                               |
 | `SEED_ADMIN_PASSWORD`, `SEED_USER_PASSWORD`                             | Passwords of the demo accounts created by the seed                              |
 | `KRW_TO_BRL`, `KRW_TO_USD`                                              | Exchange rates written to the `ExchangeRate` table by the seed (**estimates**)  |
 | `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`                           | URLs seen by the browser (inlined into the web build)                           |
 | `API_INTERNAL_URL`                                                      | API URL used by Next.js server rendering (in Compose: `http://api:3001/api/v1`) |
+| `NEXT_PUBLIC_MAP_TILE_URL`, `NEXT_PUBLIC_MAP_TILE_ATTRIBUTION`          | Map tile provider; empty = public OSM tiles (development only, see below)       |
 
 ## Internationalization
 
@@ -218,6 +219,20 @@ Ready so far:
 
 API error messages are meant for developers; the web app translates errors by `code`.
 
+## Web architecture
+
+Next.js App Router in [`apps/web`](apps/web), with next-intl for routing and messages.
+
+- **Rendering:** Home, city pages (`/cities/[slug]`) and city sections (`/cities/[slug]/[section]`) are statically generated and refreshed with ISR (every 5 minutes). When the API is not reachable at build time (e.g. the Docker image build), city pages are generated on their first request instead, and the Home is built with a friendly "cities unavailable" notice that ISR replaces.
+- **Filters stay out of the static pages:** section filters live in the URL (`?district=hongdae&price=1,2&rating=4&difficulty=easy&sort=price&page=2`, stays: `tier`, `type`, `sort=price-desc`). The proxy ([`src/proxy.ts`](apps/web/src/proxy.ts)) rewrites a section URL that has filter parameters to the internal dynamic route `[section]/filtered`, so the unfiltered page never reads the query string and stays static. The address bar keeps the public URL, filtered pages are `noindex` with a canonical to the unfiltered page, and the internal route answers 404 when requested directly. Every filter value is validated ([`filters.ts`](apps/web/src/features/sections/filters.ts)); an invalid value falls back to the default.
+- **Currency:** the server never reads the currency cookie (that would make pages dynamic). The HTML renders the locale's default currency and a client provider applies the visitor's choice after hydration.
+- **API client:** typed with `openapi-typescript` from the API's OpenAPI document (`pnpm --filter @korea-project/web gen:api`, output committed in `src/lib/api/schema.d.ts`).
+- **Map:** `MapView` ([`src/features/map`](apps/web/src/features/map)) takes provider-agnostic points; Leaflet lives only in `leaflet-map.tsx`, loaded with `next/dynamic` (`ssr: false`). Swapping to Mapbox GL JS means writing another component with the same props. Markers have a per-category icon and a text label (never color alone), and every map comes with a keyboard-navigable list of its places with a "Show on map" button.
+
+## Before production (mandatory)
+
+- [ ] **Map tiles — OpenStreetMap tile usage policy.** The default tiles come from `tile.openstreetmap.org`, which is run by volunteers and donations. Its [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) forbids heavy use, requires a valid identifying User-Agent/Referer and visible attribution, and the service can block a site at any time without notice. Before going live, review the policy and either confirm the expected traffic complies or set `NEXT_PUBLIC_MAP_TILE_URL` / `NEXT_PUBLIC_MAP_TILE_ATTRIBUTION` to a commercial or self-hosted tile provider. Keep the attribution visible either way.
+
 ## Extension points
 
 - **Automatic exchange rates (not implemented):** add a provider client and a scheduled job (e.g. `@nestjs/schedule`) that calls `ExchangeRatesService.upsert(currency, rate, '<provider>')`. Nothing else changes: the table, the cache invalidation and every reader already go through that service. Keep the admin route as a manual override.
@@ -227,6 +242,6 @@ API error messages are meant for developers; the web app translates errors by `c
 1. ✅ Monorepo setup, Docker Compose, lint/format, `.env.example`, NestJS skeleton
 2. ✅ Prisma schema (with i18n), migrations and seed
 3. ✅ API: auth, users, cities, districts, places, accommodations, reviews, favorites, cost estimates, exchange rates + tests
-4. Web: base layout, design system, locale routing, Home, city page, map
+4. ✅ Web: base layout, design system, locale routing, Home, cross-city search, city page and sections, map
 5. Cost calculator, place page, reviews, auth, favorites
 6. Admin panel, SEO, optimizations, tests, final README with an extension guide

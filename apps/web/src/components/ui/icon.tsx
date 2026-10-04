@@ -4,7 +4,7 @@ import type { IconName } from '@/lib/categories';
 type ExtraIcon = 'star' | 'star-half' | 'search' | 'map-pin' | 'globe' | 'chevron-right' | 'x';
 
 // Minimal inline icon set (24x24, stroke-based) — no icon dependency needed.
-const PATHS: Record<IconName | ExtraIcon, string> = {
+export const ICON_PATHS: Record<IconName | ExtraIcon, string> = {
   utensils: 'M7 2v9M4 2v5a3 3 0 0 0 6 0V2M7 11v11M17 2c-2 2-3 4-3 7v4h3v9',
   moon: 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z',
   mountain: 'm3 20 6-11 4 6 3-4 5 9H3Z',
@@ -26,7 +26,7 @@ const PATHS: Record<IconName | ExtraIcon, string> = {
   x: 'M18 6 6 18M6 6l12 12',
 };
 
-export type AnyIconName = keyof typeof PATHS;
+export type AnyIconName = keyof typeof ICON_PATHS;
 
 /** Decorative by default (aria-hidden). Pass `title` to make it meaningful to screen readers. */
 export function Icon({
@@ -50,7 +50,7 @@ export function Icon({
       {...props}
     >
       {title ? <title>{title}</title> : null}
-      <path d={PATHS[name]} />
+      <path d={ICON_PATHS[name]} />
     </svg>
   );
 }

@@ -1440,6 +1440,24 @@ export interface components {
       latitude: number;
       longitude: number;
     };
+    PlaceCountsDto: {
+      /** @example 5 */
+      RESTAURANT: number;
+      /** @example 5 */
+      NIGHTLIFE: number;
+      /** @example 5 */
+      HIKING: number;
+      /** @example 5 */
+      ATTRACTION: number;
+      /** @example 5 */
+      CAFE: number;
+      /** @example 5 */
+      SHOPPING: number;
+      /** @example 5 */
+      CULTURE: number;
+      /** @example 5 */
+      NATURE: number;
+    };
     CityOverviewDto: {
       /** Format: uuid */
       id: string;
@@ -1459,20 +1477,8 @@ export interface components {
       population?: number | null;
       isFeatured: boolean;
       districts: components['schemas']['DistrictDto'][];
-      /**
-       * @description Number of places per category (every category present, 0 when empty).
-       * @example {
-       *       "RESTAURANT": 5,
-       *       "NIGHTLIFE": 5,
-       *       "HIKING": 5,
-       *       "ATTRACTION": 5,
-       *       "CAFE": 5,
-       *       "SHOPPING": 5,
-       *       "CULTURE": 5,
-       *       "NATURE": 5
-       *     }
-       */
-      placeCounts: Record<string, never>;
+      /** @description Number of places per category (every category present, 0 when empty). */
+      placeCounts: components['schemas']['PlaceCountsDto'];
     };
     PlaceAreaDto: {
       /** Format: uuid */

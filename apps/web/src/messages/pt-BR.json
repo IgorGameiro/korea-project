@@ -73,7 +73,6 @@
     "planTitle": "Planeje sua viagem",
     "planBody": "Escolha a cidade, quantas pessoas e dias e o estilo de viagem para estimar hospedagem, alimentação, transporte e passeios.",
     "planCta": "Calcular minha viagem",
-    "placeCount": "{count, plural, one {# lugar} other {# lugares}}",
     "citiesUnavailable": "Não foi possível carregar as cidades em destaque agora. Volte em alguns minutos."
   },
   "categoryShortcuts": {
@@ -96,19 +95,104 @@
     "resultsCount": "{count, plural, =0 {Nenhum lugar encontrado} one {# lugar encontrado} other {# lugares encontrados}}",
     "tooShort": "Digite pelo menos 2 caracteres para buscar.",
     "tooLong": "Use no máximo 100 caracteres.",
-    "empty": "Nenhum lugar corresponde à sua busca. Tente outra palavra ou explore uma cidade.",
-    "previous": "Anterior",
-    "next": "Próxima",
-    "pageOf": "Página {page} de {total}",
-    "pagination": "Páginas de resultados"
+    "empty": "Nenhum lugar corresponde à sua busca. Tente outra palavra ou explore uma cidade."
   },
   "place": {
-    "inCity": "em {city}"
+    "inCity": "em {city}",
+    "trail": "{difficulty} · {distance} km · cerca de {hours} h"
   },
   "plan": {
     "metaTitle": "Planeje sua viagem",
     "title": "Calculadora de custos",
     "comingSoon": "A calculadora chega em breve. Enquanto isso, explore as cidades para ver o que cada uma oferece.",
     "browseCities": "Ver cidades"
+  },
+  "pagination": {
+    "label": "Páginas",
+    "previous": "Anterior",
+    "next": "Próxima",
+    "pageOf": "Página {page} de {total}"
+  },
+  "city": {
+    "sectionsNav": "Seções da cidade",
+    "overview": "Visão geral",
+    "sections": {
+      "restaurants": "Restaurantes",
+      "nightlife": "Vida noturna",
+      "hiking": "Trilhas",
+      "attractions": "Atrações",
+      "cafes": "Cafés",
+      "shopping": "Compras",
+      "culture": "Cultura",
+      "nature": "Natureza",
+      "stays": "Hospedagem"
+    },
+    "sectionTitle": "{section} em {city}",
+    "sectionMetaDescription": "{section} em {city}, Coreia do Sul: preços, avaliações, bairros e mapa.",
+    "about": "Sobre {city}",
+    "bestTime": "Melhor época para visitar",
+    "population": "População",
+    "explore": "Explore {city}",
+    "placeCount": "{count, plural, =0 {Nenhum lugar ainda} one {# lugar} other {# lugares}}",
+    "stayCount": "{count, plural, =0 {Nenhuma hospedagem ainda} one {# hospedagem} other {# hospedagens}}",
+    "districts": "Bairros",
+    "topRated": "Lugares mais bem avaliados",
+    "mapTitle": "Mapa",
+    "placesFound": "{count, plural, =0 {Nenhum lugar corresponde aos filtros} one {# lugar} other {# lugares}}",
+    "staysFound": "{count, plural, =0 {Nenhuma hospedagem corresponde aos filtros} one {# hospedagem} other {# hospedagens}}",
+    "empty": "Nada corresponde a estes filtros. Tente remover alguns.",
+    "emptySection": "Ainda não há nada nesta seção."
+  },
+  "filters": {
+    "title": "Filtros",
+    "district": "Bairro",
+    "anyDistrict": "Todos os bairros",
+    "price": "Faixa de preço",
+    "rating": "Nota mínima",
+    "anyRating": "Qualquer nota",
+    "ratingAtLeast": "{value} estrelas ou mais",
+    "difficulty": "Dificuldade da trilha",
+    "anyDifficulty": "Qualquer dificuldade",
+    "sort": "Ordenar por",
+    "sortRating": "Mais bem avaliados",
+    "sortPrice": "Menor preço",
+    "sortPriceDesc": "Maior preço",
+    "tier": "Estilo de viagem",
+    "anyTier": "Qualquer estilo",
+    "type": "Tipo",
+    "anyType": "Qualquer tipo",
+    "apply": "Aplicar filtros",
+    "clear": "Limpar filtros"
+  },
+  "difficulty": {
+    "EASY": "Fácil",
+    "MODERATE": "Moderada",
+    "HARD": "Difícil"
+  },
+  "tiers": {
+    "BUDGET": "Econômico",
+    "MID": "Conforto",
+    "LUXURY": "Luxo"
+  },
+  "stayTypes": {
+    "HOTEL": "Hotel",
+    "HOSTEL": "Hostel",
+    "GUESTHOUSE": "Pousada",
+    "HANOK": "Hanok",
+    "APARTMENT": "Apartamento"
+  },
+  "stay": {
+    "book": "Ver disponibilidade",
+    "bookLabel": "Ver disponibilidade de {name} (abre em nova aba)"
+  },
+  "map": {
+    "label": "Mapa de {name}",
+    "loading": "Carregando mapa…",
+    "legend": "Legenda do mapa",
+    "list": "Lugares no mapa",
+    "showOnMap": "Ver no mapa",
+    "showOnMapLabel": "Mostrar {name} no mapa",
+    "viewDetails": "Ver detalhes",
+    "empty": "Nenhum lugar para mostrar no mapa."
   }
 }

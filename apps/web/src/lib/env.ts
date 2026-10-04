@@ -14,3 +14,15 @@ export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:300
 
 /** Origin of an API base URL ("http://api:3001/api/v1" -> "http://api:3001"): OpenAPI paths are absolute. */
 export const originOf = (url: string) => new URL(url).origin;
+
+/**
+ * Map tiles. Defaults to the public OpenStreetMap tile servers, which are fine for development but
+ * have a usage policy that MUST be reviewed before production (see README): set a tile provider here.
+ * `||`, not `??`: Compose passes unset variables as empty strings.
+ */
+export const mapTiles = {
+  url: process.env.NEXT_PUBLIC_MAP_TILE_URL || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  attribution:
+    process.env.NEXT_PUBLIC_MAP_TILE_ATTRIBUTION ||
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+};

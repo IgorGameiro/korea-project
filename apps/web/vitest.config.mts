@@ -11,5 +11,8 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
+    // next-intl imports "next/server" without an extension, which Node's ESM resolver rejects
+    // (next has no exports map). Letting Vite bundle it resolves the path like Next does.
+    server: { deps: { inline: ['next-intl'] } },
   },
 });

@@ -2,10 +2,10 @@ import { isLocale, type Locale } from '@korea-project/shared';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Container } from '@/components/ui/container';
+import { Pagination } from '@/components/ui/pagination';
 import { PlaceCard } from '@/features/places/place-card';
 import { SearchForm } from '@/features/search/search-form';
 import { parseSearchParams } from '@/features/search/search-params';
-import { Link } from '@/i18n/navigation';
 import { load, serverApi } from '@/lib/api/server';
 
 const PAGE_SIZE = 12;
@@ -75,29 +75,7 @@ export default async function SearchPage({ params, searchParams }: PageProps<'/[
               </ul>
             )}
 
-            {results.meta.totalPages > 1 ? (
-              <nav aria-label={t('pagination')} className="mt-8 flex items-center gap-4">
-                {page > 1 ? (
-                  <Link
-                    href={pageHref(page - 1)}
-                    className="font-semibold underline underline-offset-4"
-                  >
-                    {t('previous')}
-                  </Link>
-                ) : null}
-                <span className="text-sm text-navy-700">
-                  {t('pageOf', { page, total: results.meta.totalPages })}
-                </span>
-                {page < results.meta.totalPages ? (
-                  <Link
-                    href={pageHref(page + 1)}
-                    className="font-semibold underline underline-offset-4"
-                  >
-                    {t('next')}
-                  </Link>
-                ) : null}
-              </nav>
-            ) : null}
+            <Pagination page={page} totalPages={results.meta.totalPages} hrefFor={pageHref} />
           </>
         ) : null}
       </section>

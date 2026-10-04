@@ -15,13 +15,24 @@ import { DistrictsService } from '../districts/districts.service';
 import { DistrictDto } from '../districts/dto/district.dto';
 import { PlacesService } from '../places/places.service';
 
+export class PlaceCountsDto implements Record<PlaceCategory, number> {
+  @ApiProperty({ minimum: 0, example: 5 }) RESTAURANT: number;
+  @ApiProperty({ minimum: 0, example: 5 }) NIGHTLIFE: number;
+  @ApiProperty({ minimum: 0, example: 5 }) HIKING: number;
+  @ApiProperty({ minimum: 0, example: 5 }) ATTRACTION: number;
+  @ApiProperty({ minimum: 0, example: 5 }) CAFE: number;
+  @ApiProperty({ minimum: 0, example: 5 }) SHOPPING: number;
+  @ApiProperty({ minimum: 0, example: 5 }) CULTURE: number;
+  @ApiProperty({ minimum: 0, example: 5 }) NATURE: number;
+}
+
 export class CityOverviewDto extends CityDto {
   @ApiProperty({ type: [DistrictDto] })
   districts: DistrictDto[];
 
   @ApiProperty({
+    type: PlaceCountsDto,
     description: 'Number of places per category (every category present, 0 when empty).',
-    example: Object.fromEntries(Object.values(PlaceCategory).map((c) => [c, 5])),
   })
   placeCounts: Record<PlaceCategory, number>;
 }

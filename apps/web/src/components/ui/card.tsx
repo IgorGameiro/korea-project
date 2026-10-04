@@ -5,6 +5,7 @@ import { Link } from '@/i18n/navigation';
 /**
  * Image card whose whole surface is clickable, while only the title is the link
  * (one tab stop and a meaningful accessible name — the "stretched link" pattern).
+ * Without `href` it is a plain card (its children may then hold their own links).
  */
 export function Card({
   href,
@@ -16,7 +17,7 @@ export function Card({
   headingLevel = 3,
   sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw',
 }: {
-  href: ComponentProps<typeof Link>['href'];
+  href?: ComponentProps<typeof Link>['href'];
   title: ReactNode;
   imageUrl?: string | null;
   imageAlt?: string;
@@ -42,9 +43,13 @@ export function Card({
       <div className="flex flex-1 flex-col gap-2 p-4">
         {eyebrow ? <div className="flex flex-wrap items-center gap-2">{eyebrow}</div> : null}
         <Heading className="text-lg leading-snug font-bold">
-          <Link href={href} className="after:absolute after:inset-0 focus-visible:outline-none">
-            {title}
-          </Link>
+          {href ? (
+            <Link href={href} className="after:absolute after:inset-0 focus-visible:outline-none">
+              {title}
+            </Link>
+          ) : (
+            title
+          )}
         </Heading>
         {children}
       </div>

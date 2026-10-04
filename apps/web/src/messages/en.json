@@ -73,7 +73,6 @@
     "planTitle": "Plan your trip",
     "planBody": "Choose a city, how many people and days, and your travel style to estimate lodging, food, transport and activities.",
     "planCta": "Estimate my trip",
-    "placeCount": "{count, plural, one {# place} other {# places}}",
     "citiesUnavailable": "Featured cities could not be loaded right now. Please check back in a few minutes."
   },
   "categoryShortcuts": {
@@ -96,19 +95,104 @@
     "resultsCount": "{count, plural, =0 {No places found} one {# place found} other {# places found}}",
     "tooShort": "Type at least 2 characters to search.",
     "tooLong": "Use at most 100 characters.",
-    "empty": "No places match your search. Try another word or browse a city.",
-    "previous": "Previous",
-    "next": "Next",
-    "pageOf": "Page {page} of {total}",
-    "pagination": "Search results pages"
+    "empty": "No places match your search. Try another word or browse a city."
   },
   "place": {
-    "inCity": "in {city}"
+    "inCity": "in {city}",
+    "trail": "{difficulty} · {distance} km · about {hours} h"
   },
   "plan": {
     "metaTitle": "Plan your trip",
     "title": "Trip cost calculator",
     "comingSoon": "The calculator is coming soon. Meanwhile, explore the cities to see what each one offers.",
     "browseCities": "Browse cities"
+  },
+  "pagination": {
+    "label": "Pages",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}"
+  },
+  "city": {
+    "sectionsNav": "City sections",
+    "overview": "Overview",
+    "sections": {
+      "restaurants": "Restaurants",
+      "nightlife": "Nightlife",
+      "hiking": "Hiking",
+      "attractions": "Attractions",
+      "cafes": "Cafés",
+      "shopping": "Shopping",
+      "culture": "Culture",
+      "nature": "Nature",
+      "stays": "Stays"
+    },
+    "sectionTitle": "{section} in {city}",
+    "sectionMetaDescription": "{section} in {city}, South Korea: prices, ratings, neighborhoods and a map.",
+    "about": "About {city}",
+    "bestTime": "Best time to visit",
+    "population": "Population",
+    "explore": "Explore {city}",
+    "placeCount": "{count, plural, =0 {No places yet} one {# place} other {# places}}",
+    "stayCount": "{count, plural, =0 {No stays yet} one {# stay} other {# stays}}",
+    "districts": "Neighborhoods",
+    "topRated": "Top-rated places",
+    "mapTitle": "Map",
+    "placesFound": "{count, plural, =0 {No places match these filters} one {# place} other {# places}}",
+    "staysFound": "{count, plural, =0 {No stays match these filters} one {# stay} other {# stays}}",
+    "empty": "Nothing matches these filters. Try removing some of them.",
+    "emptySection": "There is nothing in this section yet."
+  },
+  "filters": {
+    "title": "Filters",
+    "district": "Neighborhood",
+    "anyDistrict": "All neighborhoods",
+    "price": "Price level",
+    "rating": "Minimum rating",
+    "anyRating": "Any rating",
+    "ratingAtLeast": "{value} stars or more",
+    "difficulty": "Trail difficulty",
+    "anyDifficulty": "Any difficulty",
+    "sort": "Sort by",
+    "sortRating": "Highest rated",
+    "sortPrice": "Lowest price",
+    "sortPriceDesc": "Highest price",
+    "tier": "Travel style",
+    "anyTier": "Any style",
+    "type": "Type",
+    "anyType": "Any type",
+    "apply": "Apply filters",
+    "clear": "Clear filters"
+  },
+  "difficulty": {
+    "EASY": "Easy",
+    "MODERATE": "Moderate",
+    "HARD": "Hard"
+  },
+  "tiers": {
+    "BUDGET": "Budget",
+    "MID": "Comfort",
+    "LUXURY": "Luxury"
+  },
+  "stayTypes": {
+    "HOTEL": "Hotel",
+    "HOSTEL": "Hostel",
+    "GUESTHOUSE": "Guesthouse",
+    "HANOK": "Hanok",
+    "APARTMENT": "Apartment"
+  },
+  "stay": {
+    "book": "Check availability",
+    "bookLabel": "Check availability for {name} (opens in a new tab)"
+  },
+  "map": {
+    "label": "Map of {name}",
+    "loading": "Loading map…",
+    "legend": "Map legend",
+    "list": "Places on the map",
+    "showOnMap": "Show on map",
+    "showOnMapLabel": "Show {name} on the map",
+    "viewDetails": "View details",
+    "empty": "No places to show on the map."
   }
 }

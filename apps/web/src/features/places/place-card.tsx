@@ -16,6 +16,7 @@ export function PlaceCard({
   headingLevel?: 2 | 3 | 4;
 }) {
   const t = useTranslations('place');
+  const td = useTranslations('difficulty');
   return (
     <Card
       href={`/places/${place.slug}`}
@@ -37,6 +38,15 @@ export function PlaceCard({
         {place.nameKo}
       </p>
       <p className="line-clamp-2 text-sm text-navy-700">{place.description}</p>
+      {place.trail ? (
+        <p className="text-sm font-medium">
+          {t('trail', {
+            difficulty: td(place.trail.difficulty),
+            distance: place.trail.distanceKm,
+            hours: Math.round(place.trail.durationMinutes / 30) / 2,
+          })}
+        </p>
+      ) : null}
       <div className="mt-auto flex items-center justify-between gap-2 pt-2">
         <Rating value={place.ratingAvg} count={place.ratingCount} />
         <PriceLevel level={place.priceLevel} />
