@@ -41,6 +41,10 @@ describe('Favorites (e2e)', () => {
       'Ilha Udo',
     ]);
 
+    // Just the ids, to mark the hearts on every card of a page with one request.
+    const ids = await http().get(`${API}/users/me/favorites/ids`).set(auth).expect(200);
+    expect(ids.body).toEqual({ placeIds: [museum, udo] });
+
     await http().delete(`${API}/places/${udo}/favorite`).set(auth).expect(204);
     await http().delete(`${API}/places/${udo}/favorite`).set(auth).expect(204);
     const after = await http().get(`${API}/places/${udo}/favorite`).set(auth).expect(200);
@@ -61,6 +65,11 @@ describe('Favorites (e2e)', () => {
       .set({ Authorization: `Bearer ${b.token}` })
       .expect(200);
     expect(res.body.meta.total).toBe(0);
+    const ids = await http()
+      .get(`${API}/users/me/favorites/ids`)
+      .set({ Authorization: `Bearer ${b.token}` })
+      .expect(200);
+    expect(ids.body).toEqual({ placeIds: [] });
   });
 
   it('requires authentication and an existing place', async () => {
@@ -69,6 +78,7 @@ describe('Favorites (e2e)', () => {
 
     await http().post(`${API}/places/${udo}/favorite`).expect(401);
     await http().get(`${API}/users/me/favorites`).expect(401);
+    await http().get(`${API}/users/me/favorites/ids`).expect(401);
     const res = await http()
       .post(`${API}/places/00000000-0000-7000-8000-000000000000/favorite`)
       .set({ Authorization: `Bearer ${user.token}` })

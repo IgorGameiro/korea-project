@@ -1,7 +1,8 @@
 import type { SVGProps } from 'react';
 import type { IconName } from '@/lib/categories';
 
-type ExtraIcon = 'star' | 'star-half' | 'search' | 'map-pin' | 'globe' | 'chevron-right' | 'x';
+type ExtraIcon =
+  'star' | 'star-half' | 'search' | 'map-pin' | 'globe' | 'chevron-right' | 'x' | 'heart';
 
 // Minimal inline icon set (24x24, stroke-based) — no icon dependency needed.
 export const ICON_PATHS: Record<IconName | ExtraIcon, string> = {
@@ -24,6 +25,8 @@ export const ICON_PATHS: Record<IconName | ExtraIcon, string> = {
     'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20ZM2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20',
   'chevron-right': 'm9 6 6 6-6 6',
   x: 'M18 6 6 18M6 6l12 12',
+  heart:
+    'M12 20.5s-7.5-4.6-9.4-9.3C1.2 7.8 3.4 4.5 6.8 4.5c2.1 0 3.6 1.2 5.2 3 1.6-1.8 3.1-3 5.2-3 3.4 0 5.6 3.3 4.2 6.7-1.9 4.7-9.4 9.3-9.4 9.3Z',
 };
 
 export type AnyIconName = keyof typeof ICON_PATHS;

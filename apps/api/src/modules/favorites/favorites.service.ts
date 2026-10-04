@@ -5,6 +5,9 @@ import type { PlaceSummaryDto } from '../places/dto/place.response';
 import { PlacesService } from '../places/places.service';
 import { FavoritesRepository } from './favorites.repository';
 
+/** Upper bound of GET /users/me/favorites/ids. */
+export const MAX_FAVORITE_IDS = 1000;
+
 @Injectable()
 export class FavoritesService {
   constructor(
@@ -25,6 +28,11 @@ export class FavoritesService {
   async isFavorite(userId: string, placeId: string): Promise<boolean> {
     await this.places.assertExists(placeId);
     return this.repository.exists(userId, placeId);
+  }
+
+  /** Ids of the user's favorite places, so a page can mark every card at once. */
+  allIds(userId: string): Promise<string[]> {
+    return this.repository.allPlaceIds(userId, MAX_FAVORITE_IDS);
   }
 
   /** The user's favorite places as localized summaries, most recently favorited first. */

@@ -16,6 +16,7 @@ export function Card({
   children,
   headingLevel = 3,
   sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw',
+  action,
 }: {
   href?: ComponentProps<typeof Link>['href'];
   title: ReactNode;
@@ -25,6 +26,8 @@ export function Card({
   children?: ReactNode;
   headingLevel?: 2 | 3 | 4;
   sizes?: string;
+  /** A control over the image corner (e.g. a favorite button), above the stretched link. */
+  action?: ReactNode;
 }) {
   const Heading = `h${headingLevel}` as const;
   return (
@@ -39,6 +42,7 @@ export function Card({
             className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
         ) : null}
+        {action ? <div className="absolute top-3 right-3 z-10">{action}</div> : null}
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
         {eyebrow ? <div className="flex flex-wrap items-center gap-2">{eyebrow}</div> : null}

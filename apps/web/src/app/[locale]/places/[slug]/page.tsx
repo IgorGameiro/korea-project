@@ -5,6 +5,7 @@ import { Badge, CategoryBadge } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
 import { PriceLevel, PriceTag } from '@/components/ui/price-tag';
+import { FavoriteButton } from '@/features/favorites/favorite-button';
 import { MapView } from '@/features/map/map-view';
 import { allPlaceSlugs, getPlace } from '@/features/places/data';
 import { Gallery } from '@/features/places/gallery';
@@ -88,9 +89,12 @@ export default async function PlacePage({ params }: Props) {
       </nav>
 
       <header className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <CategoryBadge category={place.category} />
-          {place.district ? <Badge>{place.district.name}</Badge> : null}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <CategoryBadge category={place.category} />
+            {place.district ? <Badge>{place.district.name}</Badge> : null}
+          </div>
+          <FavoriteButton placeId={place.id} placeName={place.name} />
         </div>
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {place.name}{' '}

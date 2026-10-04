@@ -262,7 +262,8 @@
       "TOO_MANY_REQUESTS": "Muitas tentativas. Aguarde um minuto e tente de novo.",
       "API_UNAVAILABLE": "Não conseguimos falar com o servidor agora. Tente de novo em instantes.",
       "UNKNOWN": "Algo deu errado. Tente de novo."
-    }
+    },
+    "account": "Minha conta"
   },
   "calculator": {
     "title": "Estime sua viagem",
@@ -481,5 +482,26 @@
       "API_UNAVAILABLE": "Não conseguimos falar com o servidor agora. Tente de novo em instantes.",
       "UNKNOWN": "Algo deu errado. Tente de novo."
     }
+  },
+  "favorites": {
+    "save": "Salvar {name} nos favoritos",
+    "saveShort": "Salvar",
+    "saved": "Salvo",
+    "loginToSave": "Entre para salvar {name} nos favoritos",
+    "error": "Não foi possível atualizar seus favoritos. Tente de novo."
+  },
+  "account": {
+    "metaTitle": "Minha conta",
+    "title": "Minha conta",
+    "memberSince": "Membro desde {date}",
+    "favorites": "Favoritos",
+    "reviews": "Minhas avaliações",
+    "tabs": "Seções da conta",
+    "noFavorites": "Você ainda não tem favoritos. Toque no coração de qualquer lugar para salvá-lo aqui.",
+    "noReviews": "Você ainda não avaliou nenhum lugar.",
+    "reviewOf": "Sobre {place}",
+    "loadError": "Não foi possível carregar esta lista. Tente de novo em instantes.",
+    "showMore": "Ver mais",
+    "redirecting": "Levando você para a página de login…"
   }
 }

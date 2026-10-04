@@ -262,7 +262,8 @@
       "TOO_MANY_REQUESTS": "Too many attempts. Wait a minute and try again.",
       "API_UNAVAILABLE": "We cannot reach the server right now. Please try again in a moment.",
       "UNKNOWN": "Something went wrong. Please try again."
-    }
+    },
+    "account": "My account"
   },
   "calculator": {
     "title": "Estimate your trip",
@@ -481,5 +482,26 @@
       "API_UNAVAILABLE": "We cannot reach the server right now. Please try again in a moment.",
       "UNKNOWN": "Something went wrong. Please try again."
     }
+  },
+  "favorites": {
+    "save": "Save {name} to favorites",
+    "saveShort": "Save",
+    "saved": "Saved",
+    "loginToSave": "Log in to save {name} to favorites",
+    "error": "Could not update your favorites. Please try again."
+  },
+  "account": {
+    "metaTitle": "My account",
+    "title": "My account",
+    "memberSince": "Member since {date}",
+    "favorites": "Favorites",
+    "reviews": "My reviews",
+    "tabs": "Account sections",
+    "noFavorites": "You have no favorites yet. Tap the heart on any place to save it here.",
+    "noReviews": "You have not reviewed any place yet.",
+    "reviewOf": "About {place}",
+    "loadError": "This list could not be loaded. Please try again in a moment.",
+    "showMore": "Show more",
+    "redirecting": "Taking you to the login page…"
   }
 }

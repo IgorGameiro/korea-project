@@ -438,6 +438,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/users/me/favorites/ids': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Ids of every favorite place (to mark hearts on lists) */
+    get: operations['FavoritesController_ids_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/users/me/favorites': {
     parameters: {
       query?: never;
@@ -1309,6 +1326,10 @@ export interface components {
     };
     FavoriteStatusDto: {
       favorited: boolean;
+    };
+    FavoriteIdsDto: {
+      /** @description Most recent first (at most 1000). */
+      placeIds: string[];
     };
     CalculateCostDto: {
       /** @example seoul */
@@ -2985,6 +3006,25 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  FavoritesController_ids_v1: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FavoriteIdsDto'];
+        };
       };
     };
   };

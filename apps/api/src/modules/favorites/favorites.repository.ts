@@ -37,4 +37,15 @@ export class FavoritesRepository {
     ]);
     return { placeIds: rows.map((r) => r.placeId), total };
   }
+
+  /** Every favorite place id of a user (capped: enough for any real user, bounded for the DB). */
+  async allPlaceIds(userId: string, max: number): Promise<string[]> {
+    const rows = await this.prisma.favorite.findMany({
+      where: { userId },
+      orderBy: [{ createdAt: 'desc' }, { placeId: 'asc' }],
+      take: max,
+      select: { placeId: true },
+    });
+    return rows.map((r) => r.placeId);
+  }
 }

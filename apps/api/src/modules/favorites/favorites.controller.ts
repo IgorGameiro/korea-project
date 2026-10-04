@@ -30,6 +30,11 @@ export class FavoriteStatusDto {
   @ApiProperty() favorited: boolean;
 }
 
+export class FavoriteIdsDto {
+  @ApiProperty({ type: [String], format: 'uuid', description: 'Most recent first (at most 1000).' })
+  placeIds: string[];
+}
+
 @ApiTags('favorites')
 @ApiBearerAuth()
 @Controller()
@@ -69,6 +74,13 @@ export class FavoritesController {
     @Param('id', ParseUUIDPipe) placeId: string,
   ): Promise<void> {
     await this.favorites.remove(userId, placeId);
+  }
+
+  @Get('users/me/favorites/ids')
+  @ApiOperation({ summary: 'Ids of every favorite place (to mark hearts on lists)' })
+  @ApiOkResponse({ type: FavoriteIdsDto })
+  async ids(@CurrentUser('id') userId: string): Promise<FavoriteIdsDto> {
+    return { placeIds: await this.favorites.allIds(userId) };
   }
 
   @Get('users/me/favorites')

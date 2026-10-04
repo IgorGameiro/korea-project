@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { CategoryBadge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { FavoriteButton } from '@/features/favorites/favorite-button';
 import { PriceLevel } from '@/components/ui/price-tag';
 import { Rating } from '@/components/ui/rating';
 import type { PlaceSummaryDto } from '@/lib/api/types';
@@ -23,6 +24,7 @@ export function PlaceCard({
       imageUrl={place.imageUrl}
       title={place.name}
       headingLevel={headingLevel}
+      action={<FavoriteButton placeId={place.id} placeName={place.name} variant="card" />}
       eyebrow={
         <>
           <CategoryBadge category={place.category} />
