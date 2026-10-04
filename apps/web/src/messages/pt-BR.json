@@ -103,9 +103,8 @@
   },
   "plan": {
     "metaTitle": "Planeje sua viagem",
-    "title": "Calculadora de custos",
-    "comingSoon": "A calculadora chega em breve. Enquanto isso, explore as cidades para ver o que cada uma oferece.",
-    "browseCities": "Ver cidades"
+    "title": "Planeje sua viagem",
+    "intro": "Escolha a cidade, quantas pessoas vão, quantos dias vai ficar e o estilo de viagem. A estimativa se atualiza na hora, e você pode compartilhar o endereço desta página para guardar seu plano."
   },
   "pagination": {
     "label": "Páginas",
@@ -231,5 +230,43 @@
       "API_UNAVAILABLE": "Não conseguimos falar com o servidor agora. Tente de novo em instantes.",
       "UNKNOWN": "Algo deu errado. Tente de novo."
     }
+  },
+  "calculator": {
+    "title": "Estime sua viagem",
+    "titleIn": "Estime sua viagem para {city}",
+    "city": "Cidade",
+    "people": "Viajantes",
+    "days": "Dias",
+    "fewer": "Menos {what}",
+    "more": "Mais {what}",
+    "style": "Estilo de viagem",
+    "tierHints": {
+      "BUDGET": "Hostels e pousadas, comida de rua, transporte público",
+      "MID": "Hotéis 3–4 estrelas, restaurantes, alguns táxis",
+      "LUXURY": "Hotéis de luxo, alta gastronomia, traslados privados"
+    },
+    "result": "Custo estimado",
+    "total": "Total",
+    "perDay": "{amount} por dia",
+    "perPerson": "{amount} por pessoa",
+    "tripSummary": "{people, plural, one {# viajante} other {# viajantes}} · {days, plural, one {# dia} other {# dias}} · {nights, plural, one {# noite} other {# noites}} · {rooms, plural, one {# quarto} other {# quartos}}",
+    "breakdown": "Divisão",
+    "share": "{category}: {percent}% do total",
+    "categories": {
+      "lodging": "Hospedagem",
+      "food": "Alimentação",
+      "transport": "Transporte",
+      "activities": "Atividades"
+    },
+    "rateUsed": "Câmbio: ₩1 = {rate} (atualizado em {date})",
+    "disclaimer": "Estimativas para planejamento, com base em preços típicos. Os custos reais variam.",
+    "calculating": "Atualizando a estimativa…",
+    "errors": {
+      "EXCHANGE_RATE_UNAVAILABLE": "O câmbio para {currency} não está disponível agora. Tente outra moeda ou volte mais tarde.",
+      "COST_ESTIMATE_NOT_FOUND": "Ainda não há dados de custo para esta cidade e estilo de viagem.",
+      "TOO_MANY_REQUESTS": "Muitas mudanças em pouco tempo. Aguarde um instante e a estimativa será atualizada.",
+      "API_UNAVAILABLE": "Não conseguimos calcular agora. Tente de novo em instantes."
+    },
+    "citiesUnavailable": "Não foi possível carregar a lista de cidades agora. Tente de novo em alguns minutos."
   }
 }

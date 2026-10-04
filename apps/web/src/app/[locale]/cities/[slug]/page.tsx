@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
+import { CityCalculator } from '@/features/calculator/city-calculator';
 import { CityHeader } from '@/features/cities/city-header';
 import { CITY_REVALIDATE, getCityOverview, getStayTotal } from '@/features/cities/data';
 import { SectionNav } from '@/features/cities/section-nav';
@@ -41,6 +42,7 @@ export default async function CityPage({ params }: Props) {
   const locale = rawLocale as Locale;
   setRequestLocale(locale);
   const t = await getTranslations('city');
+  const tc = await getTranslations('calculator');
   const format = await getFormatter();
   const api = serverApi(CITY_REVALIDATE);
 
@@ -147,6 +149,13 @@ export default async function CityPage({ params }: Props) {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section aria-labelledby="calculator-title">
+          <h2 id="calculator-title" className="mb-4 text-2xl font-bold">
+            {tc('titleIn', { city: city.name })}
+          </h2>
+          <CityCalculator citySlug={city.slug} />
         </section>
 
         <section aria-labelledby="map-title">

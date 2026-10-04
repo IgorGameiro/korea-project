@@ -103,9 +103,8 @@
   },
   "plan": {
     "metaTitle": "Plan your trip",
-    "title": "Trip cost calculator",
-    "comingSoon": "The calculator is coming soon. Meanwhile, explore the cities to see what each one offers.",
-    "browseCities": "Browse cities"
+    "title": "Plan your trip",
+    "intro": "Pick a city, how many people are traveling, how long you will stay and your travel style. The estimate updates as you go, and you can share this page’s address to keep your plan."
   },
   "pagination": {
     "label": "Pages",
@@ -231,5 +230,43 @@
       "API_UNAVAILABLE": "We cannot reach the server right now. Please try again in a moment.",
       "UNKNOWN": "Something went wrong. Please try again."
     }
+  },
+  "calculator": {
+    "title": "Estimate your trip",
+    "titleIn": "Estimate your trip to {city}",
+    "city": "City",
+    "people": "Travelers",
+    "days": "Days",
+    "fewer": "Fewer {what}",
+    "more": "More {what}",
+    "style": "Travel style",
+    "tierHints": {
+      "BUDGET": "Hostels and guesthouses, street food, public transport",
+      "MID": "3–4 star hotels, restaurants, some taxis",
+      "LUXURY": "Top hotels, fine dining, private transfers"
+    },
+    "result": "Estimated cost",
+    "total": "Total",
+    "perDay": "{amount} per day",
+    "perPerson": "{amount} per person",
+    "tripSummary": "{people, plural, one {# traveler} other {# travelers}} · {days, plural, one {# day} other {# days}} · {nights, plural, one {# night} other {# nights}} · {rooms, plural, one {# room} other {# rooms}}",
+    "breakdown": "Breakdown",
+    "share": "{category}: {percent}% of the total",
+    "categories": {
+      "lodging": "Lodging",
+      "food": "Food",
+      "transport": "Transport",
+      "activities": "Activities"
+    },
+    "rateUsed": "Exchange rate: ₩1 = {rate} (updated {date})",
+    "disclaimer": "Estimates for planning, based on typical prices. Real costs vary.",
+    "calculating": "Updating the estimate…",
+    "errors": {
+      "EXCHANGE_RATE_UNAVAILABLE": "The exchange rate for {currency} is not available right now. Try another currency or come back later.",
+      "COST_ESTIMATE_NOT_FOUND": "There is no cost data for this city and travel style yet.",
+      "TOO_MANY_REQUESTS": "Too many changes in a short time. Wait a moment and the estimate will update.",
+      "API_UNAVAILABLE": "We cannot calculate right now. Please try again in a moment."
+    },
+    "citiesUnavailable": "The list of cities could not be loaded right now. Please try again in a few minutes."
   }
 }
