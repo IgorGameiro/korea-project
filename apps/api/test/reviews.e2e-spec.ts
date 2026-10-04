@@ -55,6 +55,8 @@ describe('Reviews (e2e)', () => {
       locale: 'en',
       visitedAt: '2026-05-01',
       author: { id: alice.id, name: 'Alice Reviewer' },
+      // The rating it produced, so the page can update without waiting for ISR.
+      placeRating: { ratingAvg: 5, ratingCount: 1 },
     });
     expect(JSON.stringify(res.body)).not.toMatch(/email|passwordHash/);
 
@@ -143,7 +145,11 @@ describe('Reviews (e2e)', () => {
       .set(bearer(author.token))
       .send({ rating: 4 })
       .expect(200);
-    expect(edited.body).toMatchObject({ rating: 4, title: 'Worth it' });
+    expect(edited.body).toMatchObject({
+      rating: 4,
+      title: 'Worth it',
+      placeRating: { ratingAvg: 4, ratingCount: 1 },
+    });
     expect((await place('cheonggyecheon-stream')).ratingAvg).toBe(4);
 
     // An admin can moderate.
@@ -153,7 +159,11 @@ describe('Reviews (e2e)', () => {
       .send({ comment: 'Edited by a moderator.' })
       .expect(200);
 
-    await http().delete(`${API}/reviews/${created.id}`).set(bearer(author.token)).expect(204);
+    const deleted = await http()
+      .delete(`${API}/reviews/${created.id}`)
+      .set(bearer(author.token))
+      .expect(200);
+    expect(deleted.body).toEqual({ placeRating: { ratingAvg: 0, ratingCount: 0 } });
     const after = await place('cheonggyecheon-stream');
     expect([after.ratingAvg, after.ratingCount]).toEqual([0, 0]);
     await http().delete(`${API}/reviews/${created.id}`).set(bearer(author.token)).expect(404);
@@ -196,5 +206,20 @@ describe('Reviews (e2e)', () => {
     );
     expect(palace?.place.name).toBe('Palácio Gyeongbokgung');
     await http().get(`${API}/users/me/reviews`).expect(401);
+
+    // "Have I reviewed this place?" — 0 or 1 result.
+    const gyeongbokgung = await place('gyeongbokgung-palace');
+    const one = await http()
+      .get(`${API}/users/me/reviews?placeId=${gyeongbokgung.id}`)
+      .set(bearer(ana))
+      .expect(200);
+    expect(one.body.meta.total).toBe(1);
+    expect(one.body.data[0].placeId).toBe(gyeongbokgung.id);
+    const none = await http()
+      .get(`${API}/users/me/reviews?placeId=${(await place('inwangsan')).id}`)
+      .set(bearer(ana))
+      .expect(200);
+    expect(none.body.meta.total).toBe(0);
+    await http().get(`${API}/users/me/reviews?placeId=not-a-uuid`).set(bearer(ana)).expect(400);
   });
 });

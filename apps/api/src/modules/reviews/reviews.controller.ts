@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
-  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -16,7 +14,6 @@ import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
-  ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -29,9 +26,12 @@ import { ApiLocale, RequestLocale } from '../../common/i18n';
 import type { AuthUser } from '../../common/types/auth-user';
 import {
   CreateReviewDto,
+  DeletedReviewDto,
   ListReviewsQueryDto,
   MyReviewDto,
+  MyReviewsQueryDto,
   ReviewDto,
+  ReviewMutationDto,
   UpdateReviewDto,
 } from './dto/review.dto';
 import { ReviewsService } from './reviews.service';
@@ -56,7 +56,7 @@ export class ReviewsController {
   @Post('places/:id/reviews')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Review a place (once per user); updates its rating' })
-  @ApiCreatedResponse({ type: ReviewDto })
+  @ApiCreatedResponse({ type: ReviewMutationDto })
   @ApiConflictResponse({ description: 'REVIEW_ALREADY_EXISTS' })
   @ApiNotFoundResponse({ description: 'PLACE_NOT_FOUND' })
   create(
@@ -64,34 +64,35 @@ export class ReviewsController {
     @Param('id', ParseUUIDPipe) placeId: string,
     @Body() dto: CreateReviewDto,
     @RequestLocale() locale: Locale,
-  ): Promise<ReviewDto> {
+  ): Promise<ReviewMutationDto> {
     return this.reviews.create(user, placeId, dto, locale);
   }
 
   @Patch('reviews/:id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Edit a review (author or admin); updates the place rating' })
-  @ApiOkResponse({ type: ReviewDto })
+  @ApiOkResponse({ type: ReviewMutationDto })
   @ApiForbiddenResponse({ description: 'FORBIDDEN: not the author' })
   update(
     @CurrentUser() user: AuthUser,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateReviewDto,
-  ): Promise<ReviewDto> {
+  ): Promise<ReviewMutationDto> {
     return this.reviews.update(user, id, dto);
   }
 
   @Delete('reviews/:id')
   @ApiBearerAuth()
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete a review (author or admin); updates the place rating' })
-  @ApiNoContentResponse()
+  @ApiOperation({
+    summary: 'Delete a review (author or admin); returns the updated place rating',
+  })
+  @ApiOkResponse({ type: DeletedReviewDto })
   @ApiForbiddenResponse({ description: 'FORBIDDEN: not the author' })
-  async remove(
+  remove(
     @CurrentUser() user: AuthUser,
     @Param('id', ParseUUIDPipe) id: string,
-  ): Promise<void> {
-    await this.reviews.delete(user, id);
+  ): Promise<DeletedReviewDto> {
+    return this.reviews.delete(user, id);
   }
 
   @Get('users/me/reviews')
@@ -101,7 +102,7 @@ export class ReviewsController {
   @ApiPaginatedResponse(MyReviewDto)
   mine(
     @CurrentUser('id') userId: string,
-    @Query() query: ListReviewsQueryDto,
+    @Query() query: MyReviewsQueryDto,
     @RequestLocale() locale: Locale,
   ): Promise<Paginated<MyReviewDto>> {
     return this.reviews.listMine(userId, query, locale);

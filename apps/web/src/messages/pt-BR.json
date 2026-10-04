@@ -437,5 +437,49 @@
     "waterfront": "Beira d’água",
     "wetland": "Área úmida",
     "young-crowd": "Público jovem"
+  },
+  "reviews": {
+    "yourReview": "Sua avaliação",
+    "writeTitle": "Escreva uma avaliação",
+    "editTitle": "Editar sua avaliação",
+    "loginToReview": "Entre para escrever uma avaliação",
+    "rating": "Sua nota",
+    "star": "{count, plural, one {# estrela} other {# estrelas}}",
+    "title": "Título",
+    "comment": "Sua avaliação",
+    "commentHint": "O que outros viajantes deveriam saber? Até 2.000 caracteres.",
+    "visitedAt": "Quando você visitou? (opcional)",
+    "writtenIn": "Sua avaliação será exibida em {language}, o idioma em que você a escrever.",
+    "submit": "Publicar avaliação",
+    "save": "Salvar alterações",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "sending": "Enviando…",
+    "deleteTitle": "Excluir sua avaliação?",
+    "deleteBody": "Sua avaliação e a nota dela serão removidas deste lugar. Não é possível desfazer.",
+    "deleteConfirm": "Excluir avaliação",
+    "published": "Obrigado! Sua avaliação foi publicada.",
+    "updated": "Sua avaliação foi atualizada.",
+    "deleted": "Sua avaliação foi excluída.",
+    "showMore": "Ver mais avaliações",
+    "count": "{count, plural, =0 {Nenhuma avaliação ainda} one {# avaliação} other {# avaliações}}",
+    "validation": {
+      "rating": "Escolha de 1 a 5 estrelas.",
+      "titleRequired": "Dê um título à sua avaliação.",
+      "titleMax": "Use no máximo 120 caracteres.",
+      "commentRequired": "Escreva algumas palavras sobre a sua visita.",
+      "commentMax": "Use no máximo 2.000 caracteres.",
+      "visitedFuture": "A data da visita não pode estar no futuro."
+    },
+    "errors": {
+      "REVIEW_ALREADY_EXISTS": "Você já avaliou este lugar. Pode editar sua avaliação abaixo.",
+      "UNAUTHORIZED": "Sua sessão terminou. Entre de novo para continuar.",
+      "FORBIDDEN": "Você só pode alterar as suas avaliações.",
+      "NOT_FOUND": "Esta avaliação não existe mais.",
+      "TOO_MANY_REQUESTS": "Muitas tentativas. Aguarde um minuto e tente de novo.",
+      "API_UNAVAILABLE": "Não conseguimos falar com o servidor agora. Tente de novo em instantes.",
+      "UNKNOWN": "Algo deu errado. Tente de novo."
+    }
   }
 }

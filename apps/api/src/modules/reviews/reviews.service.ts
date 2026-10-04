@@ -11,7 +11,15 @@ import type { AuthUser } from '../../common/types/auth-user';
 import { Prisma } from '../../generated/prisma/client';
 import { PlacesService } from '../places/places.service';
 import { UsersService } from '../users/users.service';
-import type { CreateReviewDto, MyReviewDto, ReviewDto, UpdateReviewDto } from './dto/review.dto';
+import type {
+  CreateReviewDto,
+  DeletedReviewDto,
+  MyReviewDto,
+  PlaceRatingDto,
+  ReviewDto,
+  ReviewMutationDto,
+  UpdateReviewDto,
+} from './dto/review.dto';
 import { type ReviewWrite, ReviewsRepository } from './reviews.repository';
 
 type ReviewRow = NonNullable<Awaited<ReturnType<ReviewsRepository['findById']>>>;
@@ -73,13 +81,14 @@ export class ReviewsService {
 
   async listMine(
     userId: string,
-    query: { page: number; limit: number; skip: number },
+    query: { page: number; limit: number; skip: number; placeId?: string },
     locale: Locale,
   ): Promise<Paginated<MyReviewDto>> {
-    const { rows, total } = await this.repository.listByUser(userId, {
-      skip: query.skip,
-      take: query.limit,
-    });
+    const { rows, total } = await this.repository.listByUser(
+      userId,
+      { skip: query.skip, take: query.limit },
+      query.placeId,
+    );
     const [reviews, places] = await Promise.all([
       this.withAuthors(rows),
       this.places.findSummariesByIds([...new Set(rows.map((r) => r.placeId))], locale),
@@ -102,7 +111,7 @@ export class ReviewsService {
     placeId: string,
     dto: CreateReviewDto,
     requestLocale: Locale,
-  ): Promise<ReviewDto> {
+  ): Promise<ReviewMutationDto> {
     const data: ReviewWrite = {
       rating: dto.rating,
       title: dto.title,
@@ -111,14 +120,13 @@ export class ReviewsService {
       visitedAt: parseVisitedAt(dto.visitedAt) ?? null,
     };
     try {
-      const review = await this.repository.transaction(async (tx) => {
+      const { review, placeRating } = await this.repository.transaction(async (tx) => {
         await this.places.lockForRatingUpdate(tx, placeId);
         if (await this.repository.findByUserAndPlace(tx, user.id, placeId)) throw reviewExists();
         const created = await this.repository.create(tx, { ...data, userId: user.id, placeId });
-        await this.recomputeRating(tx, placeId);
-        return created;
+        return { review: created, placeRating: await this.recomputeRating(tx, placeId) };
       });
-      return (await this.withAuthors([review]))[0];
+      return { ...(await this.withAuthors([review]))[0], placeRating };
     } catch (error) {
       // Two simultaneous first reviews by the same user: the unique index catches the second.
       if (isUniqueViolation(error)) throw reviewExists();
@@ -126,7 +134,7 @@ export class ReviewsService {
     }
   }
 
-  async update(user: AuthUser, reviewId: string, dto: UpdateReviewDto): Promise<ReviewDto> {
+  async update(user: AuthUser, reviewId: string, dto: UpdateReviewDto): Promise<ReviewMutationDto> {
     const current = await this.authorizedReview(user, reviewId);
     const data: Partial<ReviewWrite> = {
       rating: dto.rating,
@@ -135,22 +143,22 @@ export class ReviewsService {
       locale: dto.locale,
       visitedAt: parseVisitedAt(dto.visitedAt),
     };
-    const review = await this.repository.transaction(async (tx) => {
+    const { review, placeRating } = await this.repository.transaction(async (tx) => {
       await this.places.lockForRatingUpdate(tx, current.placeId);
       const updated = await this.repository.update(tx, reviewId, data);
-      await this.recomputeRating(tx, current.placeId);
-      return updated;
+      return { review: updated, placeRating: await this.recomputeRating(tx, current.placeId) };
     });
-    return (await this.withAuthors([review]))[0];
+    return { ...(await this.withAuthors([review]))[0], placeRating };
   }
 
-  async delete(user: AuthUser, reviewId: string): Promise<void> {
+  async delete(user: AuthUser, reviewId: string): Promise<DeletedReviewDto> {
     const current = await this.authorizedReview(user, reviewId);
-    await this.repository.transaction(async (tx) => {
+    const placeRating = await this.repository.transaction(async (tx) => {
       await this.places.lockForRatingUpdate(tx, current.placeId);
       await this.repository.delete(tx, reviewId);
-      await this.recomputeRating(tx, current.placeId);
+      return this.recomputeRating(tx, current.placeId);
     });
+    return { placeRating };
   }
 
   // -------------------------------------------------------------------------
@@ -168,9 +176,13 @@ export class ReviewsService {
     return review;
   }
 
-  private async recomputeRating(tx: Prisma.TransactionClient, placeId: string): Promise<void> {
+  private async recomputeRating(
+    tx: Prisma.TransactionClient,
+    placeId: string,
+  ): Promise<PlaceRatingDto> {
     const { ratingAvg, ratingCount } = await this.repository.ratingOf(tx, placeId);
     await this.places.setRating(tx, placeId, ratingAvg, ratingCount);
+    return { ratingAvg, ratingCount };
   }
 
   private async withAuthors(rows: ReviewRow[]): Promise<ReviewDto[]> {

@@ -14,3 +14,5 @@ export type AuthResponseDto = Schemas['AuthResponseDto'];
 export type CostCalculationDto = Schemas['CostCalculationDto'];
 export type PlaceOverviewDto = Schemas['PlaceOverviewDto'];
 export type ReviewDto = Schemas['ReviewDto'];
+export type ReviewMutationDto = Schemas['ReviewMutationDto'];
+export type MyReviewDto = Schemas['MyReviewDto'];

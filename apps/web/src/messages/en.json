@@ -437,5 +437,49 @@
     "waterfront": "Waterfront",
     "wetland": "Wetland",
     "young-crowd": "Young crowd"
+  },
+  "reviews": {
+    "yourReview": "Your review",
+    "writeTitle": "Write a review",
+    "editTitle": "Edit your review",
+    "loginToReview": "Log in to write a review",
+    "rating": "Your rating",
+    "star": "{count, plural, one {# star} other {# stars}}",
+    "title": "Title",
+    "comment": "Your review",
+    "commentHint": "What should other travelers know? Up to 2,000 characters.",
+    "visitedAt": "When did you visit? (optional)",
+    "writtenIn": "Your review will be shown in {language}, the language you write it in.",
+    "submit": "Publish review",
+    "save": "Save changes",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "sending": "Sending…",
+    "deleteTitle": "Delete your review?",
+    "deleteBody": "Your review and its rating will be removed from this place. This cannot be undone.",
+    "deleteConfirm": "Delete review",
+    "published": "Thanks! Your review is published.",
+    "updated": "Your review was updated.",
+    "deleted": "Your review was deleted.",
+    "showMore": "Show more reviews",
+    "count": "{count, plural, =0 {No reviews yet} one {# review} other {# reviews}}",
+    "validation": {
+      "rating": "Choose from 1 to 5 stars.",
+      "titleRequired": "Give your review a title.",
+      "titleMax": "Use at most 120 characters.",
+      "commentRequired": "Write a few words about your visit.",
+      "commentMax": "Use at most 2,000 characters.",
+      "visitedFuture": "The visit date cannot be in the future."
+    },
+    "errors": {
+      "REVIEW_ALREADY_EXISTS": "You have already reviewed this place. You can edit your review below.",
+      "UNAUTHORIZED": "Your session has ended. Log in again to continue.",
+      "FORBIDDEN": "You can only change your own reviews.",
+      "NOT_FOUND": "This review no longer exists.",
+      "TOO_MANY_REQUESTS": "Too many attempts. Wait a minute and try again.",
+      "API_UNAVAILABLE": "We cannot reach the server right now. Please try again in a moment.",
+      "UNKNOWN": "Something went wrong. Please try again."
+    }
   }
 }

@@ -44,8 +44,8 @@ export class ReviewsRepository {
     return { rows, total };
   }
 
-  async listByUser(userId: string, page: { skip: number; take: number }) {
-    const where = { userId };
+  async listByUser(userId: string, page: { skip: number; take: number }, placeId?: string) {
+    const where = placeId ? { userId, placeId } : { userId };
     const [rows, total] = await this.prisma.$transaction([
       this.prisma.review.findMany({
         where,

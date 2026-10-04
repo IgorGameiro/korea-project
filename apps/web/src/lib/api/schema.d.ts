@@ -394,7 +394,7 @@ export interface paths {
     get?: never;
     put?: never;
     post?: never;
-    /** Delete a review (author or admin); updates the place rating */
+    /** Delete a review (author or admin); returns the updated place rating */
     delete: operations['ReviewsController_remove_v1'];
     options?: never;
     head?: never;
@@ -1232,6 +1232,33 @@ export interface components {
        */
       locale?: 'en' | 'pt-BR';
     };
+    PlaceRatingDto: {
+      /** @example 4.67 */
+      ratingAvg: number;
+      ratingCount: number;
+    };
+    ReviewMutationDto: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      placeId: string;
+      rating: number;
+      title: string;
+      comment: string;
+      /**
+       * @description Language it was written in (never translated).
+       * @enum {string}
+       */
+      locale: 'en' | 'pt-BR';
+      /** @example 2026-04-12 */
+      visitedAt?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      author: components['schemas']['ReviewAuthorDto'];
+      placeRating: components['schemas']['PlaceRatingDto'];
+    };
     UpdateReviewDto: {
       /** @example 5 */
       rating?: number;
@@ -1248,6 +1275,9 @@ export interface components {
        * @enum {string}
        */
       locale?: 'en' | 'pt-BR';
+    };
+    DeletedReviewDto: {
+      placeRating: components['schemas']['PlaceRatingDto'];
     };
     ReviewedPlaceDto: {
       /** Format: uuid */
@@ -2767,7 +2797,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['ReviewDto'];
+          'application/json': components['schemas']['ReviewMutationDto'];
         };
       };
       /** @description PLACE_NOT_FOUND */
@@ -2797,11 +2827,13 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      204: {
+      200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['DeletedReviewDto'];
+        };
       };
       /** @description FORBIDDEN: not the author */
       403: {
@@ -2832,7 +2864,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['ReviewDto'];
+          'application/json': components['schemas']['ReviewMutationDto'];
         };
       };
       /** @description FORBIDDEN: not the author */
@@ -2849,6 +2881,8 @@ export interface operations {
       query?: {
         page?: number;
         limit?: number;
+        /** @description Only the review of this place (0 or 1 result): "have I reviewed it?" */
+        placeId?: string;
         /** @description Content language. Unsupported values fall back to "en". Takes precedence over Accept-Language. */
         locale?: 'en' | 'pt-BR';
       };

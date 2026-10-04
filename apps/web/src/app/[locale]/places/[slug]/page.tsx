@@ -5,14 +5,14 @@ import { Badge, CategoryBadge } from '@/components/ui/badge';
 import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
 import { PriceLevel, PriceTag } from '@/components/ui/price-tag';
-import { Rating } from '@/components/ui/rating';
 import { MapView } from '@/features/map/map-view';
 import { allPlaceSlugs, getPlace } from '@/features/places/data';
 import { Gallery } from '@/features/places/gallery';
 import { HoursTable } from '@/features/places/hours-table';
 import { OpenNow } from '@/features/places/open-now';
 import { tagLabel } from '@/features/places/tags';
-import { ReviewItem } from '@/features/reviews/review-item';
+import { LiveRating } from '@/features/reviews/live-rating';
+import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { Link } from '@/i18n/navigation';
 import { CATEGORY_META } from '@/lib/categories';
 import { alternatesFor } from '@/lib/seo';
@@ -99,7 +99,10 @@ export default async function PlacePage({ params }: Props) {
           </span>
         </h1>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-          <Rating value={place.ratingAvg} count={place.ratingCount} />
+          <LiveRating
+            placeId={place.id}
+            initial={{ ratingAvg: place.ratingAvg, ratingCount: place.ratingCount }}
+          />
           <PriceLevel level={place.priceLevel} />
           <span className="flex items-baseline gap-2 text-sm">
             <span className="text-navy-700">{t('averageSpend')}:</span>
@@ -153,20 +156,12 @@ export default async function PlacePage({ params }: Props) {
             </section>
           ) : null}
 
-          <section aria-labelledby="reviews-title">
-            <h2 id="reviews-title" className="text-xl font-bold">
-              {t('reviews')}
-            </h2>
-            {place.recentReviews.length === 0 ? (
-              <p className="mt-2 text-navy-700">{t('noReviewsYet')}</p>
-            ) : (
-              <div className="mt-2">
-                {place.recentReviews.map((review) => (
-                  <ReviewItem key={review.id} review={review} />
-                ))}
-              </div>
-            )}
-          </section>
+          <ReviewsSection
+            placeId={place.id}
+            placeSlug={place.slug}
+            initialReviews={place.recentReviews}
+            initialTotal={place.ratingCount}
+          />
         </div>
 
         <aside aria-labelledby="details-title" className="flex flex-col gap-6">

@@ -11,6 +11,7 @@ import {
   Max,
   MaxLength,
   Min,
+  IsUUID,
 } from 'class-validator';
 import { LocalizedPaginationQueryDto } from '../../../common/dto';
 
@@ -61,6 +62,16 @@ export class UpdateReviewDto extends PartialType(CreateReviewDto) {}
 
 export class ListReviewsQueryDto extends LocalizedPaginationQueryDto {}
 
+export class MyReviewsQueryDto extends ListReviewsQueryDto {
+  @ApiPropertyOptional({
+    format: 'uuid',
+    description: 'Only the review of this place (0 or 1 result): "have I reviewed it?"',
+  })
+  @IsOptional()
+  @IsUUID()
+  placeId?: string;
+}
+
 // ----- Output -----
 
 export class ReviewAuthorDto {
@@ -87,6 +98,21 @@ export class ReviewedPlaceDto {
   @ApiProperty({ format: 'uuid' }) id: string;
   @ApiProperty() slug: string;
   @ApiProperty() name: string;
+}
+
+/** The place's rating right after a review was written, edited or deleted. */
+export class PlaceRatingDto {
+  @ApiProperty({ example: 4.67 }) ratingAvg: number;
+  @ApiProperty() ratingCount: number;
+}
+
+/** A created or edited review, with the place rating it produced (same transaction). */
+export class ReviewMutationDto extends ReviewDto {
+  @ApiProperty({ type: PlaceRatingDto }) placeRating: PlaceRatingDto;
+}
+
+export class DeletedReviewDto {
+  @ApiProperty({ type: PlaceRatingDto }) placeRating: PlaceRatingDto;
 }
 
 /** A review in "my reviews", with the place it is about. */
