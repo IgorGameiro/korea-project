@@ -69,6 +69,17 @@ export class EnvironmentVariables {
   @IsBoolean()
   COOKIE_SECURE = false;
 
+  /**
+   * Number of reverse proxies in front of the API whose X-Forwarded-For can be trusted (0 = none).
+   * The web app proxies browser calls, so it must be 1 there; otherwise every visitor would share
+   * the web server's IP (and its rate limit). Never set it when the API is reachable directly.
+   */
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Max(5)
+  TRUST_PROXY = 0;
+
   @Type(() => Number)
   @IsInt()
   @IsPositive()

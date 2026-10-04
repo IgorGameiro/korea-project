@@ -14,6 +14,13 @@ describe('validateEnv', () => {
     expect(env.API_PORT).toBe(3001);
     expect(env.SWAGGER_ENABLED).toBe(true);
     expect(env.COOKIE_SECURE).toBe(false);
+    expect(env.TRUST_PROXY).toBe(0);
+  });
+
+  it('accepts a small number of trusted proxy hops only', () => {
+    expect(validateEnv({ ...required, TRUST_PROXY: '1' }).TRUST_PROXY).toBe(1);
+    expect(() => validateEnv({ ...required, TRUST_PROXY: '-1' })).toThrow(/TRUST_PROXY/);
+    expect(() => validateEnv({ ...required, TRUST_PROXY: 'true' })).toThrow(/TRUST_PROXY/);
   });
 
   it('parses numbers from strings (as they come from process.env)', () => {

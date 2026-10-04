@@ -128,7 +128,9 @@ describe('AuthService', () => {
         'old',
         expect.objectContaining({ familyId: stored.familyId }),
       );
-      expect(next.refreshToken).not.toBe(session.refreshToken);
+      expect(next.session.refreshToken).not.toBe(session.refreshToken);
+      expect(next.user).toEqual(expect.objectContaining({ id: user.id }));
+      expect(next.user).not.toHaveProperty('passwordHash');
     });
 
     it('revokes the whole family when a rotated token is reused', async () => {

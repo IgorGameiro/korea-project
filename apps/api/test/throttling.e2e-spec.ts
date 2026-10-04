@@ -43,4 +43,15 @@ describe('Rate limiting (e2e)', () => {
     expect(limited.body.error.code).toBe('TOO_MANY_REQUESTS');
     await request(app.getHttpServer()).get('/api/v1/cities/seoul/places?search=palace').expect(200);
   });
+
+  it('ignores X-Forwarded-For when no proxy is trusted (it cannot dodge the limit)', async () => {
+    const login = (ip: string) =>
+      request(app.getHttpServer())
+        .post('/api/v1/auth/login')
+        .set('X-Forwarded-For', ip)
+        .send({ email: 'nobody@example.com', password: 'wrong-password' });
+    // The auth bucket of this socket is already exhausted by the first test.
+    await login('198.51.100.7').expect(429);
+    await login('198.51.100.8').expect(429);
+  });
 });

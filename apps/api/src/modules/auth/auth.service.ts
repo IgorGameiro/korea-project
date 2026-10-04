@@ -71,7 +71,10 @@ export class AuthService {
    * Rotates a refresh token. Presenting a token that was already rotated means it leaked (or was
    * replayed): the whole family is revoked, logging out every device of that login.
    */
-  async refresh(refreshToken: string | undefined, meta: SessionMeta): Promise<IssuedSession> {
+  async refresh(
+    refreshToken: string | undefined,
+    meta: SessionMeta,
+  ): Promise<{ user: UserDto; session: IssuedSession }> {
     if (!refreshToken) throw invalidRefreshToken();
     const payload = await this.verifyRefreshToken(refreshToken);
     const record = await this.refreshTokens.findByHash(hashToken(refreshToken));
@@ -97,7 +100,14 @@ export class AuthService {
       await this.refreshTokens.revokeFamily(record.familyId);
       throw reusedRefreshToken();
     }
-    return { ...(await this.signAccessToken(user)), refreshToken: nextToken, refreshExpiresAt };
+    return {
+      user: toUserDto(user),
+      session: {
+        ...(await this.signAccessToken(user)),
+        refreshToken: nextToken,
+        refreshExpiresAt,
+      },
+    };
   }
 
   /** Ends the session of the presented refresh token (its whole family). Idempotent. */

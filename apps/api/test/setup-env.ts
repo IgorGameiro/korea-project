@@ -8,3 +8,5 @@ loadTestEnv();
 process.env.THROTTLE_LIMIT = '100000';
 process.env.THROTTLE_AUTH_LIMIT = '100000';
 process.env.THROTTLE_SEARCH_LIMIT = '100000';
+// Tests talk to the API directly (no proxy in front), whatever .env says.
+process.env.TRUST_PROXY = '0';

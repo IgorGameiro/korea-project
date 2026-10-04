@@ -194,5 +194,42 @@
     "showOnMapLabel": "Mostrar {name} no mapa",
     "viewDetails": "Ver detalhes",
     "empty": "Nenhum lugar para mostrar no mapa."
+  },
+  "auth": {
+    "loginTitle": "Entrar",
+    "loginMetaTitle": "Entrar",
+    "registerTitle": "Crie sua conta",
+    "registerMetaTitle": "Cadastro",
+    "name": "Nome",
+    "email": "E-mail",
+    "password": "Senha",
+    "passwordHint": "Pelo menos 8 caracteres.",
+    "submitLogin": "Entrar",
+    "submitRegister": "Criar conta",
+    "submitting": "Aguarde…",
+    "noAccount": "Primeira vez aqui?",
+    "registerLink": "Criar uma conta",
+    "haveAccount": "Já tem uma conta?",
+    "loginLink": "Entrar",
+    "logIn": "Entrar",
+    "logOut": "Sair",
+    "signedInAs": "Conectado como {name}",
+    "restoring": "Verificando sua sessão",
+    "validation": {
+      "nameMin": "Use pelo menos 2 caracteres.",
+      "nameMax": "Use no máximo 80 caracteres.",
+      "email": "Digite um e-mail válido.",
+      "emailMax": "Use no máximo 254 caracteres.",
+      "passwordMin": "Use pelo menos 8 caracteres.",
+      "passwordMax": "Use no máximo 128 caracteres.",
+      "required": "Campo obrigatório."
+    },
+    "errors": {
+      "INVALID_CREDENTIALS": "E-mail ou senha incorretos.",
+      "EMAIL_ALREADY_REGISTERED": "Já existe uma conta com este e-mail. Que tal entrar?",
+      "TOO_MANY_REQUESTS": "Muitas tentativas. Aguarde um minuto e tente de novo.",
+      "API_UNAVAILABLE": "Não conseguimos falar com o servidor agora. Tente de novo em instantes.",
+      "UNKNOWN": "Algo deu errado. Tente de novo."
+    }
   }
 }

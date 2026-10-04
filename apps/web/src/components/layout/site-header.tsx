@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl';
+import { UserMenu } from '@/features/auth/user-menu';
 import { Link } from '@/i18n/navigation';
 import { Container } from '../ui/container';
 import { CurrencySwitcher } from './currency-switcher';
@@ -38,6 +39,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-3">
           <LanguageSwitcher />
           <CurrencySwitcher />
+          <UserMenu />
         </div>
       </Container>
     </header>

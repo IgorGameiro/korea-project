@@ -9,3 +9,5 @@ export type PlaceSummaryDto = Schemas['PlaceSummaryDto'];
 export type SearchResultDto = Schemas['SearchResultDto'];
 export type MapPointDto = Schemas['MapPointDto'];
 export type AccommodationDto = Schemas['AccommodationDto'];
+export type UserDto = Schemas['UserDto'];
+export type AuthResponseDto = Schemas['AuthResponseDto'];

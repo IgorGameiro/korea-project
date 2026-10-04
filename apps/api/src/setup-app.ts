@@ -2,6 +2,7 @@ import { type INestApplication, VersioningType } from '@nestjs/common';
 import type { ConfigType } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import type { Express } from 'express';
 import helmet from 'helmet';
 import { API_PREFIX, DEFAULT_API_VERSION, SWAGGER_PATH } from './common/constants';
 import { appConfig } from './config';
@@ -14,6 +15,10 @@ import { appConfig } from './config';
 export function configureApp(app: INestApplication): void {
   const cfg = app.get<ConfigType<typeof appConfig>>(appConfig.KEY);
 
+  // Lets req.ip (rate limits, session metadata) see the visitor behind the web app's proxy.
+  if (cfg.trustProxy > 0) {
+    (app.getHttpAdapter().getInstance() as Express).set('trust proxy', cfg.trustProxy);
+  }
   app.setGlobalPrefix(API_PREFIX);
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: DEFAULT_API_VERSION });
   app.use(helmet());

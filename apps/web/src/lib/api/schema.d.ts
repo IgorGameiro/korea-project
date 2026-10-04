@@ -98,7 +98,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Rotate the refresh-token cookie and get a new access token */
+    /**
+     * Rotate the refresh-token cookie; returns a new access token and the user
+     * @description Also how a browser restores its session after a page load.
+     */
     post: operations['AuthController_refresh_v1'];
     delete?: never;
     options?: never;
@@ -644,16 +647,6 @@ export interface components {
        */
       email: string;
       password: string;
-    };
-    RefreshResponseDto: {
-      accessToken: string;
-      /**
-       * @example Bearer
-       * @enum {string}
-       */
-      tokenType: 'Bearer';
-      /** @example 900 */
-      expiresIn: number;
     };
     PaginationMetaDto: {
       /** @example 1 */
@@ -1817,7 +1810,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['RefreshResponseDto'];
+          'application/json': components['schemas']['AuthResponseDto'];
         };
       };
       /** @description INVALID_REFRESH_TOKEN or REFRESH_TOKEN_REUSED */

@@ -153,8 +153,9 @@ describe('Auth (e2e)', () => {
   });
 
   describe('refresh-token rotation', () => {
-    it('rotates the cookie and issues a new access token', async () => {
-      const first = refreshCookie(await register().expect(201));
+    it('rotates the cookie and returns a new access token with the user (session restore)', async () => {
+      const registered = await register().expect(201);
+      const first = refreshCookie(registered);
 
       const res = await http().post(`${AUTH}/refresh`).set('Cookie', cookiePair(first)).expect(200);
 
@@ -162,7 +163,9 @@ describe('Auth (e2e)', () => {
         accessToken: expect.any(String),
         tokenType: 'Bearer',
         expiresIn: 900,
+        user: registered.body.user,
       });
+      expect(JSON.stringify(res.body)).not.toMatch(/passwordHash|tokenHash/);
       const second = refreshCookie(res);
       expect(cookiePair(second)).not.toBe(cookiePair(first));
     });

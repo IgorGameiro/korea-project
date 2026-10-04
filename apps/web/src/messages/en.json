@@ -194,5 +194,42 @@
     "showOnMapLabel": "Show {name} on the map",
     "viewDetails": "View details",
     "empty": "No places to show on the map."
+  },
+  "auth": {
+    "loginTitle": "Log in",
+    "loginMetaTitle": "Log in",
+    "registerTitle": "Create your account",
+    "registerMetaTitle": "Sign up",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least 8 characters.",
+    "submitLogin": "Log in",
+    "submitRegister": "Create account",
+    "submitting": "Please wait…",
+    "noAccount": "New here?",
+    "registerLink": "Create an account",
+    "haveAccount": "Already have an account?",
+    "loginLink": "Log in",
+    "logIn": "Log in",
+    "logOut": "Log out",
+    "signedInAs": "Signed in as {name}",
+    "restoring": "Checking your session",
+    "validation": {
+      "nameMin": "Use at least 2 characters.",
+      "nameMax": "Use at most 80 characters.",
+      "email": "Enter a valid email address.",
+      "emailMax": "Use at most 254 characters.",
+      "passwordMin": "Use at least 8 characters.",
+      "passwordMax": "Use at most 128 characters.",
+      "required": "This field is required."
+    },
+    "errors": {
+      "INVALID_CREDENTIALS": "Wrong email or password.",
+      "EMAIL_ALREADY_REGISTERED": "An account with this email already exists. Log in instead?",
+      "TOO_MANY_REQUESTS": "Too many attempts. Wait a minute and try again.",
+      "API_UNAVAILABLE": "We cannot reach the server right now. Please try again in a moment.",
+      "UNKNOWN": "Something went wrong. Please try again."
+    }
   }
 }

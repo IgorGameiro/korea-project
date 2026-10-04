@@ -13,6 +13,7 @@ export const appConfig = registerAs('app', () => {
     port: env.API_PORT,
     corsOrigins: env.CORS_ORIGINS.split(',').map((origin) => origin.trim()),
     cookieSecure: env.COOKIE_SECURE,
+    trustProxy: env.TRUST_PROXY,
     swaggerEnabled: env.SWAGGER_ENABLED,
   };
 });

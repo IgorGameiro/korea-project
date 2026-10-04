@@ -28,7 +28,7 @@ import { appConfig } from '../../config';
 import { UserDto } from '../users/dto/user.response';
 import { AuthService } from './auth.service';
 import type { IssuedSession, SessionMeta } from './auth.types';
-import { AuthResponseDto, LoginDto, RefreshResponseDto, RegisterDto } from './dto/auth.dto';
+import { AuthResponseDto, LoginDto, RegisterDto } from './dto/auth.dto';
 import { REFRESH_COOKIE, refreshCookieOptions } from './refresh-cookie';
 
 const sessionMeta = (req: AppRequest): SessionMeta => ({
@@ -84,16 +84,19 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiCookieAuth(REFRESH_COOKIE)
-  @ApiOperation({ summary: 'Rotate the refresh-token cookie and get a new access token' })
-  @ApiOkResponse({ type: RefreshResponseDto })
+  @ApiOperation({
+    summary: 'Rotate the refresh-token cookie; returns a new access token and the user',
+    description: 'Also how a browser restores its session after a page load.',
+  })
+  @ApiOkResponse({ type: AuthResponseDto })
   @ApiUnauthorizedResponse({ description: 'INVALID_REFRESH_TOKEN or REFRESH_TOKEN_REUSED' })
   async refresh(
     @Req() req: AppRequest,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<RefreshResponseDto> {
+  ): Promise<AuthResponseDto> {
     try {
-      const session = await this.auth.refresh(readRefreshCookie(req), sessionMeta(req));
-      return this.respond(res, session);
+      const { user, session } = await this.auth.refresh(readRefreshCookie(req), sessionMeta(req));
+      return { ...this.respond(res, session), user };
     } catch (error) {
       res.clearCookie(REFRESH_COOKIE, refreshCookieOptions(this.config.cookieSecure));
       throw error;
@@ -121,7 +124,7 @@ export class AuthController {
   }
 
   /** Sets the refresh cookie and returns the access-token part of the response. */
-  private respond(res: Response, session: IssuedSession): RefreshResponseDto {
+  private respond(res: Response, session: IssuedSession): Omit<AuthResponseDto, 'user'> {
     res.cookie(REFRESH_COOKIE, session.refreshToken, {
       ...refreshCookieOptions(this.config.cookieSecure),
       expires: session.refreshExpiresAt,
