@@ -276,6 +276,83 @@ Next.js App Router in [`apps/web`](apps/web), with next-intl for routing and mes
 
 - [ ] **Map tiles — OpenStreetMap tile usage policy.** The default tiles come from `tile.openstreetmap.org`, which is run by volunteers and donations. Its [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) forbids heavy use, requires a valid identifying User-Agent/Referer and visible attribution, and the service can block a site at any time without notice. Before going live, review the policy and either confirm the expected traffic complies or set `NEXT_PUBLIC_MAP_TILE_URL` / `NEXT_PUBLIC_MAP_TILE_ATTRIBUTION` to a commercial or self-hosted tile provider. Keep the attribution visible either way.
 
+## Free deployment (Vercel + Render + Neon)
+
+A demo deployment on free plans: the website on **Vercel** (Hobby), the API on **Render** (free web service, Docker) and PostgreSQL 18 on **Neon** (free). Free plans change; check each provider's pricing page.
+
+```
+browser ──► Vercel (Next.js, ISR + /api/v1 gateway) ──► Render (NestJS API) ──► Neon (Postgres 18)
+```
+
+Trade-offs of the free plans: the Render API **sleeps after 15 minutes** without requests and takes about a minute to wake up. Pages stay fast (they are static, and a failed ISR refresh keeps the last good page), but login, reviews and the calculator wait for the API on the first request. Open `<api>/api/v1/health` a minute before a demo.
+
+### 1. Secrets
+
+Generate new values (never reuse the ones in `.env.example`, they are public):
+
+```bash
+openssl rand -base64 48
+```
+
+Run it once each for `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` and `INTERNAL_API_TOKEN`, and pick strong passwords for the demo accounts (`SEED_ADMIN_PASSWORD`, `SEED_USER_PASSWORD`): the site is public and `admin@example.com` is an ADMIN.
+
+### 2. Database (Neon)
+
+Create a project with **Postgres 18** (a migration uses `uuidv7()`). Copy the **direct** connection string (not the `-pooler` one; Prisma migrations need a direct connection) and keep `sslmode=require`.
+
+Apply the migrations and load the demo content from your machine, with a git-ignored `.env.neon` at the repository root:
+
+```bash
+DATABASE_URL=postgresql://<user>:<password>@<host>.neon.tech/<db>?sslmode=require
+SEED_ADMIN_PASSWORD=<strong password>
+SEED_USER_PASSWORD=<strong password>
+KRW_TO_BRL=0.0039
+KRW_TO_USD=0.00072
+```
+
+```bash
+set -a
+source .env.neon
+set +a
+pnpm --filter @korea-project/api db:deploy
+pnpm --filter @korea-project/api db:seed
+```
+
+Future migrations are applied the same way (`db:deploy`), before deploying the code that needs them.
+
+### 3. API (Render)
+
+New **Web Service** from the GitHub repository, **Docker** runtime, Dockerfile path `apps/api/Dockerfile`, build context `.` (the default target is the production image), free instance type, health check path `/api/v1/health`. Environment:
+
+| Variable                                  | Value                                                           |
+| ----------------------------------------- | --------------------------------------------------------------- |
+| `NODE_ENV`                                | `production`                                                    |
+| `API_PORT`                                | `10000` (the port Render routes to)                             |
+| `DATABASE_URL`                            | the Neon direct connection string                               |
+| `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | generated in step 1                                             |
+| `INTERNAL_API_TOKEN`                      | generated in step 1 (the same value goes to Vercel)             |
+| `COOKIE_SECURE`                           | `true`                                                          |
+| `TRUST_PROXY`                             | `2` (Render's proxy + the Vercel gateway)                       |
+| `CORS_ORIGINS`                            | the Vercel URL, e.g. `https://korea-project.vercel.app`         |
+| `SWAGGER_ENABLED`                         | `true` to show the API docs in the portfolio, `false` otherwise |
+
+### 4. Website (Vercel)
+
+Import the repository, set **Root Directory** to `apps/web` (install and build commands come from [`apps/web/vercel.json`](apps/web/vercel.json); the build runs Turborepo from the repository root, so `packages/shared` is built first). Environment variables (Production):
+
+| Variable                       | Value                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------- |
+| `ENABLE_EXPERIMENTAL_COREPACK` | `1` (uses the pnpm version pinned in `packageManager`)                          |
+| `API_INTERNAL_URL`             | `https://<render-service>.onrender.com/api/v1`                                  |
+| `INTERNAL_API_TOKEN`           | the same value as the API                                                       |
+| `NEXT_PUBLIC_SITE_URL`         | the Vercel URL, e.g. `https://korea-project.vercel.app` (rebuild if it changes) |
+
+Wake the API (`/api/v1/health`) before each deploy: the build prerenders the pages from it. If it does not answer, the build still succeeds and the pages are generated on their first visit.
+
+Browsers only talk to the Vercel site: its `/api/v1/*` gateway forwards to Render, so the refresh cookie is first-party and the CSP stays `connect-src 'self'`.
+
+**Known limitation of the free setup:** the Render URL is public (private networking is a paid feature), so a client calling it directly could send a forged `X-Forwarded-For` and dodge the per-IP rate limits. Acceptable for a demo; in production, keep the API on a private network (see Before production).
+
 ## Extension guide
 
 The MVP keeps infrastructure minimal on purpose (one API process, in-memory cache, Postgres only). Each item below names the single place to change.

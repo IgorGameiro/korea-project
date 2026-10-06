@@ -1,8 +1,12 @@
 import { PHASE_PRODUCTION_BUILD } from 'next/constants';
 
-/** Runs once when the server starts (Next.js instrumentation hook). */
+/**
+ * Runs once when the server starts (Next.js instrumentation hook). Only for the Docker image, whose
+ * build has no API: on Vercel the build reaches the API, and serverless instances start per request.
+ */
 export async function register() {
   if (
+    process.env.VERCEL ||
     process.env.NEXT_RUNTIME !== 'nodejs' ||
     process.env.NODE_ENV !== 'production' ||
     process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD

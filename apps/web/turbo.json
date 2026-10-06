@@ -3,7 +3,9 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "dependsOn": ["$TURBO_EXTENDS$", "typecheck"]
+      "dependsOn": ["$TURBO_EXTENDS$", "typecheck"],
+      "env": ["$TURBO_EXTENDS$", "API_INTERNAL_URL"],
+      "passThroughEnv": ["INTERNAL_API_TOKEN", "VERCEL"]
     }
   }
 }

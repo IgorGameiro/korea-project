@@ -18,8 +18,8 @@ if (existsSync(rootEnv)) {
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const nextConfig: NextConfig = {
-  // Self-contained server bundle for the production Docker image.
-  output: 'standalone',
+  // Self-contained server bundle for the production Docker image (Vercel packages the app itself).
+  output: process.env.VERCEL ? undefined : 'standalone',
   // Monorepo: trace dependencies from the repo root so workspace packages are included.
   outputFileTracingRoot: path.join(import.meta.dirname, '../../'),
   poweredByHeader: false,
