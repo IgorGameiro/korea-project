@@ -1,5 +1,9 @@
 # korea-project
 
+**🌐 Live demo: [korea-project-one.vercel.app](https://korea-project-one.vercel.app)** · API docs: [Swagger](https://korea-project-api.onrender.com/api/docs)
+
+> The demo runs on free plans: the API sleeps after 15 minutes without visits, so the first login or cost estimate can take about a minute. Pages load right away.
+
 South Korea travel guide: cities, neighborhoods, places (restaurants, nightlife, hiking, attractions, cafés, shopping, culture, nature), accommodations and a trip cost calculator. The site is in **English by default**, with **Brazilian Portuguese** as an option; prices are shown in KRW plus USD or BRL.
 
 > **Status:** all six phases are complete (MVP). See the [Roadmap](#roadmap), the [Extension guide](#extension-guide) and the [Before production](#before-production-mandatory) checklist.
