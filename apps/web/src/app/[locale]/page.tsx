@@ -1,5 +1,6 @@
 import type { Locale } from '@korea-project/shared';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ButtonLink } from '@/components/ui/button';
 import { JsonLd } from '@/components/seo/json-ld';
@@ -12,6 +13,7 @@ import { loadAtBuildOr, serverApi } from '@/lib/api/server';
 import { CATEGORIES, CATEGORY_META } from '@/lib/categories';
 import { alternatesFor } from '@/lib/seo';
 import { websiteJsonLd } from '@/lib/structured-data';
+import heroImage from '@/assets/home-hero-seoul-night.jpg';
 
 export const revalidate = 300;
 
@@ -36,7 +38,20 @@ export default async function Home({ params }: PageProps<'/[locale]'>) {
   return (
     <>
       <JsonLd data={websiteJsonLd(locale, tm('siteName'))} />
-      <section className="bg-navy-900 text-white">
+      <section className="relative isolate overflow-hidden bg-navy-900 text-white">
+        {/* Decorative (alt=""): the heading says what the page is. Same treatment as the city hero. */}
+        <Image
+          src={heroImage}
+          alt=""
+          fill
+          loading="eager"
+          fetchPriority="high"
+          placeholder="blur"
+          sizes="100vw"
+          className="-z-10 object-cover object-[center_40%] opacity-90"
+        />
+        {/* Darker on the left, where the text and the search box sit. */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900/80 via-navy-900/40 to-transparent" />
         <Container className="flex flex-col gap-6 py-16 sm:py-24">
           <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">
             {t('heroTitle')}
