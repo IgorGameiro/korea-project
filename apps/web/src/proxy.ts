@@ -1,5 +1,5 @@
 import createMiddleware from 'next-intl/middleware';
-import { NextRequest, type NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { routing } from './i18n/routing';
 import { FILTERED_HEADER, FILTERED_SEGMENT } from './lib/filtered-route';
 import { hasFilterParams, matchSectionPath } from './lib/sections';
@@ -21,6 +21,13 @@ export default function proxy(request: NextRequest): NextResponse {
   headers.delete(FILTERED_HEADER);
 
   const { pathname, searchParams } = request.nextUrl;
+
+  // The admin exists in English only: /pt/admin/... -> /admin/... (same page).
+  if (/^\/pt\/admin(\/|$)/.test(pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.slice('/pt'.length);
+    return NextResponse.redirect(url);
+  }
   if (matchSectionPath(pathname) && hasFilterParams(searchParams)) {
     const url = request.nextUrl.clone();
     url.pathname = `${pathname.replace(/\/$/, '')}/${FILTERED_SEGMENT}`;

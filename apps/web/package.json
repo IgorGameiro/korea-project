@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "gen:api": "openapi-typescript http://localhost:3001/api/docs-json -o src/lib/api/schema.d.ts && prettier --write src/lib/api/schema.d.ts"
+    "gen:api": "openapi-typescript http://localhost:3001/api/docs-json --default-non-nullable false -o src/lib/api/schema.d.ts && prettier --write src/lib/api/schema.d.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "5.9.1",

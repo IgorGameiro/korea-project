@@ -744,9 +744,9 @@ export interface components {
       /** @example 9400000 */
       population?: number;
       /** @default false */
-      isFeatured: boolean;
+      isFeatured?: boolean;
       /** @default 0 */
-      sortOrder: number;
+      sortOrder?: number;
       translations: components['schemas']['CityTranslationsDto'];
     };
     PartialCityTextDto: {
@@ -778,9 +778,9 @@ export interface components {
       /** @example 9400000 */
       population?: number;
       /** @default false */
-      isFeatured: boolean;
+      isFeatured?: boolean;
       /** @default 0 */
-      sortOrder: number;
+      sortOrder?: number;
       /** @description Only the locales sent are changed; the others are kept. */
       translations?: components['schemas']['UpdateCityTranslationsDto'];
     };
@@ -1028,7 +1028,7 @@ export interface components {
       /** Format: uri */
       website?: string | null;
       /** @default [] */
-      imageUrls: string[];
+      imageUrls?: string[];
       /**
        * @default []
        * @example [
@@ -1036,7 +1036,7 @@ export interface components {
        *       "history"
        *     ]
        */
-      tags: string[];
+      tags?: string[];
       /** @description Only for HIKING places. */
       trail?: components['schemas']['TrailDto'] | null;
       translations: components['schemas']['PlaceTranslationsDto'];
@@ -1088,7 +1088,7 @@ export interface components {
       /** Format: uri */
       website?: string | null;
       /** @default [] */
-      imageUrls: string[];
+      imageUrls?: string[];
       /**
        * @default []
        * @example [
@@ -1096,7 +1096,7 @@ export interface components {
        *       "history"
        *     ]
        */
-      tags: string[];
+      tags?: string[];
       /** @description Only for HIKING places. */
       trail?: components['schemas']['TrailDto'] | null;
       translations?: components['schemas']['UpdatePlaceTranslationsDto'];
@@ -1174,7 +1174,7 @@ export interface components {
       /** Format: uri */
       bookingUrl?: string | null;
       /** @default [] */
-      imageUrls: string[];
+      imageUrls?: string[];
     };
     UpdateAccommodationDto: {
       /**
@@ -1203,7 +1203,7 @@ export interface components {
       /** Format: uri */
       bookingUrl?: string | null;
       /** @default [] */
-      imageUrls: string[];
+      imageUrls?: string[];
     };
     ReviewAuthorDto: {
       /** Format: uuid */

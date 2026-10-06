@@ -44,4 +44,12 @@ describe('proxy', () => {
     const response = run('/cities/seoul/hiking/filtered', { 'x-kp-filtered-section': '1' });
     expect(forwardedHeader(response, 'x-kp-filtered-section')).toBeNull();
   });
+
+  it('sends the Portuguese admin URLs to the English admin, keeping the page', () => {
+    const response = run('/pt/admin/cities/abc?tab=districts');
+    expect(response.status).toBe(307);
+    const location = new URL(response.headers.get('location')!);
+    expect(location.pathname + location.search).toBe('/admin/cities/abc?tab=districts');
+    expect(run('/pt/administrator').status).not.toBe(307);
+  });
 });
