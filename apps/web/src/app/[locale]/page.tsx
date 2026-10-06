@@ -2,6 +2,7 @@ import type { Locale } from '@korea-project/shared';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ButtonLink } from '@/components/ui/button';
+import { JsonLd } from '@/components/seo/json-ld';
 import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
 import { CityCard } from '@/features/cities/city-card';
@@ -10,6 +11,7 @@ import { Link } from '@/i18n/navigation';
 import { loadAtBuildOr, serverApi } from '@/lib/api/server';
 import { CATEGORIES, CATEGORY_META } from '@/lib/categories';
 import { alternatesFor } from '@/lib/seo';
+import { websiteJsonLd } from '@/lib/structured-data';
 
 export const revalidate = 300;
 
@@ -30,8 +32,10 @@ export default async function Home({ params }: PageProps<'/[locale]'>) {
     null,
   );
 
+  const tm = await getTranslations('meta');
   return (
     <>
+      <JsonLd data={websiteJsonLd(locale, tm('siteName'))} />
       <section className="bg-navy-900 text-white">
         <Container className="flex flex-col gap-6 py-16 sm:py-24">
           <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">

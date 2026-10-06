@@ -11,7 +11,7 @@ import { routing } from '@/i18n/routing';
 import { loadOr, serverApi } from '@/lib/api/server';
 import { CurrencyProvider } from '@/lib/currency/currency-context';
 import { siteUrl } from '@/lib/env';
-import { alternatesFor } from '@/lib/seo';
+import { alternatesFor, openGraphFor } from '@/lib/seo';
 import { localeParams } from '@/lib/static-params';
 import '../globals.css';
 
@@ -36,7 +36,8 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Pr
     title: { default: t('title'), template: `%s · ${t('siteName')}` },
     description: t('description'),
     alternates: alternatesFor('/', locale as Locale),
-    openGraph: { siteName: t('siteName'), locale, type: 'website' },
+    openGraph: openGraphFor({ locale: locale as Locale, siteName: t('siteName') }),
+    twitter: { card: 'summary_large_image' },
   };
 }
 

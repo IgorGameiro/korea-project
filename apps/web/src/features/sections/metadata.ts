@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { getCityOverview } from '@/features/cities/data';
 import { isSection } from '@/lib/sections';
-import { alternatesFor } from '@/lib/seo';
+import { alternatesFor, openGraphFor } from '@/lib/seo';
 
 /** Metadata of a city section; the canonical always points to the unfiltered page. */
 export async function sectionMetadata(
@@ -20,6 +20,12 @@ export async function sectionMetadata(
     title: t('sectionTitle', values),
     description: t('sectionMetaDescription', values),
     alternates: alternatesFor(`/cities/${slug}/${section}`, locale as Locale),
-    openGraph: { images: [city.heroImageUrl] },
+    openGraph: openGraphFor({
+      locale: locale as Locale,
+      siteName: (await getTranslations({ locale, namespace: 'meta' }))('siteName'),
+      title: t('sectionTitle', values),
+      description: t('sectionMetaDescription', values),
+      images: [city.heroImageUrl],
+    }),
   };
 }

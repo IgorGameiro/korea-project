@@ -1,6 +1,7 @@
 import type { Locale } from '@korea-project/shared';
 import type { Metadata } from 'next';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
+import { JsonLd } from '@/components/seo/json-ld';
 import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
 import { CityCalculator } from '@/features/calculator/city-calculator';
@@ -14,7 +15,8 @@ import { Link } from '@/i18n/navigation';
 import { load, serverApi } from '@/lib/api/server';
 import { CATEGORIES, CATEGORY_META } from '@/lib/categories';
 import { STAYS_SECTION } from '@/lib/sections';
-import { alternatesFor } from '@/lib/seo';
+import { alternatesFor, openGraphFor } from '@/lib/seo';
+import { cityJsonLd } from '@/lib/structured-data';
 
 export const revalidate = 300;
 
@@ -33,7 +35,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: city.name,
     description,
     alternates: alternatesFor(`/cities/${slug}`, locale as Locale),
-    openGraph: { title: city.name, description, images: [city.heroImageUrl] },
+    openGraph: openGraphFor({
+      locale: locale as Locale,
+      siteName: (await getTranslations({ locale, namespace: 'meta' }))('siteName'),
+      title: city.name,
+      description,
+      images: [city.heroImageUrl],
+    }),
   };
 }
 
@@ -86,6 +94,7 @@ export default async function CityPage({ params }: Props) {
 
   return (
     <>
+      <JsonLd data={cityJsonLd(city, locale, (await getTranslations('place'))('home'))} />
       <CityHeader
         city={city}
         title={

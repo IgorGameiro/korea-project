@@ -8,6 +8,8 @@ export default defineConfig([
   ...nextTs,
   // Lets @next/eslint-plugin-next find the app when ESLint runs from the repo root (lint-staged).
   { settings: { next: { rootDir: import.meta.dirname } } },
+  // dangerouslySetInnerHTML is banned; the single audited exception is components/seo/json-ld.tsx.
+  { rules: { 'react/no-danger': 'error' } },
   prettierConfig,
   globalIgnores(['.next/**', 'out/**', 'build/**', 'coverage/**', 'next-env.d.ts']),
 ]);

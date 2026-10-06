@@ -2,6 +2,7 @@ import type { Locale, OpeningHours } from '@korea-project/shared';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Badge, CategoryBadge } from '@/components/ui/badge';
+import { JsonLd } from '@/components/seo/json-ld';
 import { Container } from '@/components/ui/container';
 import { Icon } from '@/components/ui/icon';
 import { PriceLevel, PriceTag } from '@/components/ui/price-tag';
@@ -16,7 +17,8 @@ import { LiveRating } from '@/features/reviews/live-rating';
 import { ReviewsSection } from '@/features/reviews/reviews-section';
 import { Link } from '@/i18n/navigation';
 import { CATEGORY_META } from '@/lib/categories';
-import { alternatesFor } from '@/lib/seo';
+import { alternatesFor, openGraphFor } from '@/lib/seo';
+import { placeJsonLd } from '@/lib/structured-data';
 import { staticParamsOrOnDemand } from '@/lib/static-params';
 
 // Same value as PLACE_REVALIDATE (route segment config must be a literal).
@@ -44,7 +46,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${place.name} · ${place.city.name}`,
     description,
     alternates: alternatesFor(`/places/${slug}`, locale as Locale),
-    openGraph: { title: place.name, description, images: place.imageUrls.slice(0, 1) },
+    openGraph: openGraphFor({
+      locale: locale as Locale,
+      siteName: (await getTranslations({ locale, namespace: 'meta' }))('siteName'),
+      title: place.name,
+      description,
+      images: place.imageUrls.slice(0, 1),
+      type: 'article',
+    }),
   };
 }
 
@@ -62,6 +71,7 @@ export default async function PlacePage({ params }: Props) {
 
   return (
     <Container className="flex flex-col gap-8 py-8">
+      <JsonLd data={placeJsonLd(place, locale, { home: t('home'), section: tc(section) })} />
       <nav aria-label={t('breadcrumb')}>
         <ol className="flex flex-wrap items-center gap-1 text-sm text-navy-700">
           <li>
