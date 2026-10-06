@@ -6,7 +6,7 @@ import { buttonClasses } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { browserApi } from '@/features/auth/browser-api';
 import type { components } from '@/lib/api/schema';
-import { describeError, unwrap } from '../admin-api';
+import { describeError, mutate, unwrap } from '../admin-api';
 import { ErrorBanner, Notice } from '../form-parts';
 
 type Rate = components['schemas']['ExchangeRateDto'];
@@ -66,7 +66,7 @@ function RateCard({ currency, rate }: { currency: DisplayCurrency; rate?: Rate }
     }
     setBusy(true);
     try {
-      const result = await unwrap(
+      const result = await mutate(
         browserApi().PUT('/api/v1/admin/exchange-rates/{currency}', {
           params: { path: { currency } },
           body: { rate: Number(value) },

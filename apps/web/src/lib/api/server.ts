@@ -16,6 +16,12 @@ export class ApiUnavailableError extends Error {
 const TIMEOUT_MS = 5000;
 
 /**
+ * Cache tag of every content fetch made while rendering pages. Admin changes revalidate it
+ * (app/api/revalidate), so cities, places, rates… show the new data on the next visit.
+ */
+export const CONTENT_TAG = 'content';
+
+/**
  * Typed API client for server components. `revalidate` (seconds) feeds Next's data cache, so the
  * pages that use it stay statically generated and refresh in the background (ISR).
  * openapi-fetch builds a Request object, which drops Next's `next` option, so it is re-applied here.
@@ -26,7 +32,10 @@ export function serverApi(revalidate = 300) {
     baseUrl: originOf(serverApiUrl),
     headers: internalApiToken ? { 'X-Internal-Token': internalApiToken } : undefined,
     fetch: (request: Request) =>
-      fetch(request, { next: { revalidate }, signal: AbortSignal.timeout(TIMEOUT_MS) }),
+      fetch(request, {
+        next: { revalidate, tags: [CONTENT_TAG] },
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      }),
   });
 }
 

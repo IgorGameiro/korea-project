@@ -6,7 +6,7 @@ import { Modal } from '@/components/ui/modal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { browserApi } from '@/features/auth/browser-api';
 import { Link, useRouter } from '@/i18n/navigation';
-import { describeError, unwrap } from '../admin-api';
+import { describeError, mutate, unwrap } from '../admin-api';
 import { ErrorBanner, Notice } from '../form-parts';
 import type { components } from '@/lib/api/schema';
 import { type AdminCity, CityForm, type CreateCityBody } from './city-form';
@@ -25,7 +25,7 @@ export function NewCity() {
       <h1 className="text-2xl font-bold">New city</h1>
       <CityForm
         onSave={async (body) => {
-          const created = await unwrap(
+          const created = await mutate(
             browserApi().POST('/api/v1/admin/cities', {
               body: body as CreateCityBody,
             }),
@@ -67,7 +67,7 @@ export function CityEditor({ id }: { id: string }) {
             city={city}
             onSave={async (body) => {
               setNotice(null);
-              const saved = await unwrap(
+              const saved = await mutate(
                 browserApi().PATCH('/api/v1/admin/cities/{id}', {
                   params: { path: { id } },
                   body,
@@ -105,14 +105,14 @@ function DistrictsPanel({ cityId }: { cityId: string }) {
 
   const save = async (body: Parameters<Parameters<typeof DistrictForm>[0]['onSave']>[0]) => {
     if (editing === 'new') {
-      await unwrap(
+      await mutate(
         browserApi().POST('/api/v1/admin/districts', {
           body: { ...body, cityId } as CreateDistrictBody,
         }),
       );
       setNotice(`Added ${body.translations.en.name}.`);
     } else if (editing) {
-      await unwrap(
+      await mutate(
         browserApi().PATCH('/api/v1/admin/districts/{id}', {
           params: { path: { id: editing.id } },
           body,
@@ -128,7 +128,7 @@ function DistrictsPanel({ cityId }: { cityId: string }) {
     setToDelete(null);
     setFailure(null);
     try {
-      await unwrap(
+      await mutate(
         browserApi().DELETE('/api/v1/admin/districts/{id}', {
           params: { path: { id: district.id } },
         }),

@@ -8,6 +8,7 @@ import { CostsAdmin } from './costs/costs-admin';
 import { OpeningHoursEditor } from './places/opening-hours-editor';
 import { PlaceForm } from './places/place-form';
 import { RatesAdmin } from './rates/rates-admin';
+import { AdminRefreshStatus } from './refresh-status';
 import { ReviewsAdmin } from './reviews/reviews-admin';
 import { resetAdminDataForTests } from './use-admin-data';
 
@@ -365,5 +366,46 @@ describe('ReviewsAdmin', () => {
     );
     expect(await screen.findByText(/Deleted the review by Spammer/)).toBeInTheDocument();
     expect(calls.find((c) => c.method === 'DELETE')?.path).toBe('/api/v1/reviews/r1');
+  });
+});
+
+describe('refreshing the public site', () => {
+  it('refreshes the site after a save, and warns when that fails (the save stands)', async () => {
+    let refreshStatus = 200;
+    installApi((method, path, body) => {
+      if (path === '/api/revalidate') return new Response(null, { status: refreshStatus });
+      if (method === 'GET') {
+        return Response.json({
+          base: 'KRW',
+          rates: [
+            { currency: 'USD', rate: 0.00072, source: 'env', updatedAt: '2026-10-01T00:00:00Z' },
+          ],
+        });
+      }
+      return Response.json({
+        currency: 'USD',
+        ...(body as object),
+        source: 'admin',
+        updatedAt: '2026-10-06T00:00:00Z',
+      });
+    });
+    renderWithApp(
+      <>
+        <AdminRefreshStatus />
+        <RatesAdmin />
+      </>,
+    );
+    const usd = await screen.findByRole('region', { name: 'KRW → USD' });
+    fireEvent.click(within(usd).getByRole('button', { name: 'Save USD rate' }));
+    expect(await within(usd).findByText('USD rate saved.')).toBeInTheDocument();
+    const order = calls.filter((c) => c.method !== 'GET').map((c) => c.path);
+    expect(order).toEqual(['/api/v1/admin/exchange-rates/USD', '/api/revalidate']);
+    expect(screen.queryByText(/could not be refreshed/)).toBeNull();
+
+    refreshStatus = 502;
+    fireEvent.click(within(usd).getByRole('button', { name: 'Save USD rate' }));
+    expect(
+      await screen.findByText(/Saved, but the public pages could not be refreshed now/),
+    ).toBeInTheDocument();
   });
 });

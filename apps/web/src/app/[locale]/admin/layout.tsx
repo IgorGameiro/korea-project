@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { Container } from '@/components/ui/container';
 import { AdminGuard } from '@/features/admin/admin-guard';
 import { AdminNav } from '@/features/admin/admin-nav';
+import { AdminRefreshStatus } from '@/features/admin/refresh-status';
 import { redirect } from '@/i18n/navigation';
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default async function AdminLayout({
     <Container className="flex flex-col gap-6 py-8">
       <AdminGuard>
         <AdminNav />
+        <AdminRefreshStatus />
         {children}
       </AdminGuard>
     </Container>

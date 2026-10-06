@@ -6,7 +6,7 @@ import { Modal } from '@/components/ui/modal';
 import { Skeleton } from '@/components/ui/skeleton';
 import { browserApi } from '@/features/auth/browser-api';
 import { Link } from '@/i18n/navigation';
-import { describeError, unwrap } from '../admin-api';
+import { describeError, mutate, unwrap } from '../admin-api';
 import { ErrorBanner, Notice } from '../form-parts';
 import type { AdminCity } from './city-form';
 
@@ -29,7 +29,7 @@ export function CitiesList() {
     setToDelete(null);
     setFailure(null);
     try {
-      await unwrap(
+      await mutate(
         browserApi().DELETE('/api/v1/admin/cities/{id}', { params: { path: { id: city.id } } }),
       );
       setNotice(`Deleted ${city.translations.en.name}.`);

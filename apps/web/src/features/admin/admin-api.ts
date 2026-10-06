@@ -1,4 +1,5 @@
 import type { FieldValues, Path, UseFormSetError } from 'react-hook-form';
+import { authFetch } from '@/features/auth/session';
 
 // Admin calls go through the same typed browser client (and session) as the rest of the site.
 // The API is the authority: it checks the ADMIN role and validates every payload; its errors are
@@ -81,4 +82,44 @@ export function applyFieldErrors<T extends FieldValues>(
     }
   }
   return unmatched;
+}
+
+// ----- Refreshing the public site after a change -------------------------------------------------
+
+type RefreshListener = (ok: boolean) => void;
+const refreshListeners = new Set<RefreshListener>();
+
+/** Admin screens show a notice when the site could not be refreshed (see AdminRefreshStatus). */
+export function onSiteRefresh(listener: RefreshListener) {
+  refreshListeners.add(listener);
+  return () => {
+    refreshListeners.delete(listener);
+  };
+}
+
+/** Asks the web server to revalidate the cached pages (ADMIN token, via the session). */
+export async function refreshSite(): Promise<boolean> {
+  let ok = false;
+  try {
+    const response = await authFetch(
+      new Request(new URL('/api/revalidate', window.location.origin), { method: 'POST' }),
+    );
+    ok = response.ok;
+  } catch {
+    ok = false;
+  }
+  for (const listener of refreshListeners) listener(ok);
+  return ok;
+}
+
+/**
+ * A write (create/update/delete) followed by a site refresh. The write's result is returned even if
+ * the refresh fails: the change is saved and the pages catch up when their ISR window ends.
+ */
+export async function mutate<T>(
+  call: Promise<{ data?: T; error?: unknown; response: Response }>,
+): Promise<T> {
+  const result = await unwrap(call);
+  await refreshSite();
+  return result;
 }

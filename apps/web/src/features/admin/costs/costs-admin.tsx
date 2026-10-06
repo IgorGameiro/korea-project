@@ -5,7 +5,7 @@ import { buttonClasses } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { browserApi } from '@/features/auth/browser-api';
 import type { components } from '@/lib/api/schema';
-import { describeError, unwrap } from '../admin-api';
+import { describeError, mutate, unwrap } from '../admin-api';
 import { ErrorBanner, Notice } from '../form-parts';
 import { TIER_LABELS, TIERS } from '../stays/stay-form';
 import { useAdminCities } from '../use-admin-data';
@@ -123,13 +123,13 @@ function TierCard({
     setBusy(true);
     try {
       const result = saved
-        ? await unwrap(
+        ? await mutate(
             browserApi().PATCH('/api/v1/admin/cost-estimates/{id}', {
               params: { path: { id: saved.id } },
               body: amounts,
             }),
           )
-        : await unwrap(
+        : await mutate(
             browserApi().POST('/api/v1/admin/cost-estimates', {
               body: { cityId, tier, ...amounts },
             }),

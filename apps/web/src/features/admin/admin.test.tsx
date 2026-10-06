@@ -248,6 +248,7 @@ describe('Districts', () => {
     let districts: unknown[] = [];
     installApi((request, body) => {
       const { pathname } = new URL(request.url);
+      if (pathname === '/api/revalidate') return Response.json({ revalidated: true });
       if (pathname === '/api/v1/admin/cities/c1') return Response.json(seoul);
       if (request.method === 'POST') {
         districts = [
@@ -276,7 +277,7 @@ describe('Districts', () => {
     fireEvent.click(within(form).getByRole('button', { name: 'Add district' }));
 
     expect(await screen.findByText('Added Hongdae.')).toBeInTheDocument();
-    expect(calls.find((c) => c.method === 'POST')?.body).toEqual({
+    expect(calls.find((c) => c.path === '/api/v1/admin/districts')?.body).toEqual({
       cityId: 'c1',
       slug: 'hongdae',
       nameKo: '홍대',
@@ -285,5 +286,7 @@ describe('Districts', () => {
       translations: { en: { name: 'Hongdae', description: 'Student area.' } },
     });
     expect(await screen.findByRole('button', { name: 'Edit Hongdae' })).toBeInTheDocument();
+    // The public site is asked to refresh after the change.
+    expect(calls.some((c) => c.method === 'POST' && c.path === '/api/revalidate')).toBe(true);
   });
 });

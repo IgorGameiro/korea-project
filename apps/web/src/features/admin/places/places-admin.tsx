@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { browserApi } from '@/features/auth/browser-api';
 import { Link, useRouter } from '@/i18n/navigation';
 import { CATEGORIES } from '@/lib/categories';
-import { describeError, unwrap } from '../admin-api';
+import { describeError, mutate, unwrap } from '../admin-api';
 import { ConfirmDialog } from '../confirm-dialog';
 import { ErrorBanner, Notice } from '../form-parts';
 import { useAdminCities, useAdminList } from '../use-admin-data';
@@ -46,7 +46,7 @@ export function PlacesList() {
   const remove = async (place: AdminPlace) => {
     setToDelete(null);
     try {
-      await unwrap(
+      await mutate(
         browserApi().DELETE('/api/v1/admin/places/{id}', { params: { path: { id: place.id } } }),
       );
       setNotice(
@@ -227,7 +227,7 @@ export function NewPlace() {
       <h1 className="text-2xl font-bold">New place</h1>
       <PlaceForm
         onSave={async (body) => {
-          const created = await unwrap(
+          const created = await mutate(
             browserApi().POST('/api/v1/admin/places', { body: body as CreatePlaceBody }),
           );
           router.replace(`/admin/places/${created.id}`);
@@ -272,7 +272,7 @@ export function PlaceEditor({ id }: { id: string }) {
             place={place}
             onSave={async (body) => {
               setNotice(null);
-              const saved = await unwrap(
+              const saved = await mutate(
                 browserApi().PATCH('/api/v1/admin/places/{id}', { params: { path: { id } }, body }),
               );
               setPlace(saved);

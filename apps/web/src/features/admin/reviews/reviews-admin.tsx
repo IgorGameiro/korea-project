@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { browserApi } from '@/features/auth/browser-api';
 import { Link } from '@/i18n/navigation';
 import type { MyReviewDto } from '@/lib/api/types';
-import { describeError, unwrap } from '../admin-api';
+import { describeError, mutate, unwrap } from '../admin-api';
 import { ConfirmDialog } from '../confirm-dialog';
 import { ErrorBanner, Notice } from '../form-parts';
 import { Pager } from '../places/places-admin';
@@ -26,7 +26,7 @@ export function ReviewsAdmin() {
   const remove = async (review: MyReviewDto) => {
     setToDelete(null);
     try {
-      await unwrap(
+      await mutate(
         browserApi().DELETE('/api/v1/reviews/{id}', { params: { path: { id: review.id } } }),
       );
       setNotice(`Deleted the review by ${review.author.name}. The place rating was recalculated.`);
