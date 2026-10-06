@@ -86,15 +86,54 @@ describe('tagLabel', () => {
 });
 
 describe('Gallery', () => {
+  const credited = {
+    url: 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Namsan.jpg',
+    credit: {
+      author: 'Jane Doe',
+      license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Namsan.jpg',
+    },
+  };
+
   it('gives every photo a meaningful alt text', () => {
     renderWithApp(
       <Gallery
         name="Namsan Tower"
-        images={['https://picsum.photos/a', 'https://picsum.photos/b']}
+        photos={[{ url: 'https://picsum.photos/a' }, { url: 'https://picsum.photos/b' }]}
       />,
     );
     expect(screen.getByAltText('Namsan Tower, photo 1 of 2')).toBeInTheDocument();
     expect(screen.getByAltText('Namsan Tower, photo 2 of 2')).toBeInTheDocument();
+  });
+
+  it('credits a real photo: author linked to its source, license linked to its text', () => {
+    renderWithApp(<Gallery name="Namsan Tower" photos={[credited]} />);
+    const author = screen.getByRole('link', { name: 'Photo: Jane Doe' });
+    expect(author).toHaveAttribute('href', credited.credit.sourceUrl);
+    expect(author).toHaveAttribute('rel', 'noopener noreferrer');
+    const license = screen.getByRole('link', { name: 'CC BY-SA 4.0' });
+    expect(license).toHaveAttribute('href', credited.credit.licenseUrl);
+    expect(license.getAttribute('rel')).toContain('license');
+  });
+
+  it('marks placeholders as illustrative, and public domain needs no license link', () => {
+    renderWithApp(
+      <Gallery
+        name="Namsan Tower"
+        photos={[
+          {
+            ...credited,
+            credit: { ...credited.credit, license: 'Public domain', licenseUrl: null },
+          },
+          { url: 'https://picsum.photos/b' },
+        ]}
+      />,
+      { locale: 'pt-BR' },
+    );
+    expect(screen.getByText('Imagem ilustrativa')).toBeInTheDocument();
+    expect(screen.getByText(/Public domain/)).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Public domain' })).toBeNull();
   });
 });
 

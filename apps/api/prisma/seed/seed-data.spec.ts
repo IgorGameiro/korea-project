@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { LOCALES, validateOpeningHours } from '@korea-project/shared';
+import { LOCALES, validateOpeningHours, validatePhotos } from '@korea-project/shared';
 import { CostTier, PlaceCategory } from '../../src/generated/prisma/enums';
 import { cities, favorites, reviews, users } from './data';
-import { galleryImages, slugify } from './helpers';
+import { cityPhotos, placePhotos } from './data/photos';
+import { galleryImages, placeImages, slugify } from './helpers';
 import type { Localized } from './types';
 
 // Guards the quality of the demo data: these checks run without a database.
@@ -224,5 +225,36 @@ describe('tag labels in the web app', () => {
     const labels = messages(locale).tags ?? {};
     const missing = seedTags.filter((tag) => !labels[tag]?.trim());
     expect(missing).toEqual([]);
+  });
+});
+
+describe('real photos (data/photos.ts)', () => {
+  const real = [...Object.values(cityPhotos), ...Object.values(placePhotos)];
+
+  it('belong to existing places and cities', () => {
+    expect(Object.keys(placePhotos).filter((slug) => !placeSlugs.has(slug))).toEqual([]);
+    const citySlugs = new Set(cities.map((city) => city.slug));
+    expect(Object.keys(cityPhotos).filter((slug) => !citySlugs.has(slug))).toEqual([]);
+  });
+
+  it('every real photo is credited (author, license, source) and comes from Wikimedia', () => {
+    expect(real.flatMap((photo) => validatePhotos([photo]))).toEqual([]);
+    for (const photo of real) {
+      expect(photo.credit).toBeTruthy();
+      expect(new URL(photo.url).hostname).toMatch(/^(upload|thumb)\.wikimedia\.org$/);
+      expect(photo.credit?.sourceUrl).toMatch(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
+      // A license link is optional only for public domain.
+      if (!/public domain/i.test(photo.credit?.license ?? '')) {
+        expect(photo.credit?.licenseUrl).toMatch(/^https?:\/\//);
+      }
+    }
+  });
+
+  it('places without a real photo keep uncredited placeholders', () => {
+    expect(placeImages('some-cafe', undefined)).toEqual(
+      galleryImages('some-cafe').map((url) => ({ url })),
+    );
+    const photo = Object.values(placePhotos)[0];
+    expect(placeImages('x', photo)).toEqual([photo]);
   });
 });

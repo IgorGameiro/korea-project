@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: (await getTranslations({ locale, namespace: 'meta' }))('siteName'),
       title: place.name,
       description,
-      images: place.imageUrls.slice(0, 1),
+      images: place.images.slice(0, 1).map((photo) => photo.url),
       type: 'article',
     }),
   };
@@ -125,7 +125,7 @@ export default async function PlacePage({ params }: Props) {
         </div>
       </header>
 
-      <Gallery name={place.name} images={place.imageUrls} />
+      <Gallery name={place.name} photos={place.images} />
 
       <div className="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <div className="flex flex-col gap-8">

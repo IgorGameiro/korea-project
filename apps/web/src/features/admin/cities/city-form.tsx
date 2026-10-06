@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
+import { validatePhotos } from '@korea-project/shared';
 import { z } from 'zod';
 import { buttonClasses } from '@/components/ui/button';
 import { TextAreaField, TextField } from '@/components/ui/text-field';
@@ -50,6 +51,12 @@ const schema = z.object({
     .string()
     .trim()
     .refine((value) => value === '' || /^\d+$/.test(value), 'A whole number, or empty.'),
+  heroImageCredit: z.object({
+    author: z.string().trim().max(300),
+    license: z.string().trim().max(100),
+    licenseUrl: z.string().trim().max(500),
+    sourceUrl: z.string().trim().max(500),
+  }),
   isFeatured: z.boolean(),
   sortOrder: z.coerce
     .string()
@@ -77,6 +84,11 @@ const FIELDS = [
   'slug',
   'nameKo',
   'heroImageUrl',
+  'heroImageCredit',
+  'heroImageCredit.author',
+  'heroImageCredit.license',
+  'heroImageCredit.licenseUrl',
+  'heroImageCredit.sourceUrl',
   'latitude',
   'longitude',
   'population',
@@ -87,6 +99,19 @@ const FIELDS = [
   ),
 ];
 
+/** Form fields -> PhotoCredit (an empty license link means none, as for public domain). */
+const toCredit = (credit: {
+  author: string;
+  license: string;
+  licenseUrl: string;
+  sourceUrl: string;
+}) => ({
+  author: credit.author,
+  license: credit.license,
+  sourceUrl: credit.sourceUrl,
+  licenseUrl: credit.licenseUrl || null,
+});
+
 const emptyText = { name: '', description: '', bestTimeToVisit: '' };
 
 function toValues(city?: AdminCity): Input {
@@ -95,6 +120,12 @@ function toValues(city?: AdminCity): Input {
     slug: city?.slug ?? '',
     nameKo: city?.nameKo ?? '',
     heroImageUrl: city?.heroImageUrl ?? '',
+    heroImageCredit: {
+      author: city?.heroImageCredit?.author ?? '',
+      license: city?.heroImageCredit?.license ?? '',
+      licenseUrl: city?.heroImageCredit?.licenseUrl ?? '',
+      sourceUrl: city?.heroImageCredit?.sourceUrl ?? '',
+    },
     latitude: city?.latitude ?? '',
     longitude: city?.longitude ?? '',
     population: city?.population?.toString() ?? '',
@@ -116,6 +147,11 @@ export function toBody(values: Output, editing: boolean) {
     slug: values.slug,
     nameKo: values.nameKo,
     heroImageUrl: values.heroImageUrl,
+    ...(Object.values(values.heroImageCredit).some((value) => value !== '')
+      ? { heroImageCredit: toCredit(values.heroImageCredit) }
+      : editing
+        ? { heroImageCredit: null }
+        : {}),
     latitude: values.latitude,
     longitude: values.longitude,
     ...(values.population === '' ? {} : { population: Number(values.population) }),
@@ -146,6 +182,21 @@ export function CityForm({
   } = useForm<Input, unknown, Output>({
     resolver: zodResolver(
       schema.superRefine((values, ctx) => {
+        // The hero credit is optional (placeholder photos), but complete when given.
+        const credit = values.heroImageCredit;
+        if (Object.values(credit).some((value) => value.trim() !== '')) {
+          const problems = validatePhotos([{ url: 'https://x.invalid', credit: toCredit(credit) }]);
+          for (const problem of problems) {
+            const field = problem.match(/credit\.(\w+)/)?.[1] ?? 'author';
+            ctx.addIssue({
+              code: 'custom',
+              path: ['heroImageCredit', field],
+              message: problem.includes('required')
+                ? 'Required with a credit.'
+                : 'A full https:// URL.',
+            });
+          }
+        }
         // Portuguese is optional, but all of it or nothing.
         if (!values.withPortuguese) return;
         for (const field of ['name', 'description', 'bestTimeToVisit'] as const) {
@@ -228,6 +279,31 @@ export function CityForm({
           error={errors.heroImageUrl?.message}
           {...register('heroImageUrl')}
         />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField
+            label="Hero photo author"
+            hint="Credit for real photos (e.g. from Wikimedia Commons). Leave the four fields empty for a placeholder."
+            error={errors.heroImageCredit?.author?.message}
+            {...register('heroImageCredit.author')}
+          />
+          <TextField
+            label="Hero photo license"
+            hint="e.g. CC BY-SA 4.0"
+            error={errors.heroImageCredit?.license?.message}
+            {...register('heroImageCredit.license')}
+          />
+          <TextField
+            label="Hero photo license URL"
+            hint="Optional for public domain."
+            error={errors.heroImageCredit?.licenseUrl?.message}
+            {...register('heroImageCredit.licenseUrl')}
+          />
+          <TextField
+            label="Hero photo source page"
+            error={errors.heroImageCredit?.sourceUrl?.message}
+            {...register('heroImageCredit.sourceUrl')}
+          />
+        </div>
         <div className="grid gap-4 sm:grid-cols-4">
           <TextField
             label="Latitude"

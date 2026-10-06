@@ -70,18 +70,20 @@ enum Role {
 // ---------------------------------------------------------------------------
 
 model City {
-  id           String   @id @default(uuid(7)) @db.Uuid
-  slug         String   @unique
-  nameKo       String
-  heroImageUrl String
-  latitude     Float
-  longitude    Float
-  population   Int?
+  id              String   @id @default(uuid(7)) @db.Uuid
+  slug            String   @unique
+  nameKo          String
+  heroImageUrl    String
+  /// PhotoCredit from @korea-project/shared (author, license, source). Null = placeholder image.
+  heroImageCredit Json?
+  latitude        Float
+  longitude       Float
+  population      Int?
   /// Shown in the Home "featured cities" grid, ordered by sortOrder.
-  isFeatured   Boolean  @default(false)
-  sortOrder    Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isFeatured      Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   translations   CityTranslation[]
   districts      District[]
@@ -158,7 +160,8 @@ model Place {
   /// OpeningHours from @korea-project/shared. Null = not informed.
   openingHours    Json?
   website         String?
-  imageUrls       String[]
+  /// Photo[] from @korea-project/shared: url + optional credit (author, license, source).
+  images          Json          @default("[]")
   tags            String[]
   /// Denormalized from Review; kept in sync in the same transaction as review writes.
   ratingAvg       Float         @default(0)

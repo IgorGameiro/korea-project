@@ -503,5 +503,19 @@
     "loadError": "This list could not be loaded. Please try again in a moment.",
     "showMore": "Show more",
     "redirecting": "Taking you to the login page…"
+  },
+  "photos": {
+    "credit": "Photo: {author}",
+    "license": "{license}",
+    "source": "Source: Wikimedia Commons",
+    "placeholder": "Illustrative image",
+    "creditsLink": "Photo credits",
+    "creditsTitle": "Photo credits",
+    "creditsMetaTitle": "Photo credits",
+    "creditsIntro": "The photos of cities and places come from Wikimedia Commons and are used under their free licenses. Each one is credited below with its author, license and source. Places without a credited photo show an illustrative image.",
+    "cities": "Cities",
+    "places": "Places",
+    "in": "in {city}",
+    "unavailable": "The credits could not be loaded right now. Please try again in a few minutes."
   }
 }

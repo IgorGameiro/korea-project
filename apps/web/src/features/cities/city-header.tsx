@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { ReactNode } from 'react';
+import { PhotoCredit } from '@/components/photos/photo-credit';
 import { Container } from '@/components/ui/container';
 import type { CityOverviewDto } from '@/lib/api/types';
 
@@ -37,6 +38,11 @@ export function CityHeader({
           </p>
         ) : null}
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">{title}</h1>
+        {city.heroImageCredit ? (
+          <p className="mt-3 sm:text-right">
+            <PhotoCredit credit={city.heroImageCredit} tone="light" />
+          </p>
+        ) : null}
       </Container>
     </div>
   );

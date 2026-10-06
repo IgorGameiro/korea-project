@@ -503,5 +503,19 @@
     "loadError": "Não foi possível carregar esta lista. Tente de novo em instantes.",
     "showMore": "Ver mais",
     "redirecting": "Levando você para a página de login…"
+  },
+  "photos": {
+    "credit": "Foto: {author}",
+    "license": "{license}",
+    "source": "Fonte: Wikimedia Commons",
+    "placeholder": "Imagem ilustrativa",
+    "creditsLink": "Créditos das fotos",
+    "creditsTitle": "Créditos das fotos",
+    "creditsMetaTitle": "Créditos das fotos",
+    "creditsIntro": "As fotos das cidades e dos lugares vêm do Wikimedia Commons e são usadas sob suas licenças livres. Cada uma está creditada abaixo com autor, licença e fonte. Lugares sem foto creditada mostram uma imagem ilustrativa.",
+    "cities": "Cidades",
+    "places": "Lugares",
+    "in": "em {city}",
+    "unavailable": "Não foi possível carregar os créditos agora. Tente de novo em alguns minutos."
   }
 }

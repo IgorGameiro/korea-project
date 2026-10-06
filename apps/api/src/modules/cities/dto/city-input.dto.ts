@@ -1,3 +1,4 @@
+import type { PhotoCredit } from '@korea-project/shared';
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
@@ -16,6 +17,7 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { IsPhotoCredit, PhotoCreditDto } from '../../../common/dto/photo.dto';
 import { SLUG_MESSAGE, SLUG_PATTERN } from '../../../common/validation';
 
 export class CityTextDto {
@@ -88,6 +90,15 @@ class CityBaseDto {
   @IsUrl({ protocols: ['https'], require_protocol: true })
   @MaxLength(500)
   heroImageUrl: string;
+
+  @ApiPropertyOptional({
+    type: PhotoCreditDto,
+    nullable: true,
+    description: 'Author, license and source of the hero photo; null for a placeholder.',
+  })
+  @IsOptional()
+  @IsPhotoCredit()
+  heroImageCredit?: PhotoCredit | null;
 
   @ApiProperty({ example: 37.5665 })
   @IsLatitude()

@@ -24,7 +24,7 @@ const place = (overrides: Partial<PlaceOverviewDto> = {}): PlaceOverviewDto => (
   tags: [],
   address: '88 Changgyeonggung-ro, Jongno-gu',
   openingHours: null,
-  imageUrls: ['https://picsum.photos/a'],
+  images: [{ url: 'https://picsum.photos/a' }],
   city: { id: 'c1', slug: 'seoul', name: 'Seoul' },
   recentReviews: [],
   ...overrides,
@@ -32,21 +32,24 @@ const place = (overrides: Partial<PlaceOverviewDto> = {}): PlaceOverviewDto => (
 
 describe('JSON-LD output is safe', () => {
   it('a value cannot close the <script> element or inject markup', () => {
-    const data = placeJsonLd(place({ name: ATTACK, description: 'a b' }), 'en', {
+    const data = placeJsonLd(place({ name: ATTACK, description: 'a\u2028b' }), 'en', {
       home: 'Home',
       section: 'Restaurants',
     });
     const html = renderToStaticMarkup(<JsonLd data={data} />);
 
-    expect(html.startsWith('<script type="application/ld+json">')).toBe(true);
-    expect(html.match(/<\/script>/gi)).toHaveLength(1); // only the real closing tag
-    expect(html.match(/<script/gi)).toHaveLength(1);
+    // One <script> per object (place + breadcrumb), and nothing else.
+    expect(html.match(/<script/gi)).toHaveLength(2);
+    expect(html.match(/<\/script>/gi)).toHaveLength(2); // only the real closing tags
     expect(html).not.toContain('<!--');
-    expect(html).not.toContain(' ');
+    expect(html).not.toContain('\u2028');
 
-    // Search engines parse it back to exactly the same data.
-    const json = html.replace(/^<script[^>]*>/, '').replace(/<\/script>$/, '');
-    expect(JSON.parse(json)).toEqual(data);
+    // Search engines parse each one back to exactly the same object, with its own @context.
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(
+      (match) => JSON.parse(match[1]!) as Record<string, unknown>,
+    );
+    expect(blocks).toEqual(data);
+    for (const block of blocks) expect(block['@context']).toBe('https://schema.org');
   });
 
   it('escapes <, >, & and the JavaScript line separators', () => {

@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { type Locale, LOCALES, type Paginated } from '@korea-project/shared';
+import { type Locale, LOCALES, type Paginated, type PhotoCredit } from '@korea-project/shared';
 import { paginate } from '../../common/dto';
+import { Prisma } from '../../generated/prisma/client';
 import { pickTranslation, planTranslationChanges, translationsByLocale } from '../../common/i18n';
 import { CitiesRepository, type CityBase } from './cities.repository';
 import type { CityTextDto, CreateCityDto, UpdateCityDto } from './dto/city-input.dto';
@@ -25,6 +26,7 @@ function toCityDto(row: CityRow, locale: Locale): CityDto {
     description: t.description,
     bestTimeToVisit: t.bestTimeToVisit,
     heroImageUrl: row.heroImageUrl,
+    heroImageCredit: (row.heroImageCredit as PhotoCredit | null) ?? null,
     latitude: row.latitude,
     longitude: row.longitude,
     population: row.population,
@@ -38,6 +40,7 @@ function toAdminCityDto(row: CityRow): AdminCityDto {
     slug: row.slug,
     nameKo: row.nameKo,
     heroImageUrl: row.heroImageUrl,
+    heroImageCredit: (row.heroImageCredit as PhotoCredit | null) ?? null,
     latitude: row.latitude,
     longitude: row.longitude,
     population: row.population,
@@ -122,16 +125,20 @@ export class CitiesService {
   }
 
   async create(dto: CreateCityDto): Promise<AdminCityDto> {
-    const { translations, ...base } = dto;
+    const { translations, heroImageCredit, ...rest } = dto;
+    const base: CityBase = { ...rest, heroImageCredit: heroImageCredit ?? Prisma.JsonNull };
     const rows = LOCALES.flatMap((locale) => {
       const text = translations[locale];
       return text ? [{ locale, text }] : [];
     });
-    return toAdminCityDto(await this.repository.create(base satisfies CityBase, rows));
+    return toAdminCityDto(await this.repository.create(base, rows));
   }
 
   async update(id: string, dto: UpdateCityDto): Promise<AdminCityDto> {
-    const { translations, ...base } = dto;
+    const { translations, heroImageCredit, ...rest } = dto;
+    const base: Partial<CityBase> = { ...rest };
+    // undefined keeps the current credit; null clears it.
+    if (heroImageCredit !== undefined) base.heroImageCredit = heroImageCredit ?? Prisma.JsonNull;
     const current = await this.repository.findByIdAdmin(id);
     if (!current) throw cityNotFound();
 

@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Container } from '../ui/container';
 
 export function SiteFooter() {
@@ -16,6 +17,10 @@ export function SiteFooter() {
           >
             {t('footer.mapData')}
           </a>
+          {' · '}
+          <Link href="/credits" className="underline underline-offset-4 hover:text-coral-600">
+            {t('photos.creditsLink')}
+          </Link>
         </p>
       </Container>
     </footer>

@@ -1,4 +1,4 @@
-import type { OpeningHours } from '@korea-project/shared';
+import type { OpeningHours, Photo } from '@korea-project/shared';
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { type ComponentProps, useState } from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -6,6 +6,7 @@ import { resetSessionForTests, startSession } from '@/features/auth/session';
 import { renderWithApp } from '@/test/render';
 import { CostsAdmin } from './costs/costs-admin';
 import { OpeningHoursEditor } from './places/opening-hours-editor';
+import { PhotosEditor } from './places/photos-editor';
 import { PlaceForm } from './places/place-form';
 import { RatesAdmin } from './rates/rates-admin';
 import { AdminRefreshStatus } from './refresh-status';
@@ -195,7 +196,11 @@ describe('PlaceForm', () => {
     fireEvent.change(within(trail).getByLabelText('Elevation gain (m)'), {
       target: { value: '700' },
     });
-    fill('Image URLs', 'https://picsum.photos/a\n\n  https://picsum.photos/b  ');
+    const photos = screen.getByRole('group', { name: 'Photos' });
+    fireEvent.click(within(photos).getByRole('button', { name: 'Add a photo' }));
+    fireEvent.change(within(photos).getByLabelText('URL (https)'), {
+      target: { value: 'https://picsum.photos/a' },
+    });
     fill('Tags', 'hiking, views ,national-park');
     fireEvent.click(screen.getByRole('button', { name: 'Create place' }));
 
@@ -205,7 +210,7 @@ describe('PlaceForm', () => {
       districtId: 'd1',
       category: 'HIKING',
       website: null,
-      imageUrls: ['https://picsum.photos/a', 'https://picsum.photos/b'],
+      images: [{ url: 'https://picsum.photos/a', credit: null }],
       tags: ['hiking', 'views', 'national-park'],
       openingHours: null,
       trail: { difficulty: 'MODERATE', distanceKm: 8.4, durationMinutes: 270, elevationGainM: 700 },
@@ -213,14 +218,19 @@ describe('PlaceForm', () => {
     });
   });
 
-  it('rejects image lines that are not https URLs', async () => {
+  it('rejects a photo that is not an https URL', async () => {
     const onSave = vi.fn<(body: unknown) => Promise<void>>(async () => undefined);
     renderWithApp(<PlaceForm onSave={onSave} />);
     await fillBasics();
     fill('Category', 'CAFE');
-    fill('Image URLs', 'http://insecure.example/a.jpg');
+    const photos = screen.getByRole('group', { name: 'Photos' });
+    fireEvent.click(within(photos).getByRole('button', { name: 'Add a photo' }));
+    fireEvent.change(within(photos).getByLabelText('URL (https)'), {
+      target: { value: 'http://insecure.example/a.jpg' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Create place' }));
-    expect(await screen.findByText('One https:// URL per line.')).toBeInTheDocument();
+    expect(await within(photos).findByText('Photo 1.url must be an https URL')).toBeInTheDocument();
+    expect(await screen.findByText('Fix the photos.')).toBeInTheDocument();
     expect(onSave).not.toHaveBeenCalled();
   });
 
@@ -407,5 +417,55 @@ describe('refreshing the public site', () => {
     expect(
       await screen.findByText(/Saved, but the public pages could not be refreshed now/),
     ).toBeInTheDocument();
+  });
+});
+
+describe('PhotosEditor', () => {
+  function Harness({ onValue }: { onValue: (v: Photo[]) => void }) {
+    const [value, setValue] = useState<Photo[]>([
+      { url: 'https://picsum.photos/a' },
+      { url: 'https://picsum.photos/b' },
+    ]);
+    return (
+      <PhotosEditor
+        value={value}
+        onChange={(next) => {
+          setValue(next);
+          onValue(next);
+        }}
+      />
+    );
+  }
+
+  it('reorders the cover and requires a complete credit once one is started', () => {
+    let last: Photo[] = [];
+    renderWithApp(<Harness onValue={(v) => (last = v)} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Move Photo 2 up' }));
+    expect(last.map((p) => p.url)).toEqual(['https://picsum.photos/b', 'https://picsum.photos/a']);
+    expect(screen.queryByRole('alert')).toBeNull();
+
+    const first = screen.getByRole('group', { name: 'Photo 1 (cover)' });
+    fireEvent.change(within(first).getByLabelText('Author'), { target: { value: 'Jane Doe' } });
+    expect(screen.getByRole('alert')).toHaveTextContent('Photo 1.credit.license is required');
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Photo 1.credit.sourceUrl must be an https URL',
+    );
+
+    fireEvent.change(within(first).getByLabelText('License (e.g. CC BY-SA 4.0)'), {
+      target: { value: 'CC0' },
+    });
+    fireEvent.change(within(first).getByLabelText('Source page (e.g. the Commons file page)'), {
+      target: { value: 'https://commons.wikimedia.org/wiki/File:B.jpg' },
+    });
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(last[0]).toEqual({
+      url: 'https://picsum.photos/b',
+      credit: {
+        author: 'Jane Doe',
+        license: 'CC0',
+        licenseUrl: null,
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:B.jpg',
+      },
+    });
   });
 });

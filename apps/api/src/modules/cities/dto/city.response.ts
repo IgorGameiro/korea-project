@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Locale, LOCALES } from '@korea-project/shared';
+import { PhotoCreditDto } from '../../../common/dto/photo.dto';
 import { CityTextDto } from './city-input.dto';
 
 /** Public, single-language view. `locale` tells which language the text is in (after fallback). */
@@ -12,6 +13,12 @@ export class CityDto {
   @ApiProperty() description: string;
   @ApiProperty() bestTimeToVisit: string;
   @ApiProperty() heroImageUrl: string;
+  @ApiPropertyOptional({
+    type: PhotoCreditDto,
+    nullable: true,
+    description: 'Null for placeholders.',
+  })
+  heroImageCredit: PhotoCreditDto | null;
   @ApiProperty() latitude: number;
   @ApiProperty() longitude: number;
   @ApiPropertyOptional({ nullable: true, type: Number }) population: number | null;
@@ -29,6 +36,8 @@ export class AdminCityDto {
   @ApiProperty() slug: string;
   @ApiProperty() nameKo: string;
   @ApiProperty() heroImageUrl: string;
+  @ApiPropertyOptional({ type: PhotoCreditDto, nullable: true })
+  heroImageCredit: PhotoCreditDto | null;
   @ApiProperty() latitude: number;
   @ApiProperty() longitude: number;
   @ApiPropertyOptional({ nullable: true, type: Number }) population: number | null;

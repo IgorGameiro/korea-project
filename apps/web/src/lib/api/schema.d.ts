@@ -558,6 +558,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/credits': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Photo credits: every credited city and place photo */
+    get: operations['CreditsController_list_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/cities/{slug}': {
     parameters: {
       query?: never;
@@ -692,6 +709,19 @@ export interface components {
       /** @example 2 */
       totalPages: number;
     };
+    PhotoCreditDto: {
+      /** @example Jane Doe */
+      author: string;
+      /** @example CC BY-SA 4.0 */
+      license: string;
+      /**
+       * @description Absent for public domain.
+       * @example https://creativecommons.org/licenses/by-sa/4.0
+       */
+      licenseUrl?: string | null;
+      /** @example https://commons.wikimedia.org/wiki/File:Example.jpg */
+      sourceUrl: string;
+    };
     CityDto: {
       /** Format: uuid */
       id: string;
@@ -706,6 +736,8 @@ export interface components {
       description: string;
       bestTimeToVisit: string;
       heroImageUrl: string;
+      /** @description Null for placeholders. */
+      heroImageCredit?: components['schemas']['PhotoCreditDto'] | null;
       latitude: number;
       longitude: number;
       population?: number | null;
@@ -728,6 +760,7 @@ export interface components {
       slug: string;
       nameKo: string;
       heroImageUrl: string;
+      heroImageCredit?: components['schemas']['PhotoCreditDto'] | null;
       latitude: number;
       longitude: number;
       population?: number | null;
@@ -754,6 +787,8 @@ export interface components {
        * @example https://picsum.photos/seed/seoul/1600/900
        */
       heroImageUrl: string;
+      /** @description Author, license and source of the hero photo; null for a placeholder. */
+      heroImageCredit?: components['schemas']['PhotoCreditDto'] | null;
       /** @example 37.5665 */
       latitude: number;
       /** @example 126.978 */
@@ -788,6 +823,8 @@ export interface components {
        * @example https://picsum.photos/seed/seoul/1600/900
        */
       heroImageUrl?: string;
+      /** @description Author, license and source of the hero photo; null for a placeholder. */
+      heroImageCredit?: components['schemas']['PhotoCreditDto'] | null;
       /** @example 37.5665 */
       latitude?: number;
       /** @example 126.978 */
@@ -914,7 +951,10 @@ export interface components {
       ratingAvg: number;
       ratingCount: number;
       tags: string[];
+      /** @description The cover photo. */
       imageUrl?: string | null;
+      /** @description Credit of imageUrl. */
+      imageCredit?: components['schemas']['PhotoCreditDto'] | null;
       trail?: components['schemas']['TrailDto'] | null;
     };
     MapPointDto: {
@@ -956,6 +996,12 @@ export interface components {
     OpeningHoursDto: {
       days: components['schemas']['WeekScheduleDto'];
     };
+    PhotoDto: {
+      /** @example https://upload.wikimedia.org/wikipedia/commons/a/ab/Example.jpg */
+      url: string;
+      /** @description Author, license and source; null for placeholder images. */
+      credit?: components['schemas']['PhotoCreditDto'] | null;
+    };
     PlaceTextDto: {
       /** @example Gyeongbokgung Palace */
       name: string;
@@ -993,7 +1039,7 @@ export interface components {
       averageSpendKRW: number;
       openingHours?: components['schemas']['OpeningHoursDto'] | null;
       website?: string | null;
-      imageUrls: string[];
+      images: components['schemas']['PhotoDto'][];
       tags: string[];
       trail?: components['schemas']['TrailDto'] | null;
       ratingAvg: number;
@@ -1044,8 +1090,11 @@ export interface components {
       openingHours?: components['schemas']['OpeningHoursDto'] | null;
       /** Format: uri */
       website?: string | null;
-      /** @default [] */
-      imageUrls?: string[];
+      /**
+       * @description In display order (the first one is the cover). Credit required for real photos.
+       * @default []
+       */
+      images?: components['schemas']['PhotoDto'][];
       /**
        * @default []
        * @example [
@@ -1104,8 +1153,11 @@ export interface components {
       openingHours?: components['schemas']['OpeningHoursDto'] | null;
       /** Format: uri */
       website?: string | null;
-      /** @default [] */
-      imageUrls?: string[];
+      /**
+       * @description In display order (the first one is the cover). Credit required for real photos.
+       * @default []
+       */
+      images?: components['schemas']['PhotoDto'][];
       /**
        * @default []
        * @example [
@@ -1506,9 +1558,28 @@ export interface components {
       ratingAvg: number;
       ratingCount: number;
       tags: string[];
+      /** @description The cover photo. */
       imageUrl?: string | null;
+      /** @description Credit of imageUrl. */
+      imageCredit?: components['schemas']['PhotoCreditDto'] | null;
       trail?: components['schemas']['TrailDto'] | null;
       city: components['schemas']['SearchCityDto'];
+    };
+    CreditedCityDto: {
+      slug: string;
+      name: string;
+      photo: components['schemas']['PhotoDto'];
+    };
+    CreditedPlaceDto: {
+      slug: string;
+      name: string;
+      citySlug: string;
+      cityName: string;
+      photos: components['schemas']['PhotoDto'][];
+    };
+    CreditsDto: {
+      cities: components['schemas']['CreditedCityDto'][];
+      places: components['schemas']['CreditedPlaceDto'][];
     };
     DistrictDto: {
       /** Format: uuid */
@@ -1554,6 +1625,8 @@ export interface components {
       description: string;
       bestTimeToVisit: string;
       heroImageUrl: string;
+      /** @description Null for placeholders. */
+      heroImageCredit?: components['schemas']['PhotoCreditDto'] | null;
       latitude: number;
       longitude: number;
       population?: number | null;
@@ -1603,14 +1676,17 @@ export interface components {
       ratingAvg: number;
       ratingCount: number;
       tags: string[];
+      /** @description The cover photo. */
       imageUrl?: string | null;
+      /** @description Credit of imageUrl. */
+      imageCredit?: components['schemas']['PhotoCreditDto'] | null;
       trail?: components['schemas']['TrailDto'] | null;
       address: string;
       /** @description Weekly schedule (Asia/Seoul). */
       openingHours?: components['schemas']['OpeningHoursDto'] | null;
       openingHoursNote?: string | null;
       website?: string | null;
-      imageUrls: string[];
+      images: components['schemas']['PhotoDto'][];
       city: components['schemas']['PlaceAreaDto'];
       district?: components['schemas']['PlaceAreaDto'] | null;
       /** @description The 5 newest reviews (see /places/:slug/reviews). */
@@ -3351,6 +3427,31 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  CreditsController_list_v1: {
+    parameters: {
+      query?: {
+        /** @description Content language. Unsupported values fall back to "en". Takes precedence over Accept-Language. */
+        locale?: 'en' | 'pt-BR';
+      };
+      header?: {
+        /** @description Used when ?locale is absent. */
+        'Accept-Language'?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CreditsDto'];
+        };
       };
     };
   };

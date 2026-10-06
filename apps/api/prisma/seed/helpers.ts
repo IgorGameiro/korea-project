@@ -1,4 +1,10 @@
-import { type OpeningHours, type TimeRange, type Weekday, WEEKDAYS } from '@korea-project/shared';
+import {
+  type OpeningHours,
+  type Photo,
+  type TimeRange,
+  type Weekday,
+  WEEKDAYS,
+} from '@korea-project/shared';
 
 /** "Hotel Shilla & Spa" -> "hotel-shilla-and-spa" */
 export function slugify(value: string): string {
@@ -12,7 +18,8 @@ export function slugify(value: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-// Placeholder photos: deterministic per seed string, never broken. Replace with real photos later.
+// Placeholder photos (no credit needed): deterministic per seed string, never broken. Used where no
+// reviewed real photo exists (see data/photos.ts).
 const picsum = (seed: string, width: number, height: number) =>
   `https://picsum.photos/seed/${encodeURIComponent(`korea-project-${seed}`)}/${width}/${height}`;
 
@@ -20,6 +27,10 @@ export const heroImage = (citySlug: string) => picsum(`city-${citySlug}`, 1600, 
 
 export const galleryImages = (slug: string, count = 3) =>
   Array.from({ length: count }, (_, i) => picsum(`${slug}-${i + 1}`, 1200, 800));
+
+/** A place's photos: the reviewed real one (with its credit), or uncredited placeholders. */
+export const placeImages = (slug: string, real: Photo | undefined): Photo[] =>
+  real ? [real] : galleryImages(slug).map((url) => ({ url }));
 
 // ---------------------------------------------------------------------------
 // Opening hours builders (language-neutral; caveats go in the translated hoursNote)

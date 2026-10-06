@@ -30,7 +30,11 @@ function entries(
  * filtered sections (noindex), login/register/account and the admin.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const pages: Entry[] = [...entries('/', 1, 'weekly'), ...entries('/plan', 0.6, 'monthly')];
+  const pages: Entry[] = [
+    ...entries('/', 1, 'weekly'),
+    ...entries('/plan', 0.6, 'monthly'),
+    ...entries('/credits', 0.2, 'monthly'),
+  ];
   try {
     const cities = await load(
       serverApi(3600).GET('/api/v1/cities', { params: { query: { limit: 100 } } }),

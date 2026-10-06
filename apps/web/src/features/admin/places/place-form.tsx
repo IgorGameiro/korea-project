@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { OpeningHours } from '@korea-project/shared';
+import type { OpeningHours, Photo } from '@korea-project/shared';
 import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
@@ -14,17 +14,13 @@ import { coordinate } from '../cities/city-form';
 import { CheckboxField, ErrorBanner, FormSection } from '../form-parts';
 import { useAdminCities, useAdminDistricts } from '../use-admin-data';
 import { OpeningHoursEditor, openingHoursProblems } from './opening-hours-editor';
+import { PhotosEditor, photosProblems } from './photos-editor';
 
 export type AdminPlace = components['schemas']['AdminPlaceDto'];
 export type CreatePlaceBody = components['schemas']['CreatePlaceDto'];
 
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 const HTTPS_URL = /^https:\/\/\S+$/;
-const lines = (value: string) =>
-  value
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
 const tagList = (value: string) =>
   value
     .split(',')
@@ -51,13 +47,7 @@ const schema = z
       .trim()
       .max(500)
       .refine((value) => value === '' || HTTPS_URL.test(value), 'A full https:// URL, or empty.'),
-    imageUrls: z
-      .string()
-      .refine(
-        (value) => lines(value).every((url) => HTTPS_URL.test(url)),
-        'One https:// URL per line.',
-      )
-      .refine((value) => lines(value).length <= 20, 'At most 20 images.'),
+    images: z.custom<Photo[]>(),
     tags: z
       .string()
       .refine(
@@ -87,6 +77,9 @@ const schema = z
     }),
   })
   .superRefine((values, ctx) => {
+    if (photosProblems(values.images).length > 0) {
+      ctx.addIssue({ code: 'custom', path: ['images'], message: 'Fix the photos.' });
+    }
     if (openingHoursProblems(values.openingHours).length > 0) {
       ctx.addIssue({ code: 'custom', path: ['openingHours'], message: 'Fix the opening hours.' });
     }
@@ -146,7 +139,7 @@ const FIELDS = [
   'priceLevel',
   'averageSpendKRW',
   'website',
-  'imageUrls',
+  'images',
   'tags',
   'openingHours',
   'trail.difficulty',
@@ -177,7 +170,7 @@ function toValues(place?: AdminPlace): Input {
     priceLevel: place?.priceLevel ?? 1,
     averageSpendKRW: place?.averageSpendKRW ?? 0,
     website: place?.website ?? '',
-    imageUrls: (place?.imageUrls ?? []).join('\n'),
+    images: (place?.images as Photo[] | undefined) ?? [],
     tags: (place?.tags ?? []).join(', '),
     trail: {
       difficulty: place?.trail?.difficulty ?? '',
@@ -207,7 +200,7 @@ export function toPlaceBody(values: Output, editing: boolean) {
     priceLevel: values.priceLevel,
     averageSpendKRW: values.averageSpendKRW,
     website: values.website || null,
-    imageUrls: lines(values.imageUrls),
+    images: values.images,
     tags: tagList(values.tags),
     openingHours: values.openingHours,
     trail:
@@ -426,12 +419,6 @@ export function PlaceForm({
           error={errors.website?.message}
           {...register('website')}
         />
-        <TextAreaField
-          label="Image URLs"
-          hint="One https:// URL per line (the first one is the cover). Hosts must be allowed in next.config.ts."
-          error={errors.imageUrls?.message}
-          {...register('imageUrls')}
-        />
         <TextField
           label="Tags"
           hint="Comma-separated keys, e.g. street-food, night. New keys need a label in the web messages."
@@ -485,6 +472,19 @@ export function PlaceForm({
           </div>
         </FormSection>
       ) : null}
+
+      <FormSection title="Photos">
+        <Controller
+          control={control}
+          name="images"
+          render={({ field }) => (
+            <PhotosEditor value={field.value ?? []} onChange={field.onChange} />
+          )}
+        />
+        {errors.images ? (
+          <p className="text-sm font-medium text-coral-600">{errors.images.message}</p>
+        ) : null}
+      </FormSection>
 
       <FormSection title="Opening hours">
         <Controller

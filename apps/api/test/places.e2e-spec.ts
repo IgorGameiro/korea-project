@@ -179,7 +179,20 @@ describe('Places (e2e)', () => {
         district: null,
       });
       expect(res.body.openingHours.days.tue).toEqual([]);
-      expect(res.body.imageUrls).toHaveLength(3);
+      // A reviewed real photo, with the credit its license requires.
+      expect(res.body.images).toEqual([
+        {
+          url: expect.stringMatching(/^https:\/\/(upload|thumb)\.wikimedia\.org\//),
+          credit: {
+            author: expect.any(String),
+            license: expect.any(String),
+            licenseUrl: expect.any(String),
+            sourceUrl: expect.stringMatching(/^https:\/\/commons\.wikimedia\.org\/wiki\/File:/),
+          },
+        },
+      ]);
+      expect(res.body.imageUrl).toBe(res.body.images[0].url);
+      expect(res.body.imageCredit).toEqual(res.body.images[0].credit);
     });
 
     it('localizes the place and its breadcrumb', async () => {

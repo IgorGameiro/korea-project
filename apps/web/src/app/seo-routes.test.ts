@@ -26,8 +26,8 @@ describe('sitemap.xml', () => {
     const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
-    // home + plan + 1 city + 9 sections + 1 place = 13 pages, in 2 languages
-    expect(urls).toHaveLength(26);
+    // home + plan + credits + 1 city + 9 sections + 1 place = 14 pages, in 2 languages
+    expect(urls).toHaveLength(28);
     expect(urls).toContain('http://localhost:3000/cities/seoul/hiking');
     expect(urls).toContain('http://localhost:3000/pt/places/gyeongbokgung-palace');
     expect(urls.some((url) => /\/(admin|account|login|register|search)/.test(url))).toBe(false);
@@ -50,6 +50,8 @@ describe('sitemap.xml', () => {
       'http://localhost:3000/pt',
       'http://localhost:3000/plan',
       'http://localhost:3000/pt/plan',
+      'http://localhost:3000/credits',
+      'http://localhost:3000/pt/credits',
     ]);
   });
 });

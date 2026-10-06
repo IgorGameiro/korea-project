@@ -153,7 +153,7 @@ export function placeJsonLd(
       alternateName: place.nameKo,
       description: place.description,
       url: absolute(locale, `/places/${place.slug}`),
-      ...(place.imageUrls.length > 0 ? { image: place.imageUrls } : {}),
+      ...(place.images.length > 0 ? { image: place.images.map((photo) => photo.url) } : {}),
       address: {
         '@type': 'PostalAddress',
         streetAddress: place.address,

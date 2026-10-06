@@ -1,7 +1,8 @@
 import { LOCALES, type DisplayCurrency, type Locale } from '@korea-project/shared';
 import { Prisma, type PrismaClient } from '../../src/generated/prisma/client';
 import { CostTier } from '../../src/generated/prisma/enums';
-import { galleryImages, heroImage, slugify } from './helpers';
+import { cityPhotos, placePhotos } from './data/photos';
+import { galleryImages, heroImage, placeImages, slugify } from './helpers';
 import type { CitySeed, FavoriteSeed, Localized, ReviewSeed, UserSeed } from './types';
 
 export interface SeedInput {
@@ -55,7 +56,12 @@ export async function runSeed(prisma: PrismaClient, input: SeedInput): Promise<S
         text,
         ...city
       } of input.cities) {
-        const cityData = { ...city, heroImageUrl: heroImage(city.slug) };
+        const hero = cityPhotos[city.slug];
+        const cityData = {
+          ...city,
+          heroImageUrl: hero?.url ?? heroImage(city.slug),
+          heroImageCredit: hero?.credit ?? Prisma.JsonNull,
+        };
         const { id: cityId } = await tx.city.upsert({
           where: { slug: city.slug },
           create: cityData,
@@ -111,7 +117,7 @@ export async function runSeed(prisma: PrismaClient, input: SeedInput): Promise<S
             districtId: districtId(district),
             openingHours: openingHours ?? Prisma.JsonNull,
             website: website ?? null,
-            imageUrls: galleryImages(place.slug),
+            images: placeImages(place.slug, placePhotos[place.slug]),
             difficulty: trail?.difficulty ?? null,
             distanceKm: trail?.distanceKm ?? null,
             durationMinutes: trail?.durationMinutes ?? null,

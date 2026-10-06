@@ -23,6 +23,7 @@ import { PlaceOverviewModule } from './modules/place-overview/place-overview.mod
 import { PlacesModule } from './modules/places/places.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { SearchModule } from './modules/search/search.module';
+import { CreditsModule } from './modules/credits/credits.module';
 import { ExchangeRatesModule } from './modules/exchange-rates/exchange-rates.module';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
@@ -57,6 +58,7 @@ import { PrismaModule } from './prisma/prisma.module';
     FavoritesModule,
     CostEstimatesModule,
     SearchModule,
+    CreditsModule,
     CityOverviewModule,
     PlaceOverviewModule,
   ],

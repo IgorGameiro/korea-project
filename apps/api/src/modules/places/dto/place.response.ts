@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Locale, LOCALES, type OpeningHours, PlaceCategory } from '@korea-project/shared';
+import { PhotoCreditDto, PhotoDto } from '../../../common/dto/photo.dto';
 import { OpeningHoursDto } from './opening-hours.dto';
 import { PlaceTextDto, TrailDto } from './place-input.dto';
 
@@ -23,7 +24,10 @@ export class PlaceSummaryDto {
   @ApiProperty({ example: 4.67 }) ratingAvg: number;
   @ApiProperty() ratingCount: number;
   @ApiProperty({ type: [String] }) tags: string[];
-  @ApiPropertyOptional({ nullable: true, type: String }) imageUrl: string | null;
+  @ApiPropertyOptional({ nullable: true, type: String, description: 'The cover photo.' })
+  imageUrl: string | null;
+  @ApiPropertyOptional({ type: PhotoCreditDto, nullable: true, description: 'Credit of imageUrl.' })
+  imageCredit: PhotoCreditDto | null;
   @ApiPropertyOptional({ type: TrailDto, nullable: true }) trail: TrailDto | null;
 }
 
@@ -38,7 +42,7 @@ export class PlaceDetailDto extends PlaceSummaryDto {
   openingHours: OpeningHours | null;
   @ApiPropertyOptional({ nullable: true, type: String }) openingHoursNote: string | null;
   @ApiPropertyOptional({ nullable: true, type: String }) website: string | null;
-  @ApiProperty({ type: [String] }) imageUrls: string[];
+  @ApiProperty({ type: [PhotoDto] }) images: PhotoDto[];
 }
 
 /** Lightweight marker for the city map. */
@@ -71,7 +75,7 @@ export class AdminPlaceDto {
   @ApiPropertyOptional({ type: OpeningHoursDto, nullable: true })
   openingHours: OpeningHours | null;
   @ApiPropertyOptional({ nullable: true, type: String }) website: string | null;
-  @ApiProperty({ type: [String] }) imageUrls: string[];
+  @ApiProperty({ type: [PhotoDto] }) images: PhotoDto[];
   @ApiProperty({ type: [String] }) tags: string[];
   @ApiPropertyOptional({ type: TrailDto, nullable: true }) trail: TrailDto | null;
   @ApiProperty() ratingAvg: number;

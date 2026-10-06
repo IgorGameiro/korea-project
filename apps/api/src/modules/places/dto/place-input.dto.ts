@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional, OmitType, PartialType } from '@nestjs/swagger';
 import {
   type OpeningHours,
+  type Photo,
   PlaceCategory,
   TrailDifficulty,
   validateOpeningHours,
@@ -30,6 +31,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { SLUG_MESSAGE, SLUG_PATTERN } from '../../../common/validation';
+import { IsPhotos, PhotoDto } from '../../../common/dto/photo.dto';
 import { OpeningHoursDto } from './opening-hours.dto';
 
 /** Validates the shared OpeningHours shape (every weekday, HH:MM ranges). */
@@ -189,12 +191,14 @@ export class CreatePlaceDto {
   @MaxLength(500)
   website?: string | null;
 
-  @ApiPropertyOptional({ type: [String], default: [] })
+  @ApiPropertyOptional({
+    type: [PhotoDto],
+    default: [],
+    description: 'In display order (the first one is the cover). Credit required for real photos.',
+  })
   @IsOptional()
-  @IsArray()
-  @ArrayMaxSize(20)
-  @IsUrl({ protocols: ['https'], require_protocol: true }, { each: true })
-  imageUrls?: string[];
+  @IsPhotos()
+  images?: Photo[];
 
   @ApiPropertyOptional({ type: [String], default: [], example: ['palace', 'history'] })
   @IsOptional()

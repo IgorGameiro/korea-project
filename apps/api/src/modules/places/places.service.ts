@@ -11,6 +11,7 @@ import {
   LOCALES,
   type OpeningHours,
   type Paginated,
+  type Photo,
   PlaceCategory,
 } from '@korea-project/shared';
 import type { Cache } from 'cache-manager';
@@ -57,6 +58,9 @@ function localizedText(row: PlaceRow, locale: Locale) {
   return t;
 }
 
+/** The JSON column, as validated on write (see IsPhotos). */
+const photosOf = (row: PlaceRow): Photo[] => (row.images as Photo[] | null) ?? [];
+
 function toSummary(row: PlaceRow, locale: Locale): PlaceSummaryDto {
   const t = localizedText(row, locale);
   return {
@@ -76,7 +80,8 @@ function toSummary(row: PlaceRow, locale: Locale): PlaceSummaryDto {
     ratingAvg: row.ratingAvg,
     ratingCount: row.ratingCount,
     tags: row.tags,
-    imageUrl: row.imageUrls[0] ?? null,
+    imageUrl: photosOf(row)[0]?.url ?? null,
+    imageCredit: photosOf(row)[0]?.credit ?? null,
     trail: trailOf(row),
   };
 }
@@ -88,7 +93,7 @@ function toDetail(row: PlaceRow, locale: Locale): PlaceDetailDto {
     openingHours: (row.openingHours as OpeningHours | null) ?? null,
     openingHoursNote: localizedText(row, locale).openingHoursNote,
     website: row.website,
-    imageUrls: row.imageUrls,
+    images: photosOf(row),
   };
 }
 
@@ -107,7 +112,7 @@ function toAdmin(row: PlaceRow): AdminPlaceDto {
     averageSpendKRW: row.averageSpendKRW,
     openingHours: (row.openingHours as OpeningHours | null) ?? null,
     website: row.website,
-    imageUrls: row.imageUrls,
+    images: photosOf(row),
     tags: row.tags,
     trail: trailOf(row),
     ratingAvg: row.ratingAvg,
@@ -237,6 +242,25 @@ export class PlacesService {
   }
 
   /** Summaries in the order of `ids` (unknown ids are skipped). */
+  /** Every place with at least one credited photo (the credits page), with its localized name. */
+  async listCreditedPhotos(
+    locale: Locale,
+  ): Promise<{ slug: string; name: string; cityId: string; photos: Photo[] }[]> {
+    const { rows } = await this.repository.listLocalized(
+      null,
+      {},
+      'rating',
+      { skip: 0, take: 1000 },
+      locale,
+    );
+    return rows.flatMap((row) => {
+      const photos = photosOf(row).filter((photo) => photo.credit);
+      return photos.length > 0
+        ? [{ slug: row.slug, name: toSummary(row, locale).name, cityId: row.cityId, photos }]
+        : [];
+    });
+  }
+
   async findSummariesByIds(ids: string[], locale: Locale): Promise<PlaceSummaryDto[]> {
     if (ids.length === 0) return [];
     const rows = await this.repository.findManyByIdsLocalized(ids, locale);
@@ -286,6 +310,7 @@ export class PlacesService {
 
     const base: PlaceBase = {
       ...rest,
+      images: rest.images ?? [],
       openingHours: openingHours ?? Prisma.JsonNull,
       ...trailColumns(trail ?? null),
     };
