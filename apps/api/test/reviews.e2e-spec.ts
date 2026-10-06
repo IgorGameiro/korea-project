@@ -222,4 +222,30 @@ describe('Reviews (e2e)', () => {
     expect(none.body.meta.total).toBe(0);
     await http().get(`${API}/users/me/reviews?placeId=not-a-uuid`).set(bearer(ana)).expect(400);
   });
+
+  it('lets an ADMIN list every review for moderation (USER gets 403)', async () => {
+    const ana = await loginAs(app, 'user');
+    await http().get(`${API}/admin/reviews`).set(bearer(ana)).expect(403);
+    await http().get(`${API}/admin/reviews`).expect(401);
+
+    const all = await http()
+      .get(`${API}/admin/reviews?locale=pt-BR&limit=100`)
+      .set(bearer(adminToken))
+      .expect(200);
+    const rows = all.body.data as { createdAt: string; place: { slug: string; name: string } }[];
+    expect(all.body.meta.total).toBeGreaterThan(5);
+    const dates = rows.map((r) => r.createdAt);
+    expect(dates).toEqual([...dates].sort().reverse());
+    expect(rows.find((r) => r.place.slug === 'gyeongbokgung-palace')?.place.name).toBe(
+      'Palácio Gyeongbokgung',
+    );
+    expect(JSON.stringify(all.body)).not.toMatch(/email|passwordHash/);
+
+    const palace = await place('gyeongbokgung-palace');
+    const one = await http()
+      .get(`${API}/admin/reviews?placeId=${palace.id}`)
+      .set(bearer(adminToken))
+      .expect(200);
+    expect(one.body.meta.total).toBe(palace.ratingCount);
+  });
 });

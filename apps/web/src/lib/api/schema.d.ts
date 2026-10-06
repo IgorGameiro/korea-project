@@ -419,6 +419,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/admin/reviews': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** All reviews with their place, newest first (optionally one place) */
+    get: operations['AdminReviewsController_list_v1'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/places/{id}/favorite': {
     parameters: {
       query?: never;
@@ -2926,6 +2943,45 @@ export interface operations {
             meta: components['schemas']['PaginationMetaDto'];
           };
         };
+      };
+    };
+  };
+  AdminReviewsController_list_v1: {
+    parameters: {
+      query?: {
+        page?: number;
+        limit?: number;
+        /** @description Only the review of this place (0 or 1 result): "have I reviewed it?" */
+        placeId?: string;
+        /** @description Content language. Unsupported values fall back to "en". Takes precedence over Accept-Language. */
+        locale?: 'en' | 'pt-BR';
+      };
+      header?: {
+        /** @description Used when ?locale is absent. */
+        'Accept-Language'?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            data: components['schemas']['MyReviewDto'][];
+            meta: components['schemas']['PaginationMetaDto'];
+          };
+        };
+      };
+      /** @description FORBIDDEN: requires the ADMIN role */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

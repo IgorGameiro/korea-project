@@ -5,6 +5,11 @@ import { Link, usePathname } from '@/i18n/navigation';
 export const ADMIN_SECTIONS = [
   { href: '/admin', label: 'Dashboard' },
   { href: '/admin/cities', label: 'Cities & districts' },
+  { href: '/admin/places', label: 'Places' },
+  { href: '/admin/stays', label: 'Stays' },
+  { href: '/admin/costs', label: 'Cost estimates' },
+  { href: '/admin/exchange-rates', label: 'Exchange rates' },
+  { href: '/admin/reviews', label: 'Reviews' },
 ] as const;
 
 export function AdminNav() {

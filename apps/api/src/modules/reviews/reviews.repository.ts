@@ -44,6 +44,21 @@ export class ReviewsRepository {
     return { rows, total };
   }
 
+  /** Every review, newest first (moderation); optionally only one place's. */
+  async listAll(page: { skip: number; take: number }, placeId?: string) {
+    const where = placeId ? { placeId } : {};
+    const [rows, total] = await this.prisma.$transaction([
+      this.prisma.review.findMany({
+        where,
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        skip: page.skip,
+        take: page.take,
+      }),
+      this.prisma.review.count({ where }),
+    ]);
+    return { rows, total };
+  }
+
   async listByUser(userId: string, page: { skip: number; take: number }, placeId?: string) {
     const where = placeId ? { userId, placeId } : { userId };
     const [rows, total] = await this.prisma.$transaction([

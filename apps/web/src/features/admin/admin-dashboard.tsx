@@ -5,29 +5,51 @@ import { browserApi } from '@/features/auth/browser-api';
 import { Link } from '@/i18n/navigation';
 import { unwrap } from './admin-api';
 
+type Key = 'cities' | 'districts' | 'places' | 'stays' | 'reviews';
+
 /** Entry point: what can be managed, with counts. */
 export function AdminDashboard() {
-  const [counts, setCounts] = useState<{ cities?: number; districts?: number }>({});
+  const [counts, setCounts] = useState<Partial<Record<Key, number>>>({});
 
   useEffect(() => {
     const api = browserApi();
-    void Promise.allSettled([
-      unwrap(api.GET('/api/v1/admin/cities', { params: { query: { limit: 1 } } })),
-      unwrap(api.GET('/api/v1/admin/districts', { params: { query: { limit: 1 } } })),
-    ]).then(([cities, districts]) =>
-      setCounts({
-        cities: cities.status === 'fulfilled' ? cities.value.meta.total : undefined,
-        districts: districts.status === 'fulfilled' ? districts.value.meta.total : undefined,
-      }),
+    const one = { params: { query: { limit: 1 } } };
+    const calls: Record<Key, Promise<{ meta: { total: number } }>> = {
+      cities: unwrap(api.GET('/api/v1/admin/cities', one)),
+      districts: unwrap(api.GET('/api/v1/admin/districts', one)),
+      places: unwrap(api.GET('/api/v1/admin/places', one)),
+      stays: unwrap(api.GET('/api/v1/admin/accommodations', one)),
+      reviews: unwrap(api.GET('/api/v1/admin/reviews', one)),
+    };
+    const keys = Object.keys(calls) as Key[];
+    void Promise.allSettled(keys.map((key) => calls[key])).then((results) =>
+      setCounts(
+        Object.fromEntries(
+          results.map((result, i) => [
+            keys[i],
+            result.status === 'fulfilled' ? result.value.meta.total : undefined,
+          ]),
+        ),
+      ),
     );
   }, []);
 
+  const n = (key: Key) => counts[key] ?? '…';
   const cards = [
     {
       href: '/admin/cities',
       title: 'Cities & districts',
-      detail: `${counts.cities ?? '…'} cities · ${counts.districts ?? '…'} districts`,
+      detail: `${n('cities')} cities · ${n('districts')} districts`,
     },
+    { href: '/admin/places', title: 'Places', detail: `${n('places')} places` },
+    { href: '/admin/stays', title: 'Stays', detail: `${n('stays')} stays` },
+    {
+      href: '/admin/costs',
+      title: 'Cost estimates',
+      detail: 'Calculator amounts per city and style',
+    },
+    { href: '/admin/exchange-rates', title: 'Exchange rates', detail: 'KRW → USD and BRL' },
+    { href: '/admin/reviews', title: 'Reviews', detail: `${n('reviews')} reviews to moderate` },
   ];
 
   return (

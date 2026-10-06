@@ -79,6 +79,18 @@ export class ReviewsService {
     return this.withAuthors(rows);
   }
 
+  /** Moderation list: every review with its place, newest first. */
+  async listAll(
+    query: { page: number; limit: number; skip: number; placeId?: string },
+    locale: Locale,
+  ): Promise<Paginated<MyReviewDto>> {
+    const { rows, total } = await this.repository.listAll(
+      { skip: query.skip, take: query.limit },
+      query.placeId,
+    );
+    return paginate(await this.withPlaces(rows, locale), total, query);
+  }
+
   async listMine(
     userId: string,
     query: { page: number; limit: number; skip: number; placeId?: string },
@@ -89,19 +101,20 @@ export class ReviewsService {
       { skip: query.skip, take: query.limit },
       query.placeId,
     );
+    return paginate(await this.withPlaces(rows, locale), total, query);
+  }
+
+  /** Reviews with their author and the place they are about (localized name). */
+  private async withPlaces(rows: ReviewRow[], locale: Locale): Promise<MyReviewDto[]> {
     const [reviews, places] = await Promise.all([
       this.withAuthors(rows),
       this.places.findSummariesByIds([...new Set(rows.map((r) => r.placeId))], locale),
     ]);
     const placeById = new Map(places.map((p) => [p.id, { id: p.id, slug: p.slug, name: p.name }]));
-    return paginate(
-      reviews.flatMap((review) => {
-        const place = placeById.get(review.placeId);
-        return place ? [{ ...review, place }] : [];
-      }),
-      total,
-      query,
-    );
+    return reviews.flatMap((review) => {
+      const place = placeById.get(review.placeId);
+      return place ? [{ ...review, place }] : [];
+    });
   }
 
   // ----- Writes (each one recomputes the place rating in the same transaction) -----
