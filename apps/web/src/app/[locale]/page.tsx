@@ -39,7 +39,8 @@ export default async function Home({ params }: PageProps<'/[locale]'>) {
     <>
       <JsonLd data={websiteJsonLd(locale, tm('siteName'))} />
       <section className="relative isolate overflow-hidden bg-navy-900 text-white">
-        {/* Decorative (alt=""): the heading says what the page is. Same treatment as the city hero. */}
+        {/* Decorative (alt=""): the heading says what the page is. A light navy tint (the section
+            background through 90% opacity); the text shadows keep the copy readable over the sky. */}
         <Image
           src={heroImage}
           alt=""
@@ -50,13 +51,13 @@ export default async function Home({ params }: PageProps<'/[locale]'>) {
           sizes="100vw"
           className="-z-10 object-cover object-[center_40%] opacity-90"
         />
-        {/* Darker on the left, where the text and the search box sit. */}
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-navy-900/80 via-navy-900/40 to-transparent" />
         <Container className="flex flex-col gap-6 py-16 sm:py-24">
-          <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">
+          <h1 className="max-w-3xl text-4xl font-bold tracking-tight text-shadow-lg text-shadow-navy-900/60 sm:text-5xl">
             {t('heroTitle')}
           </h1>
-          <p className="max-w-2xl text-lg text-navy-100">{t('heroSubtitle')}</p>
+          <p className="max-w-2xl text-lg text-white text-shadow-md text-shadow-navy-900/70">
+            {t('heroSubtitle')}
+          </p>
           <div className="max-w-2xl rounded-[var(--radius-card)] bg-white p-4 text-navy-900 sm:p-5">
             <SearchForm locale={locale} />
           </div>
