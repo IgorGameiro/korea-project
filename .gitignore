@@ -28,3 +28,7 @@ coverage/
 .DS_Store
 *.pem
 *.log
+
+# Playwright artifacts
+apps/web/test-results/
+apps/web/playwright-report/

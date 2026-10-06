@@ -3,7 +3,7 @@
 #
 # Targets:
 #   dev       hot reload (used by docker-compose.override.yml)
-#   migrator  applies migrations and, unless NODE_ENV=production, loads the demo seed
+#   migrator  applies migrations and loads the demo seed (outside production, or with SEED_DEMO_DATA=true)
 #             (needs the Prisma CLI and tsx, which are dev dependencies)
 #   runner    production image (default)
 

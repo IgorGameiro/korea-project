@@ -2,18 +2,18 @@
 
 South Korea travel guide: cities, neighborhoods, places (restaurants, nightlife, hiking, attractions, cafés, shopping, culture, nature), accommodations and a trip cost calculator. The site is in **English by default**, with **Brazilian Portuguese** as an option; prices are shown in KRW plus USD or BRL.
 
-> **Status:** Phase 3 — REST API complete. See the [Roadmap](#roadmap).
+> **Status:** all six phases are complete (MVP). See the [Roadmap](#roadmap), the [Extension guide](#extension-guide) and the [Before production](#before-production-mandatory) checklist.
 
 ## Stack
 
-| Layer    | Technology                                                                         |
-| -------- | ---------------------------------------------------------------------------------- |
-| Frontend | Next.js 16 (App Router) · React 19 · Tailwind CSS 4                                |
-| Backend  | NestJS 12 · Swagger/OpenAPI · Terminus · Throttler · Cache Manager                 |
-| Database | PostgreSQL 18 · Prisma 7 (driver adapter `@prisma/adapter-pg`)                     |
-| Monorepo | pnpm 12 workspaces · Turborepo                                                     |
-| Quality  | TypeScript 6 · ESLint 9 · Prettier · Husky + lint-staged · Jest/Supertest · Vitest |
-| Infra    | Docker Compose · Node.js 24 LTS                                                    |
+| Layer    | Technology                                                                                      |
+| -------- | ----------------------------------------------------------------------------------------------- |
+| Frontend | Next.js 16 (App Router) · React 19 · Tailwind CSS 4                                             |
+| Backend  | NestJS 12 · Swagger/OpenAPI · Terminus · Throttler · Cache Manager                              |
+| Database | PostgreSQL 18 · Prisma 7 (driver adapter `@prisma/adapter-pg`)                                  |
+| Monorepo | pnpm 12 workspaces · Turborepo                                                                  |
+| Quality  | TypeScript 6 · ESLint 9 · Prettier · Husky + lint-staged · Jest/Supertest · Vitest · Playwright |
+| Infra    | Docker Compose · Node.js 24 LTS                                                                 |
 
 Every dependency is pinned to an exact version (no `^`) in the `package.json` files.
 
@@ -63,11 +63,19 @@ docker compose up --build
 
 Starts `postgres` → `migrate` (applies migrations, loads the demo seed, exits) → `api` → `web`, in development mode with hot reload for `apps/api/src` and `apps/web/src`. Changes to `packages/shared` or to dependencies need `docker compose up --build` (or `docker compose restart api web`).
 
-To run the production images only (no override, **no demo seed**):
+To run the production images only (no override, `NODE_ENV=production`, **no demo seed**):
 
 ```bash
 docker compose -f docker-compose.yml up --build
 ```
+
+A production database starts empty: create the content through `/admin` (an ADMIN user is needed; see the seed's `admin@example.com`) and set the exchange rates. For a **demo deployment** with the sample content, load the seed once with `SEED_DEMO_DATA=true`:
+
+```bash
+SEED_DEMO_DATA=true docker compose -f docker-compose.yml up --build
+```
+
+The web image is built without a reachable API, so the pages prebuilt by `next build` (home, plan) start with their "could not be loaded" fallback. Right after starting, the web server waits for the API's health check and invalidates them ([`startup-refresh.ts`](apps/web/src/lib/startup-refresh.ts), called from [`instrumentation.ts`](apps/web/src/instrumentation.ts)), so the first visitors already get live content. The log says `Startup: prebuilt pages invalidated…`.
 
 ### Option B — database in Docker, apps on the host
 
@@ -100,6 +108,7 @@ pnpm dev            # api on :3001 and web on :3000, in watch mode
 | `pnpm typecheck`    | `tsc --noEmit` in every package                                                                |
 | `pnpm test`         | Unit tests (Jest in api, Vitest in web, `node --test` in shared)                               |
 | `pnpm test:e2e`     | API end-to-end tests with Supertest against `TEST_DATABASE_URL` (**needs a running Postgres**) |
+| `pnpm e2e`          | Browser tests (Playwright) of the acceptance flow against a running stack (**see Testing**)    |
 | `pnpm format`       | Prettier on the whole repository                                                               |
 | `pnpm format:check` | Checks formatting (useful in CI)                                                               |
 
@@ -131,6 +140,7 @@ The API **validates its variables at startup** ([`env.validation.ts`](apps/api/s
 | `INTERNAL_API_TOKEN`                                                    | Secret of the web server's own API calls (build/ISR), exempt from rate limits   |
 | `THROTTLE_*`                                                            | Global rate limit and the stricter ones for `/auth/*` and `/search`             |
 | `CACHE_TTL_MS`                                                          | Default cache TTL                                                               |
+| `SEED_DEMO_DATA`                                                        | `true` loads the demo seed even with `NODE_ENV=production` (demo deployments)   |
 | `SEED_ADMIN_PASSWORD`, `SEED_USER_PASSWORD`                             | Passwords of the demo accounts created by the seed                              |
 | `KRW_TO_BRL`, `KRW_TO_USD`                                              | Exchange rates written to the `ExchangeRate` table by the seed (**estimates**)  |
 | `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_SITE_URL`                           | URLs seen by the browser (inlined into the web build)                           |
@@ -162,17 +172,26 @@ To change the schema: edit `schema.prisma`, run `pnpm --filter @korea-project/ap
 [`apps/api/prisma/seed`](apps/api/prisma/seed) loads 4 cities (Seoul, Busan, Jeju, Incheon) with 19 neighborhoods, 130 well-known places across 8 categories (texts in English and Portuguese), 36 accommodations, daily cost estimates per travel style, demo users, reviews in both languages, favorites and exchange rates.
 
 - **Idempotent:** every row is upserted by its natural key in a single transaction, so it can run any number of times.
-- **When it runs:** in Docker, the `migrate` service seeds after migrating **only when `NODE_ENV` is not `production`** (the development override sets `development`). Manually: `pnpm --filter @korea-project/api db:seed`.
+- **When it runs:** in Docker, the `migrate` service seeds after migrating **only when `NODE_ENV` is not `production`** (the development override sets `development`), or when `SEED_DEMO_DATA=true`. Manually: `pnpm --filter @korea-project/api db:seed`.
 - **Demo accounts:** `admin@example.com` (ADMIN, password `SEED_ADMIN_PASSWORD`) and `ana.souza@`, `bruno.lima@`, `carla.mendes@`, `diego.rocha@`, `emily.carter@`, `grace.kim@example.com` (password `SEED_USER_PASSWORD`).
 - **Integrity tests** ([`seed-data.spec.ts`](apps/api/prisma/seed/seed-data.spec.ts)) check slugs, translations, coordinates, opening hours, category counts and references, without a database.
 
-> ⚠️ **Prices, opening hours, average spend and exchange rates are planning estimates**, not verified data — review them before relying on them. Images are placeholders from [picsum.photos](https://picsum.photos) (deterministic per slug), to be replaced with real photos.
+> ⚠️ **Prices, opening hours, average spend and exchange rates are planning estimates**, not verified data — review them before relying on them. 82 places and the 4 cities have credited Wikimedia Commons photos; the other places use placeholders from [picsum.photos](https://picsum.photos) (deterministic per slug).
 
 ## Testing
 
 - **Unit tests** (`pnpm test`) need no database.
 - **End-to-end tests** (`pnpm test:e2e`) run the full Nest app with Supertest against `TEST_DATABASE_URL` (default: `korea_project_test` on the Compose Postgres). Before the suite, [`global-setup.ts`](apps/api/test/global-setup.ts) **drops and recreates** that database, applies the migrations and loads the seed, so every run starts from the same state and never touches development data.
 - **Safety guard:** the e2e suite refuses to run unless the database name contains `_test` ([`test-database.ts`](apps/api/test/test-database.ts)).
+- **Web unit and component tests** (Vitest + Testing Library + jest-axe) cover the components, hooks, proxy, filters, SEO helpers, security headers and route handlers.
+- **Browser tests** ([`apps/web/e2e`](apps/web/e2e), Playwright) run the SPEC's acceptance flow on desktop and mobile (Pixel 7) viewports: choose a city → the map and its place list → the cost calculator → a section with a filter in the URL; sign up → review a place → the count updates → delete it; sign up → reload → the session is restored; anonymous visitors are redirected from `/account` and `/admin` to the login page. They run against a **running stack** (dev or production compose, with the demo seed) and use the installed Google Chrome, so nothing is downloaded:
+
+  ```bash
+  docker compose up -d
+  pnpm e2e
+  ```
+
+  `E2E_BASE_URL` points them elsewhere (default `http://localhost:3000`). They create throwaway accounts, so the config **refuses any host other than localhost** unless `E2E_ALLOW_REMOTE=true` (for a disposable staging stack only). On failure, a trace is kept in `apps/web/test-results/` (`pnpm --filter @korea-project/web exec playwright show-trace <trace.zip>`).
 
 ## API endpoints
 
@@ -225,7 +244,7 @@ API error messages are meant for developers; the web app translates errors by `c
 
 Next.js App Router in [`apps/web`](apps/web), with next-intl for routing and messages.
 
-- **Rendering:** Home, city pages (`/cities/[slug]`) and city sections (`/cities/[slug]/[section]`) are statically generated and refreshed with ISR (every 5 minutes). When the API is not reachable at build time (e.g. the Docker image build), city pages are generated on their first request instead, and the Home is built with a friendly "cities unavailable" notice that ISR replaces.
+- **Rendering:** Home, city pages (`/cities/[slug]`) and city sections (`/cities/[slug]/[section]`) are statically generated and refreshed with ISR (every 5 minutes). When the API is not reachable at build time (e.g. the Docker image build), city and place pages are generated on their first request instead, and the Home is built with a friendly "cities unavailable" notice that the server replaces as soon as it starts and the API answers (see Getting started). `loading.tsx` skeletons must not read request data (they receive no route params): their translated label comes from a client component, otherwise every on-demand ISR page fails with `DYNAMIC_SERVER_USAGE`.
 - **Filters stay out of the static pages:** section filters live in the URL (`?district=hongdae&price=1,2&rating=4&difficulty=easy&sort=price&page=2`, stays: `tier`, `type`, `sort=price-desc`). The proxy ([`src/proxy.ts`](apps/web/src/proxy.ts)) rewrites a section URL that has filter parameters to the internal dynamic route `[section]/filtered`, so the unfiltered page never reads the query string and stays static. The address bar keeps the public URL, filtered pages are `noindex` with a canonical to the unfiltered page, and the internal route answers 404 when requested directly. Every filter value is validated ([`filters.ts`](apps/web/src/features/sections/filters.ts)); an invalid value falls back to the default.
 - **Currency:** the server never reads the currency cookie (that would make pages dynamic). The HTML renders the locale's default currency and a client provider applies the visitor's choice after hydration.
 - **Session (no tokens in localStorage):** the access token lives only in memory; the refresh token is an httpOnly cookie. On every page load the browser calls `POST /api/v1/auth/refresh` to restore the session (the header shows a neutral placeholder meanwhile). Refreshing is single-flight — requests that expire together share one refresh — and serialized across tabs with the Web Locks API, because refresh tokens rotate and a token presented twice revokes the whole session. Static pages render the signed-out shell; everything user-specific runs on the client, so ISR is unaffected.
@@ -247,13 +266,71 @@ Next.js App Router in [`apps/web`](apps/web), with next-intl for routing and mes
 - [ ] **Do not expose the API port publicly** when `TRUST_PROXY` > 0 (direct clients could spoof `X-Forwarded-For`). Browsers only need the web app; publish the API (or Swagger) only on a private network.
 - [ ] **Photos: copy them to your own storage.** The MVP hotlinks Wikimedia Commons thumbnails (allowed, and Next's image optimizer caches them), but for production copy each file to your storage (S3/Cloudinary, see Extension points) and keep its credit: Wikimedia asks heavy users not to hotlink, and a renamed or deleted file would break the image. Replace the remaining placeholders with real, licensed photos.
 - [ ] **A strong, private `INTERNAL_API_TOKEN`** (e.g. `openssl rand -base64 36`), the same in the API and the web server, never exposed to browsers (no `NEXT_PUBLIC_` prefix). Rotate it if it leaks: whoever has it bypasses the rate limits.
-- [ ] **HTTPS and `COOKIE_SECURE=true`**, so the refresh cookie is only sent over TLS.
+- [ ] **HTTPS and `COOKIE_SECURE=true`**, so the refresh cookie is only sent over TLS. Set `NEXT_PUBLIC_SITE_URL` to the real https origin (canonical URLs, sitemap, Open Graph) and `CORS_ORIGINS` to it.
+- [ ] **New secrets:** `JWT_ACCESS_SECRET` and `JWT_REFRESH_SECRET` (`openssl rand -base64 48`), a strong `POSTGRES_PASSWORD`. The values in `.env.example` are public.
+- [ ] **No demo data:** keep `SEED_DEMO_DATA=false`. If a demo seed was ever loaded, delete the demo accounts or at least change their passwords — `admin@example.com` is an ADMIN.
+- [ ] **Exchange rates set by an admin** (`/admin/exchange-rates`), otherwise the calculator answers "rate unavailable" for USD/BRL.
+- [ ] **Swagger:** `SWAGGER_ENABLED=false` unless the API documentation is meant to be public.
+- [ ] **Database backups** (e.g. scheduled `pg_dump` or the managed provider's snapshots) and `prisma migrate deploy` as a release step, never `migrate dev` or `migrate reset`.
+- [ ] **Review the estimates** (prices, opening hours, average spend) before presenting them as current.
 
 - [ ] **Map tiles — OpenStreetMap tile usage policy.** The default tiles come from `tile.openstreetmap.org`, which is run by volunteers and donations. Its [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) forbids heavy use, requires a valid identifying User-Agent/Referer and visible attribution, and the service can block a site at any time without notice. Before going live, review the policy and either confirm the expected traffic complies or set `NEXT_PUBLIC_MAP_TILE_URL` / `NEXT_PUBLIC_MAP_TILE_ATTRIBUTION` to a commercial or self-hosted tile provider. Keep the attribution visible either way.
 
-## Extension points
+## Extension guide
 
-- **Automatic exchange rates (not implemented):** add a provider client and a scheduled job (e.g. `@nestjs/schedule`) that calls `ExchangeRatesService.upsert(currency, rate, '<provider>')`. Nothing else changes: the table, the cache invalidation and every reader already go through that service. Keep the admin route as a manual override.
+The MVP keeps infrastructure minimal on purpose (one API process, in-memory cache, Postgres only). Each item below names the single place to change.
+
+### A new API module
+
+1. `apps/api/src/modules/<name>/` with `<name>.module.ts`, `<name>.controller.ts`, `<name>.service.ts`, `<name>.repository.ts` (the only file that touches Prisma) and `dto/` (class-validator, `@ApiProperty` for Swagger).
+2. Register the module in [`app.module.ts`](apps/api/src/app.module.ts). Routes are versioned automatically (`/api/v1/...`); add `@Public()` to public endpoints (JWT is required by default) and `@Roles('ADMIN')` to admin ones.
+3. Other modules use it only through its **exported service**, never its tables. If it combines domains, put that in a small composition module (like `city-overview`).
+4. Schema changes: edit `schema.prisma`, `db:migrate --name <change>`, review the SQL. Translatable text goes in a `<Entity>Translation` table with the locale CHECK constraint (copy it from the i18n migration).
+5. Regenerate the web client: `pnpm --filter @korea-project/web gen:api` (API running) and commit `schema.d.ts`.
+6. Tests: a `*.spec.ts` unit test next to the service and an e2e spec in `apps/api/test/`.
+
+### Redis cache
+
+Everything injects `CACHE_MANAGER`; the store is chosen only in [`app-cache.module.ts`](apps/api/src/common/cache/app-cache.module.ts). Add `@keyv/redis`, a `REDIS_URL` variable (validated in `env.validation.ts`), `stores: [new KeyvRedis(url)]` in the factory and a `redis` service in `docker-compose.yml`. Needed as soon as the API runs **more than one instance**: the in-memory cache and the cache invalidation after admin writes are per process. With several instances, also move the throttler storage to Redis (`@nest-lab/throttler-storage-redis`), or limits become per instance.
+
+### Background jobs (BullMQ)
+
+For work that should not run inside a request (sending emails, importing photos, recomputing aggregates, fetching exchange rates): add `@nestjs/bullmq` with the same Redis, a `jobs` module with one queue per kind of work, and processors that call the existing services. Run the processors in a separate container (same image, another entrypoint) so a slow job never delays the API.
+
+### Domain events (event-emitter)
+
+Today side effects are direct calls (e.g. a review write recomputes the place's `ratingAvg`). To decouple them, add `@nestjs/event-emitter`, emit events from the owning service after the transaction commits (`review.created`, `place.updated`…) and move side effects into listeners (cache invalidation, a BullMQ job, notifications). Keep anything that must be consistent with the write (the rating) inside the transaction.
+
+### Uploads (S3 or Cloudinary)
+
+Photos are stored as `{ url, credit }` objects in JSON columns and validated by the shared `validatePhotos` ([`packages/shared`](packages/shared/src)), so storage can change without a migration:
+
+1. An `uploads` API module with an ADMIN-only endpoint that returns a **pre-signed upload URL** (S3/R2: `@aws-sdk/s3-presigner`; Cloudinary: a signed upload preset). The browser uploads directly; the API never streams files.
+2. Validate type and size in the signature (images only, e.g. ≤ 10 MB) and store only the final public URL.
+3. Add the bucket/CDN host to `images.remotePatterns` in [`next.config.ts`](apps/web/next.config.ts) (the CSP needs nothing else: images go through `next/image`).
+4. In the admin [photos editor](apps/web/src/features/admin/places/photos-editor.tsx), add an "Upload" button next to the URL field. Keep the credit fields: they are required for third-party photos.
+
+### Map provider and map tiles
+
+- **Tiles only** (same Leaflet map): set `NEXT_PUBLIC_MAP_TILE_URL` and `NEXT_PUBLIC_MAP_TILE_ATTRIBUTION` (inlined at build time, so rebuild the web image). The tile host is added to the CSP's `img-src` automatically ([`security-headers.ts`](apps/web/security-headers.ts)).
+- **Another library** (e.g. Mapbox GL JS, MapLibre): `MapView` takes provider-agnostic points and only `leaflet-map.tsx` knows Leaflet. Write another component with the same props, load it with `next/dynamic` (`ssr: false`), and extend the CSP (`connect-src`/`worker-src` for vector tiles, `script-src` if the library needs a CDN). Keep the accessible place list and the per-category icons.
+
+### Exchange-rate provider
+
+Add a provider client (e.g. an ECB or Open Exchange Rates API) and a scheduled job (`@nestjs/schedule`, or a BullMQ repeatable job) that calls `ExchangeRatesService.upsert(currency, rate, '<provider>')`. Nothing else changes: the table, the cache invalidation and every reader already go through that service. Keep the admin route as a manual override, and keep the "rate unavailable" behavior when the provider fails rather than storing a zero.
+
+### A new language
+
+1. Add the BCP 47 tag to `LOCALES` and its default currency to `DEFAULT_CURRENCY_BY_LOCALE` in [`packages/shared/src/i18n.ts`](packages/shared/src/i18n.ts).
+2. A migration that updates the locale CHECK constraints of every translation table (and `Review.locale`).
+3. `apps/web/src/messages/<tag>.json` with every key of `en.json` (a test fails on missing keys), and, if the URL prefix differs from the tag, an entry in `localePrefix.prefixes` in [`routing.ts`](apps/web/src/i18n/routing.ts).
+4. Translate the content in `/admin` (missing translations fall back to English, and the API says which locale it returned). The sitemap and the hreflang alternates pick the new locale up from `LOCALES`.
+
+### A new place category
+
+1. Add it to `enum PlaceCategory` in `schema.prisma` (migration) and to the shared enum in [`packages/shared/src/enums.ts`](packages/shared/src/enums.ts).
+2. Web: its icon and color in [`categories.ts`](apps/web/src/lib/categories.ts) (`CATEGORY_META`), its section slug in [`sections.ts`](apps/web/src/lib/sections.ts), its labels in both message files (`categoryShortcuts`, `city.sections`) and its schema.org type in [`structured-data.ts`](apps/web/src/lib/structured-data.ts).
+3. Regenerate the API client; TypeScript then points at every `Record<PlaceCategory, …>` that still lacks it.
 
 ## Roadmap
 
@@ -261,5 +338,7 @@ Next.js App Router in [`apps/web`](apps/web), with next-intl for routing and mes
 2. ✅ Prisma schema (with i18n), migrations and seed
 3. ✅ API: auth, users, cities, districts, places, accommodations, reviews, favorites, cost estimates, exchange rates + tests
 4. ✅ Web: base layout, design system, locale routing, Home, cross-city search, city page and sections, map
-5. Cost calculator, place page, reviews, auth, favorites
-6. Admin panel, SEO, optimizations, tests, final README with an extension guide
+5. ✅ Cost calculator, place page, reviews, auth, favorites
+6. ✅ Admin panel, SEO, real photos, optimizations (performance and security headers), browser tests, final README with an extension guide
+
+Possible next steps: automatic exchange rates, uploads to own storage, Redis + several API instances, more cities and languages (see the [Extension guide](#extension-guide)).

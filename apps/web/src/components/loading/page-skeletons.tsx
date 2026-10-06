@@ -1,18 +1,6 @@
-import { getTranslations } from 'next-intl/server';
-import type { ReactNode } from 'react';
 import { Container } from '@/components/ui/container';
 import { CardSkeleton, Skeleton } from '@/components/ui/skeleton';
-
-/** Busy region announced once to screen readers; the shapes below are decorative. */
-async function Busy({ children }: { children: ReactNode }) {
-  const t = await getTranslations('loading');
-  return (
-    <div role="status" aria-busy="true" aria-live="polite">
-      <span className="sr-only">{t('page')}</span>
-      {children}
-    </div>
-  );
-}
+import { Busy } from './busy';
 
 const cards = (count: number) => (
   <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

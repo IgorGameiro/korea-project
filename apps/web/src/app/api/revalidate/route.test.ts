@@ -7,6 +7,7 @@ vi.mock('next/cache', () => ({ revalidateTag, revalidatePath }));
 vi.mock('server-only', () => ({}));
 
 const { POST } = await import('./route');
+const { issueStartupToken } = await import('@/lib/startup-refresh');
 
 const post = (authorization?: string) =>
   POST(
@@ -67,6 +68,39 @@ describe('POST /api/revalidate', () => {
   it('says so when the API cannot be reached', async () => {
     apiReturns(new Error('ECONNREFUSED'));
     expect((await post('Bearer the-token')).status).toBe(502);
+    expect(revalidateTag).not.toHaveBeenCalled();
+  });
+
+  it('accepts the one-time startup token once, without asking the API', async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal('fetch', fetchSpy);
+    const token = issueStartupToken();
+    const withToken = () =>
+      POST(
+        new NextRequest('http://localhost:3000/api/revalidate', {
+          method: 'POST',
+          headers: { 'x-startup-token': token },
+        }),
+      );
+
+    expect((await withToken()).status).toBe(200);
+    expect(revalidatePath).toHaveBeenCalledWith('/', 'layout');
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    revalidatePath.mockReset();
+    expect((await withToken()).status).toBe(401);
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it('refuses a wrong startup token', async () => {
+    issueStartupToken();
+    const response = await POST(
+      new NextRequest('http://localhost:3000/api/revalidate', {
+        method: 'POST',
+        headers: { 'x-startup-token': 'guess' },
+      }),
+    );
+    expect(response.status).toBe(401);
     expect(revalidateTag).not.toHaveBeenCalled();
   });
 });

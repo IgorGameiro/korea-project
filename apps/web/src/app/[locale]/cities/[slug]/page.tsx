@@ -51,6 +51,7 @@ export default async function CityPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations('city');
   const tc = await getTranslations('calculator');
+  const tm = await getTranslations('map');
   const format = await getFormatter();
   const api = serverApi(CITY_REVALIDATE);
 
@@ -171,7 +172,7 @@ export default async function CityPage({ params }: Props) {
           <h2 id="map-title" className="mb-4 text-2xl font-bold">
             {t('mapTitle')}
           </h2>
-          <MapView points={points} label={t('about', { city: city.name })} />
+          <MapView points={points} label={tm('label', { name: city.name })} />
         </section>
 
         {topRated.data.length > 0 ? (

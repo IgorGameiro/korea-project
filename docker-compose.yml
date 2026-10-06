@@ -32,6 +32,8 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+      # true loads the demo data in production mode (e.g. `SEED_DEMO_DATA=true docker compose up`).
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-false}
     depends_on:
       postgres:
         condition: service_healthy

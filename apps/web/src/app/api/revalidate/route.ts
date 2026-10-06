@@ -2,6 +2,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import type { NextRequest } from 'next/server';
 import { CONTENT_TAG } from '@/lib/api/server';
 import { originOf, serverApiUrl } from '@/lib/env';
+import { consumeStartupToken, STARTUP_TOKEN_HEADER } from '@/lib/startup-refresh';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +19,9 @@ const error = (status: number, code: string, message: string) =>
  * missed dependency would silently show stale data. Pages regenerate lazily, on their next visit.
  */
 export async function POST(request: NextRequest): Promise<Response> {
+  // The server itself, once after starting (see lib/startup-refresh).
+  if (consumeStartupToken(request.headers.get(STARTUP_TOKEN_HEADER))) return invalidate();
+
   const authorization = request.headers.get('authorization');
   if (!authorization?.startsWith('Bearer ')) {
     return error(401, 'UNAUTHORIZED', 'Authentication required');
@@ -37,7 +41,10 @@ export async function POST(request: NextRequest): Promise<Response> {
   if (!me.ok) return error(502, 'API_UNAVAILABLE', 'The API is unavailable');
   const user = (await me.json()) as { role?: string };
   if (user.role !== 'ADMIN') return error(403, 'FORBIDDEN', 'Requires the ADMIN role');
+  return invalidate();
+}
 
+function invalidate(): Response {
   // expire: 0 — the next visit gets fresh data (an admin checks the page right after saving).
   revalidateTag(CONTENT_TAG, { expire: 0 });
   revalidatePath('/', 'layout');
