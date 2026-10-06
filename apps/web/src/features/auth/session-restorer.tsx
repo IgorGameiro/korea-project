@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
-import { refreshSession } from './session';
+import { restoreSession } from './session';
 
-/** Restores the session once per page load from the refresh cookie. Renders nothing. */
+/** Restores the session once per page load (when a session cookie exists). Renders nothing. */
 export function SessionRestorer() {
   useEffect(() => {
-    void refreshSession();
+    void restoreSession();
   }, []);
   return null;
 }

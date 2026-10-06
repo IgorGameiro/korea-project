@@ -32,7 +32,8 @@ export function Gallery({ name, photos }: { name: string; photos: Photo[] }) {
             src={first!.url}
             alt={alt(0)}
             fill
-            priority
+            loading="eager"
+            fetchPriority="high"
             sizes={rest.length > 0 ? '(min-width: 640px) 66vw, 100vw' : '100vw'}
             className="object-cover"
           />

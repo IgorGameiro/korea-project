@@ -1,6 +1,7 @@
 'use client';
 
 import { useLocale, useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { buttonClasses } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
@@ -9,7 +10,7 @@ import { useSession } from '@/features/auth/use-session';
 import { Link } from '@/i18n/navigation';
 import type { ReviewDto } from '@/lib/api/types';
 import { setPlaceRating } from './place-rating-store';
-import { ReviewForm } from './review-form';
+import type { ReviewForm as ReviewFormComponent } from './review-form';
 import { ReviewItem } from './review-item';
 import {
   createReview,
@@ -21,6 +22,13 @@ import {
   type ReviewInput,
   updateReview,
 } from './reviews-api';
+
+// The form (React Hook Form + Zod, ~100 KB) is only for signed-in visitors: loaded on demand, so a
+// place page does not ship it to everyone.
+const ReviewForm = dynamic(() => import('./review-form').then((m) => m.ReviewForm), {
+  ssr: false,
+  loading: () => <Skeleton className="h-64 w-full" />,
+}) as typeof ReviewFormComponent;
 
 /** Same page size as the place endpoint's "recent reviews". */
 export const REVIEWS_PAGE_SIZE = 5;

@@ -3,6 +3,7 @@ import { login, logout } from './actions';
 import { installFakeApi, PASSWORD, USER } from '@/test/fake-auth-api';
 import {
   authFetch,
+  restoreSession,
   getAccessToken,
   refreshSession,
   resetSessionForTests,
@@ -38,9 +39,18 @@ describe('session', () => {
     expect((await (await api('/users/me/favorites')).json()).ok).toBe(true);
   });
 
-  it('without a cookie a reload settles as anonymous', async () => {
-    await refreshSession();
+  it('without a session cookie a page load settles as anonymous, with no request', async () => {
+    await restoreSession();
     expect(sessionStore.getSnapshot().status).toBe('anonymous');
+    expect(fake.refreshCalls()).toBe(0);
+  });
+
+  it('with a session cookie a page load restores the session', async () => {
+    await login({ email: USER.email, password: PASSWORD });
+    resetSessionForTests();
+    await restoreSession();
+    expect(sessionStore.getSnapshot()).toEqual({ status: 'authenticated', user: USER });
+    expect(fake.refreshCalls()).toBe(1);
   });
 
   it('refreshes once when many requests expire at the same time (single-flight)', async () => {

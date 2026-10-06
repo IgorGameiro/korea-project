@@ -14,3 +14,17 @@ export const refreshCookieOptions = (secure: boolean): CookieOptions => ({
   sameSite: 'lax',
   path: `/${API_PREFIX}/v${DEFAULT_API_VERSION}/auth`,
 });
+
+/**
+ * Readable hint that a session cookie exists ("1", no secret), so the web app only tries to restore
+ * a session when there is one — anonymous visitors make no refresh request (and log no 401). It
+ * proves nothing: the refresh token itself stays httpOnly and is what the API checks.
+ */
+export const SESSION_HINT_COOKIE = 'has_session';
+
+export const sessionHintCookieOptions = (secure: boolean): CookieOptions => ({
+  httpOnly: false,
+  secure,
+  sameSite: 'lax',
+  path: '/',
+});

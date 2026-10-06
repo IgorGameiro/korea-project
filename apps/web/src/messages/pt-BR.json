@@ -59,7 +59,6 @@
     "close": "Fechar"
   },
   "header": {
-    "home": "Início do Guia de Viagem da Coreia",
     "mainNav": "Principal",
     "switchLanguage": "Mudar idioma",
     "switchCurrency": "Mudar moeda"
@@ -110,7 +109,7 @@
     "details": "Informações práticas",
     "address": "Endereço",
     "website": "Site",
-    "websiteLabel": "Site oficial de {name} (abre em nova aba)",
+    "websiteLabel": "site oficial de {name} (abre em nova aba)",
     "hours": "Horário de funcionamento",
     "seoulTime": "Horários no fuso da Coreia (KST).",
     "closed": "Fechado",
@@ -223,7 +222,7 @@
     "legend": "Legenda do mapa",
     "list": "Lugares no mapa",
     "showOnMap": "Ver no mapa",
-    "showOnMapLabel": "Mostrar {name} no mapa",
+    "showOnMapLabel": "Ver no mapa: {name}",
     "viewDetails": "Ver detalhes",
     "empty": "Nenhum lugar para mostrar no mapa."
   },
@@ -486,7 +485,6 @@
   "favorites": {
     "save": "Salvar {name} nos favoritos",
     "saveShort": "Salvar",
-    "saved": "Salvo",
     "loginToSave": "Entre para salvar {name} nos favoritos",
     "error": "Não foi possível atualizar seus favoritos. Tente de novo."
   },
@@ -517,5 +515,8 @@
     "places": "Lugares",
     "in": "em {city}",
     "unavailable": "Não foi possível carregar os créditos agora. Tente de novo em alguns minutos."
+  },
+  "loading": {
+    "page": "Carregando…"
   }
 }

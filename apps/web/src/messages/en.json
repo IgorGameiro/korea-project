@@ -59,7 +59,6 @@
     "close": "Close"
   },
   "header": {
-    "home": "Korea Travel Guide home",
     "mainNav": "Main",
     "switchLanguage": "Change language",
     "switchCurrency": "Change currency"
@@ -110,7 +109,7 @@
     "details": "Practical information",
     "address": "Address",
     "website": "Website",
-    "websiteLabel": "Official website of {name} (opens in a new tab)",
+    "websiteLabel": "official website of {name} (opens in a new tab)",
     "hours": "Opening hours",
     "seoulTime": "Times are in Korea time (KST).",
     "closed": "Closed",
@@ -223,7 +222,7 @@
     "legend": "Map legend",
     "list": "Places on the map",
     "showOnMap": "Show on map",
-    "showOnMapLabel": "Show {name} on the map",
+    "showOnMapLabel": "Show on map: {name}",
     "viewDetails": "View details",
     "empty": "No places to show on the map."
   },
@@ -486,7 +485,6 @@
   "favorites": {
     "save": "Save {name} to favorites",
     "saveShort": "Save",
-    "saved": "Saved",
     "loginToSave": "Log in to save {name} to favorites",
     "error": "Could not update your favorites. Please try again."
   },
@@ -517,5 +515,8 @@
     "places": "Places",
     "in": "in {city}",
     "unavailable": "The credits could not be loaded right now. Please try again in a few minutes."
+  },
+  "loading": {
+    "page": "Loading…"
   }
 }

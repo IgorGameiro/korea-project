@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from '@testing-library/react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderWithApp } from '@/test/render';
@@ -65,7 +65,7 @@ describe('MapView', () => {
 
   it('"Show on map" selects the point on the map', () => {
     renderWithApp(<MapView points={points} label="Map of Seoul" />);
-    const button = screen.getByRole('button', { name: 'Show Gwangjang Market on the map' });
+    const button = screen.getByRole('button', { name: 'Show on map: Gwangjang Market' });
     expect(button).toHaveAttribute('aria-pressed', 'false');
     fireEvent.click(button);
     expect(button).toHaveAttribute('aria-pressed', 'true');
@@ -76,5 +76,45 @@ describe('MapView', () => {
     renderWithApp(<MapView points={[]} label="Map of Seoul" />);
     expect(screen.getByText('No places to show on the map.')).toBeInTheDocument();
     expect(screen.queryByTestId('map')).toBeNull();
+  });
+});
+
+describe('MapView loading', () => {
+  it('mounts the map only when it nears the viewport (Leaflet and tiles wait)', () => {
+    let trigger: ((entries: { isIntersecting: boolean }[]) => void) | undefined;
+    const observe = vi.fn();
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        constructor(callback: (entries: { isIntersecting: boolean }[]) => void) {
+          trigger = callback;
+        }
+        observe = observe;
+        disconnect = vi.fn();
+      },
+    );
+    renderWithApp(<MapView points={points} label="Map of Seoul" compact />);
+    expect(screen.queryByTestId('map')).toBeNull();
+    expect(screen.getByRole('status')).toHaveTextContent('Loading map…');
+    expect(observe).toHaveBeenCalledWith(screen.getByRole('region', { name: 'Map of Seoul' }));
+
+    act(() => trigger?.([{ isIntersecting: true }]));
+    expect(screen.getByTestId('map')).toBeInTheDocument();
+    vi.unstubAllGlobals();
+  });
+});
+
+describe('MapView server render', () => {
+  it('renders the same placeholder on the server as on the first client render (no hydration mismatch)', async () => {
+    const { renderToString } = await import('react-dom/server');
+    const { NextIntlClientProvider } = await import('next-intl');
+    const en = (await import('@/messages/en.json')).default;
+    const html = renderToString(
+      <NextIntlClientProvider locale="en" messages={en} timeZone="Asia/Seoul">
+        <MapView points={points} label="Map of Seoul" compact />
+      </NextIntlClientProvider>,
+    );
+    expect(html).toContain('Loading map…');
+    expect(html).not.toContain('data-testid="map"');
   });
 });

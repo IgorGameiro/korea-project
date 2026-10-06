@@ -62,6 +62,22 @@ export function refreshSession(): Promise<string | null> {
   return inFlight;
 }
 
+/** Readable hint set by the API next to the httpOnly refresh cookie (no secret in it). */
+const SESSION_HINT = /(?:^|;\s*)has_session=1(?:;|$)/;
+const hasSessionHint = () => typeof document !== 'undefined' && SESSION_HINT.test(document.cookie);
+
+/**
+ * Page-load restore: only when the browser holds a session cookie (its readable hint says so).
+ * Anonymous visitors settle at once, without a request (and without a 401 in the console).
+ */
+export function restoreSession(): Promise<string | null> {
+  if (!hasSessionHint()) {
+    if (state.status === 'restoring') setState(ANONYMOUS);
+    return Promise.resolve(null);
+  }
+  return refreshSession();
+}
+
 async function doRefresh(): Promise<string | null> {
   let response: Response;
   try {

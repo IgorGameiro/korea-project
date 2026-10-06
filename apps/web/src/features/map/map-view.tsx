@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
-import { useRef, useState } from 'react';
+import { type RefObject, useEffect, useRef, useState } from 'react';
 import { Icon } from '@/components/ui/icon';
 import { Link } from '@/i18n/navigation';
 import { type MapPoint, markerStyle } from './types';
@@ -19,6 +19,38 @@ function MapLoading() {
 
 // Leaflet touches `window` on import, so the map only ever renders in the browser.
 const LeafletMap = dynamic(() => import('./leaflet-map'), { ssr: false, loading: MapLoading });
+
+/**
+ * True once the element is near the viewport. Leaflet and its tiles (~300 KB) wait until then, so
+ * a map below the fold does not compete with the page's main photo. Without IntersectionObserver
+ * (old browsers, tests) the map loads right away.
+ */
+function useNearViewport(ref: RefObject<HTMLElement | null>, margin = '400px') {
+  // Starts false on the server and in the browser alike, so hydration sees the same markup.
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const element = ref.current;
+    if (near || !element) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      // No observer (old browsers, tests): load right away, after hydration.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setNear(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setNear(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: margin },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref, near, margin]);
+  return near;
+}
 
 /**
  * Interactive map plus a keyboard-friendly list of the same points. The list is the accessible way
@@ -38,17 +70,23 @@ export function MapView({
   const kindLabel = useKindLabel();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
+  const near = useNearViewport(mapRef);
 
   if (points.length === 0) return <p className="text-navy-700">{t('empty')}</p>;
 
   if (compact) {
     return (
       <div
+        ref={mapRef}
         role="region"
         aria-label={label}
         className="isolate h-56 overflow-hidden rounded-[var(--radius-card)] ring-1 ring-navy-100"
       >
-        <LeafletMap points={points} selectedId={null} kindLabel={kindLabel} />
+        {near ? (
+          <LeafletMap points={points} selectedId={null} kindLabel={kindLabel} />
+        ) : (
+          <MapLoading />
+        )}
       </div>
     );
   }
@@ -69,7 +107,11 @@ export function MapView({
           aria-label={label}
           className="isolate h-80 overflow-hidden rounded-[var(--radius-card)] ring-1 ring-navy-100 sm:h-[28rem]"
         >
-          <LeafletMap points={points} selectedId={selectedId} kindLabel={kindLabel} />
+          {near ? (
+            <LeafletMap points={points} selectedId={selectedId} kindLabel={kindLabel} />
+          ) : (
+            <MapLoading />
+          )}
         </div>
         <ul aria-label={t('legend')} className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
           {kinds.map((kind) => (

@@ -71,7 +71,7 @@ export function FavoriteButton({
         className={`${shape} ${saved ? 'text-coral-600' : 'text-navy-700 hover:text-coral-600'}`}
       >
         <Icon name="heart" filled={saved} className="size-5" />
-        {variant === 'full' ? (saved ? t('saved') : t('saveShort')) : null}
+        {variant === 'full' ? t('saveShort') : null}
       </button>
       {failed ? (
         <span role="alert" className="rounded bg-white px-1 text-xs font-medium text-coral-700">

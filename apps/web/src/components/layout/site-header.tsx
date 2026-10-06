@@ -11,7 +11,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-navy-100 bg-white/95 backdrop-blur">
       <Container className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3">
-        <Link href="/" aria-label={t('header.home')} className="flex items-center gap-2 font-bold">
+        <Link href="/" className="flex items-center gap-2 font-bold">
           <span
             aria-hidden="true"
             className="grid size-8 place-items-center rounded-full bg-coral-500 text-white"

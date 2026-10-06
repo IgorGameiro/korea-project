@@ -56,9 +56,10 @@ export default async function Home({ params }: PageProps<'/[locale]'>) {
           <p className="mt-1 text-navy-700">{t('featuredSubtitle')}</p>
           {featured ? (
             <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {featured.data.map((city) => (
+              {featured.data.map((city, index) => (
                 <li key={city.id} className="flex">
-                  <CityCard city={city} />
+                  {/* The first card is in view on phones (and is then the largest element). */}
+                  <CityCard city={city} eager={index === 0} />
                 </li>
               ))}
             </ul>

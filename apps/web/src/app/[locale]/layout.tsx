@@ -1,6 +1,6 @@
 import type { Locale } from '@korea-project/shared';
 import type { Metadata } from 'next';
-import { Inter, Noto_Sans_KR } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -15,16 +15,9 @@ import { alternatesFor, openGraphFor } from '@/lib/seo';
 import { localeParams } from '@/lib/static-params';
 import '../globals.css';
 
-const inter = Inter({ subsets: ['latin', 'latin-ext'], display: 'swap', variable: '--font-inter' });
-
-// Korean names only. Google Fonts splits Hangul into ~100 unicode-range slices; without preloading,
-// the browser downloads just the slices for the characters actually on the page.
-const notoSansKr = Noto_Sans_KR({
-  weight: ['400', '700'],
-  display: 'swap',
-  preload: false,
-  variable: '--font-noto-kr',
-});
+// Latin covers English and Portuguese (á, ã, ç, õ…): one preloaded file. Korean names use the
+// system's Korean font (see globals.css), which every platform ships — no download, no CSS.
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' });
 
 export const generateStaticParams = localeParams;
 
@@ -55,7 +48,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   });
 
   return (
-    <html lang={locale} className={`${inter.variable} ${notoSansKr.variable}`}>
+    <html lang={locale} className={`${inter.variable}`}>
       <body className="flex min-h-screen flex-col">
         <a href="#main" className="skip-link">
           {t('skipToContent')}

@@ -29,7 +29,12 @@ import { UserDto } from '../users/dto/user.response';
 import { AuthService } from './auth.service';
 import type { IssuedSession, SessionMeta } from './auth.types';
 import { AuthResponseDto, LoginDto, RegisterDto } from './dto/auth.dto';
-import { REFRESH_COOKIE, refreshCookieOptions } from './refresh-cookie';
+import {
+  REFRESH_COOKIE,
+  refreshCookieOptions,
+  SESSION_HINT_COOKIE,
+  sessionHintCookieOptions,
+} from './refresh-cookie';
 
 const sessionMeta = (req: AppRequest): SessionMeta => ({
   userAgent: req.headers['user-agent'],
@@ -98,7 +103,7 @@ export class AuthController {
       const { user, session } = await this.auth.refresh(readRefreshCookie(req), sessionMeta(req));
       return { ...this.respond(res, session), user };
     } catch (error) {
-      res.clearCookie(REFRESH_COOKIE, refreshCookieOptions(this.config.cookieSecure));
+      this.clearSession(res);
       throw error;
     }
   }
@@ -111,7 +116,7 @@ export class AuthController {
   @ApiNoContentResponse()
   async logout(@Req() req: AppRequest, @Res({ passthrough: true }) res: Response): Promise<void> {
     await this.auth.logout(readRefreshCookie(req));
-    res.clearCookie(REFRESH_COOKIE, refreshCookieOptions(this.config.cookieSecure));
+    this.clearSession(res);
   }
 
   @Get('me')
@@ -123,10 +128,20 @@ export class AuthController {
     return this.auth.me(userId);
   }
 
-  /** Sets the refresh cookie and returns the access-token part of the response. */
+  /** Removes the refresh cookie and its readable hint. */
+  private clearSession(res: Response) {
+    res.clearCookie(REFRESH_COOKIE, refreshCookieOptions(this.config.cookieSecure));
+    res.clearCookie(SESSION_HINT_COOKIE, sessionHintCookieOptions(this.config.cookieSecure));
+  }
+
+  /** Sets the refresh cookie (and its hint) and returns the access-token part of the response. */
   private respond(res: Response, session: IssuedSession): Omit<AuthResponseDto, 'user'> {
     res.cookie(REFRESH_COOKIE, session.refreshToken, {
       ...refreshCookieOptions(this.config.cookieSecure),
+      expires: session.refreshExpiresAt,
+    });
+    res.cookie(SESSION_HINT_COOKIE, '1', {
+      ...sessionHintCookieOptions(this.config.cookieSecure),
       expires: session.refreshExpiresAt,
     });
     return { accessToken: session.accessToken, tokenType: 'Bearer', expiresIn: session.expiresIn };

@@ -196,6 +196,33 @@ describe('Auth (e2e)', () => {
     });
   });
 
+  describe('session hint cookie', () => {
+    const cookies = (res: { headers: Record<string, unknown> }) =>
+      (res.headers['set-cookie'] as string[] | undefined) ?? [];
+    const named = (res: { headers: Record<string, unknown> }, name: string) =>
+      cookies(res).find((c) => c.startsWith(`${name}=`));
+
+    it('marks a session with a readable hint, while the refresh token stays httpOnly', async () => {
+      const res = await register().expect(201);
+      const hint = named(res, 'has_session');
+      expect(hint).toMatch(/^has_session=1;/);
+      expect(hint).toContain('Path=/;');
+      expect(hint).not.toMatch(/HttpOnly/i);
+      expect(named(res, 'refresh_token')).toMatch(/HttpOnly/i);
+    });
+
+    it('clears the hint on logout and when the refresh fails', async () => {
+      const first = refreshCookie(await register().expect(201));
+      const out = await http().post(`${AUTH}/logout`).set('Cookie', cookiePair(first)).expect(204);
+      expect(named(out, 'has_session')).toMatch(/^has_session=;.*Expires=Thu, 01 Jan 1970/);
+      const failed = await http()
+        .post(`${AUTH}/refresh`)
+        .set('Cookie', cookiePair(first))
+        .expect(401);
+      expect(named(failed, 'has_session')).toMatch(/^has_session=;/);
+    });
+  });
+
   describe('logout', () => {
     it('revokes the session and clears the cookie', async () => {
       const cookie = cookiePair(refreshCookie(await register().expect(201)));

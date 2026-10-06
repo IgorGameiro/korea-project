@@ -1,6 +1,19 @@
 @import 'tailwindcss';
 
 /*
+ * The won sign (₩) is outside Inter's "latin" subset: drawing it would download Inter's whole
+ * latin-ext file (86 KB) on every page with a price. This face covers only U+20A9 and maps to fonts
+ * already installed (local(), nothing is downloaded); it comes first in --font-sans, so ₩ uses it
+ * and every other character still uses Inter. If none is installed, Inter's file is the fallback.
+ */
+@font-face {
+  font-family: 'Won Sign';
+  src:
+    local('Helvetica Neue'), local('Helvetica'), local('Arial'), local('Segoe UI'), local('Roboto');
+  unicode-range: U+20A9;
+}
+
+/*
  * Design tokens. Palette inspired by Korea: deep navy, white, coral accent.
  * Text colors are chosen for WCAG AA contrast on white (navy-900/700, coral-600 for text).
  */
@@ -21,8 +34,12 @@
 
   --color-sand-50: #faf8f4;
 
-  --font-sans: var(--font-inter), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-korean: var(--font-noto-kr), 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-sans:
+    'Won Sign', var(--font-inter), system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* System Korean fonts (macOS/iOS, Windows, Android/Linux): a web font for a few names added
+     248 render-blocking @font-face rules to every page. */
+  --font-korean:
+    'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', 'Noto Sans CJK KR', sans-serif;
 
   --radius-card: 1rem;
   --shadow-card: 0 1px 2px rgb(11 31 58 / 0.06), 0 4px 16px rgb(11 31 58 / 0.06);

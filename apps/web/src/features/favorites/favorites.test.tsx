@@ -174,7 +174,8 @@ describe('FavoriteButton', () => {
     fireEvent.click(full!);
     expect(full).toHaveAttribute('aria-pressed', 'true'); // before the API answers
     expect(card).toHaveAttribute('aria-pressed', 'true');
-    expect(full).toHaveTextContent('Saved');
+    // The visible text stays "Save": the state is announced by aria-pressed (and drawn by the heart).
+    expect(full).toHaveTextContent('Save');
     await waitFor(() => expect(api.calls).toContain('POST /api/v1/places/p1/favorite'));
 
     fireEvent.click(card!);

@@ -13,6 +13,7 @@ export const USER = {
 export const PASSWORD = 'correct horse battery';
 
 export function installFakeApi() {
+  document.cookie = 'has_session=; path=/; max-age=0';
   let cookie: string | null = null;
   let issued = 0;
   const calls: string[] = [];
@@ -23,6 +24,8 @@ export function installFakeApi() {
     const accessToken = `access-${issued}`;
     validTokens.add(accessToken);
     cookie = `refresh-${issued}`;
+    // The real API sets this readable hint next to the httpOnly refresh cookie.
+    document.cookie = 'has_session=1; path=/';
     return Response.json({ accessToken, tokenType: 'Bearer', expiresIn: 900, user: USER });
   };
 
@@ -48,6 +51,7 @@ export function installFakeApi() {
     }
     if (path === '/api/v1/auth/logout') {
       cookie = null;
+      document.cookie = 'has_session=; path=/; max-age=0';
       return new Response(null, { status: 204 });
     }
     const token = request.headers.get('Authorization')?.replace('Bearer ', '');

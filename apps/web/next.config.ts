@@ -3,6 +3,7 @@ import path from 'node:path';
 import { parseEnv } from 'node:util';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
+import { securityHeaders } from './security-headers';
 
 // One .env at the repository root serves every app (README). Next only reads .env files from the
 // app folder, so load the root one for host runs. Variables already set (Docker) win, and NODE_ENV
@@ -25,6 +26,8 @@ const nextConfig: NextConfig = {
   // Don't let `next dev` write AGENTS.md/CLAUDE.md into the app when it detects an AI agent.
   agentRules: false,
   images: {
+    // AVIF first (much smaller photos, so a faster Largest Contentful Paint), WebP as fallback.
+    formats: ['image/avif', 'image/webp'],
     // Seed placeholders (picsum redirects to fastly.picsum.photos).
     remotePatterns: [
       { protocol: 'https', hostname: 'picsum.photos' },
@@ -33,6 +36,21 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'upload.wikimedia.org', pathname: '/wikipedia/commons/**' },
       { protocol: 'https', hostname: 'thumb.wikimedia.org', pathname: '/wikipedia/commons/**' },
     ],
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: securityHeaders({
+          isDev: process.env.NODE_ENV === 'development',
+          // Same defaults as src/lib/env.ts (mapTiles, siteUrl).
+          tileUrl:
+            process.env.NEXT_PUBLIC_MAP_TILE_URL ||
+            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
+        }),
+      },
+    ];
   },
 };
 

@@ -231,10 +231,10 @@ export default async function PlacePage({ params }: Props) {
                       href={place.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={t('websiteLabel', { name: place.name })}
                       className="break-all text-coral-600 underline underline-offset-4"
                     >
                       {new URL(place.website).hostname}
+                      <span className="sr-only"> — {t('websiteLabel', { name: place.name })}</span>
                     </a>
                   </dd>
                 </div>
